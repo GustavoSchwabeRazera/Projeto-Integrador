@@ -46,7 +46,7 @@ import java.awt.Font;
 			contentPane.setBackground(new Color(175, 244, 198));
 			contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 			setContentPane(contentPane);
-			contentPane.setLayout(new MigLayout("", "[200,grow][200,grow][200,grow][200,grow][200,grow]", "[113.00,grow][][grow][grow][grow][grow][grow][grow][grow][grow]"));
+			contentPane.setLayout(new MigLayout("", "[233.00,grow][200,grow][200,grow][302.00,grow][138.00,grow]", "[113.00,grow][][grow][grow][grow][grow][grow][71.00,grow][54.00,grow][grow]"));
 			
 			//logo
 			JLabel lblNewLabel_3 = new JLabel("");
@@ -64,7 +64,8 @@ import java.awt.Font;
 				public void actionPerformed(ActionEvent e) {
 				}
 			});
-
+			
+			//pesquisar
 			ImageIcon pesquisar = new ImageIcon(tela_inicial.class.getResource("/imagens/pesquisar.png"));
 			Image imgPesquisar = pesquisar.getImage().getScaledInstance(200, 80, Image.SCALE_SMOOTH);
 			
@@ -114,6 +115,7 @@ import java.awt.Font;
 			
 			//perfil
 			JButton btnPerfil = new JButton();
+			btnPerfil.setFont(new Font("Tahoma", Font.BOLD, 11));
 			btnPerfil.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				}
@@ -127,10 +129,80 @@ import java.awt.Font;
 			btnPerfil.setContentAreaFilled(false);
 			btnPerfil.setFocusPainted(false);
 
-			contentPane.add(btnPerfil, "cell 4 0,growx,aligny center");
+			contentPane.add(btnPerfil, "cell 4 0,aligny center");
 			
 			JLabel lblNewLabel_1 = new JLabel("");
 			contentPane.add(lblNewLabel_1, "cell 4 0");
-		}
+							
+			// histórico
+			JButton btnHistorico = new JButton("");
+			btnHistorico.setBorderPainted(false);
+			btnHistorico.addActionListener(new ActionListener() {
+			    public void actionPerformed(ActionEvent e) {
+			    }
+			});
+
+			btnHistorico.setContentAreaFilled(false);
+
+			// tamanho da imagem
+			ImageIcon historico = new ImageIcon(
+			    tela_inicial.class.getResource("/imagens/historico.png")
+			);
+
+			Image imgHistorico = historico.getImage().getScaledInstance(
+			    170, 50, Image.SCALE_SMOOTH
+			);
+			
+			// calendário
+			JButton btnCalendario = new JButton("");
+			btnCalendario.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				}
+			});
+			btnCalendario.setContentAreaFilled(false);
+			btnCalendario.setBorderPainted(false);
+			btnCalendario.setFocusPainted(false);
+
+			// tamanho da imagem
+			ImageIcon calendario = new ImageIcon(
+				tela_inicial.class.getResource("/imagens/calendario.png")
+			);
+
+			Image imgCalendario = calendario.getImage().getScaledInstance(
+				50, 50, Image.SCALE_SMOOTH
+			);
+
+			btnCalendario.setIcon(new ImageIcon(imgCalendario));
+
+			contentPane.add(btnCalendario, "cell 4 7");
+			
+			//historico
+			btnHistorico.setIcon(new ImageIcon(imgHistorico));
+
+			contentPane.add(btnHistorico, "cell 0 8");
+			
+			// notificação
+			JButton btnNotificacao = new JButton("");
+			btnNotificacao.setContentAreaFilled(false);
+			btnNotificacao.setBorderPainted(false);
+			btnNotificacao.setFocusPainted(false);
+
+			btnNotificacao.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				}
+			});
+
+			// tamanho da imagem
+			ImageIcon notificacao = new ImageIcon(
+				tela_inicial.class.getResource("/imagens/notificacao.png")
+			);
+
+			Image imgNotificacao = notificacao.getImage().getScaledInstance(
+				50, 50, Image.SCALE_SMOOTH
+			);
+
+			btnNotificacao.setIcon(new ImageIcon(imgNotificacao));
+
+			contentPane.add(btnNotificacao, "cell 4 8,alignx left");
 	
-	}
+	}}
