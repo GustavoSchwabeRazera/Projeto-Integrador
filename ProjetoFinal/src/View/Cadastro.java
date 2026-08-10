@@ -1,3 +1,4 @@
+
 package View;
 
 import java.awt.EventQueue;
@@ -28,7 +29,6 @@ public class Cadastro extends JFrame {
 	
 	private JComboBox comboBox;
 	private JButton botaoCadastrar;
-	private JButton botaoMostrar;
 	
 
 	/**
@@ -69,8 +69,8 @@ public class Cadastro extends JFrame {
 	            Cadastro.class.getResource("/imagens/Logo.png"));
 
 	    Image logoRedimensionada = logoOriginal.getImage().getScaledInstance(
-	            300,   // largura
-	            150,   // altura
+	            300,
+	            150,
 	            Image.SCALE_SMOOTH);
 
 	    lblNewLabel.setIcon(new ImageIcon(logoRedimensionada));
@@ -85,7 +85,7 @@ public class Cadastro extends JFrame {
 	    JPanel panel = new ImagePanel();
 	    panel.setOpaque(false);
 	    contentPane.add(panel, "cell 2 4,grow");
-	    panel.setLayout(new MigLayout("", "[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]", "[73.00][][][28.00][][][][24.00][][][][][27.00][][][][31.00][35.00][][31.00][grow]"));
+	    panel.setLayout(new MigLayout("", "[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]", "[73.00][][][28.00][][][][24.00][][][][][27.00][][][][31.00][35.00][][31.00][][][][grow]"));
 	    
 	    JLabel lblNewLabel_1 = new JLabel("Nome do Livro");
 	    lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -93,7 +93,8 @@ public class Cadastro extends JFrame {
 	    panel.add(lblNewLabel_1, "cell 0 1 6 1,alignx center");
 	    
 	    txtNome = new JTextField();
-	    panel.add(txtNome, "cell 2 2,growx");
+	    txtNome.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+	    panel.add(txtNome, "cell 2 2,growx,h 42!");
 	    txtNome.setColumns(10);
 	    
 	    JLabel lblNewLabel_1_1_1 = new JLabel("Editora");
@@ -102,8 +103,9 @@ public class Cadastro extends JFrame {
 	    panel.add(lblNewLabel_1_1_1, "cell 0 4 6 1,growx");
 	    
 	    txtEditora = new JTextField();
+	    txtEditora.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 	    txtEditora.setColumns(10);
-	    panel.add(txtEditora, "cell 2 6,growx");
+	    panel.add(txtEditora, "cell 2 6,growx,h 42!");
 	    
 	    JLabel lblNewLabel_1_1_1_1 = new JLabel("Ano de Lançamento");
 	    lblNewLabel_1_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -111,8 +113,9 @@ public class Cadastro extends JFrame {
 	    panel.add(lblNewLabel_1_1_1_1, "cell 0 9 6 1,alignx center");
 	    
 	    txtAno = new JTextField();
+	    txtAno.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 	    txtAno.setColumns(10);
-	    panel.add(txtAno, "cell 2 11,growx");
+	    panel.add(txtAno, "cell 2 11,growx,h 42!");
 	    
 	    JLabel lblNewLabel_1_1_1_1_1 = new JLabel("Autor");
 	    lblNewLabel_1_1_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -120,8 +123,9 @@ public class Cadastro extends JFrame {
 	    panel.add(lblNewLabel_1_1_1_1_1, "cell 0 13 6 1,growx");
 	    
 	    txtAutor = new JTextField();
+	    txtAutor.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 	    txtAutor.setColumns(10);
-	    panel.add(txtAutor, "cell 2 15,growx");
+	    panel.add(txtAutor, "cell 2 15,growx,h 42!");
 	    
 	    JLabel lblNewLabel_1_1_1_1_1_1 = new JLabel("Genero");
 	    lblNewLabel_1_1_1_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -135,14 +139,6 @@ public class Cadastro extends JFrame {
 	    
 	    JPanel panel_1 = new JPanel();
 	    panel_1.setVisible(false);
-	    panel.add(panel_1, "cell 1 20,grow");
-	    
-	   
-	    botaoMostrar = new JButton("");
-	    botaoMostrar.setContentAreaFilled(false);
-	    botaoMostrar.setBorderPainted(false);
-	    botaoMostrar.setIcon(new ImageIcon(Cadastro.class.getResource("/imagens/MostrarTabela.png")));
-	    panel.add(botaoMostrar, "flowx,cell 2 20");
 	    
 	    
 	    botaoCadastrar = new JButton("");
@@ -150,14 +146,15 @@ public class Cadastro extends JFrame {
 	    botaoCadastrar.setBorderPainted(false);
 	    botaoCadastrar.setIcon(new ImageIcon(Cadastro.class.getResource("/imagens/BotaoCerto.png")));
 	    panel.add(botaoCadastrar, "cell 2 20");
+	    panel.add(panel_1, "cell 1 23,grow");
 	    
 	    JPanel panel_2 = new JPanel();
 	    panel_2.setVisible(false);
-	    panel.add(panel_2, "cell 2 20");
+	    panel.add(panel_2, "cell 2 23");
 	    
 	    JPanel panel_3 = new JPanel();
 	    panel_3.setVisible(false);
-	    panel.add(panel_3, "cell 3 20,grow");
+	    panel.add(panel_3, "cell 3 23,grow");
 	}
 
 	
@@ -206,7 +203,6 @@ public class Cadastro extends JFrame {
         return botaoCadastrar;
     }
 
-    public JButton getBtnVisualizar() {
-        return botaoMostrar;
-    }
+    
 }
+
