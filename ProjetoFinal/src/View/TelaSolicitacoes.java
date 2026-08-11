@@ -29,6 +29,9 @@ public class TelaSolicitacoes extends JFrame {
     /**
      * Painel com cantos arredondados
      */
+	/**
+     * Painel com cantos arredondados
+     */
     private static class RoundedPanel extends JPanel {
 
         private static final long serialVersionUID = 1L;
@@ -49,8 +52,7 @@ public class TelaSolicitacoes extends JFrame {
                 RenderingHints.VALUE_ANTIALIAS_ON
             );
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1920, 1080);
+            // AS LINHAS COM ERRO FORAM REMOVIDAS DAQUI
 
             g2.fillRoundRect(
                 0,
@@ -96,7 +98,7 @@ public class TelaSolicitacoes extends JFrame {
     public TelaSolicitacoes() {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 1330, 721);
+        setBounds(100, 100, 1920, 1080);
 
         contentPane = new JPanel();
         contentPane.setBackground(new Color(175, 244, 198));
@@ -253,6 +255,7 @@ public class TelaSolicitacoes extends JFrame {
             ),
             40
         );
+        painelSolicitacoes.setForeground(new Color(0, 128, 0));
 
         painelSolicitacoes.setBackground(
             new Color(36, 107, 45)
@@ -285,6 +288,7 @@ public class TelaSolicitacoes extends JFrame {
             ),
             35
         );
+        solicitacao.setForeground(new Color(255, 255, 255));
 
         solicitacao.setBackground(
             new Color(174, 244, 198)
@@ -340,7 +344,7 @@ public class TelaSolicitacoes extends JFrame {
 
         solicitacao.add(
             informacoes,
-            "cell 1 0,growx,aligny center"
+            "flowx,cell 1 0,growx,aligny center"
         );
 
 
@@ -374,75 +378,46 @@ public class TelaSolicitacoes extends JFrame {
             lblLivro,
             "cell 0 1"
         );
-
-
-        // =====================================================
-        // BOTÃO RECUSAR
-        // =====================================================
-
-        JButton btnRecusar = new JButton("X");
-
-        btnRecusar.setFont(
-            new Font("Tahoma", Font.BOLD, 28)
-        );
-
-        btnRecusar.setForeground(
-            new Color(150, 30, 30)
-        );
-
-        btnRecusar.setBackground(
-            new Color(174, 244, 198)
-        );
-
-        btnRecusar.setBorderPainted(false);
-        btnRecusar.setContentAreaFilled(false);
-        btnRecusar.setFocusPainted(false);
-
-        btnRecusar.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-
-        solicitacao.add(
-            btnRecusar,
-            "cell 2 0,alignx center,aligny center"
-        );
-
-
-        // =====================================================
-        // BOTÃO ACEITAR
-        // =====================================================
-
-        JButton btnAceitar = new JButton("✓");
-
-        btnAceitar.setFont(
-            new Font("Tahoma", Font.BOLD, 32)
-        );
-
-        btnAceitar.setForeground(
-            new Color(20, 60, 25)
-        );
-
-        btnAceitar.setBackground(
-            new Color(174, 244, 198)
-        );
-
-        btnAceitar.setBorderPainted(false);
-        btnAceitar.setContentAreaFilled(false);
-        btnAceitar.setFocusPainted(false);
-
-        btnAceitar.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-
-        solicitacao.add(
-            btnAceitar,
-            "cell 3 0,alignx center,aligny center"
-        );
+        
+               
+                
+                JButton btnNewButton = new JButton("");
+                btnNewButton.setBorderPainted(false);
+                btnNewButton.setContentAreaFilled(false);
+                btnNewButton.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/excluirdim.png")));
+                solicitacao.add(btnNewButton, "cell 1 0");
+                
+                
+                        // =====================================================
+                        // BOTÃO ACEITAR
+                        // =====================================================
+                
+                        JButton btnAceitar = new JButton("");
+                        btnAceitar.addActionListener(new ActionListener() {
+                        	public void actionPerformed(ActionEvent e) {
+                        	}
+                        });
+                        btnAceitar.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/verificadim.png")));
+                        
+                                btnAceitar.setFont(
+                                    new Font("Tahoma", Font.BOLD, 32)
+                                );
+                                
+                                        btnAceitar.setForeground(
+                                            new Color(20, 60, 25)
+                                        );
+                                        
+                                                btnAceitar.setBackground(
+                                                    new Color(174, 244, 198)
+                                                );
+                                                
+                                                        btnAceitar.setBorderPainted(false);
+                                                        btnAceitar.setContentAreaFilled(false);
+                                                        btnAceitar.setFocusPainted(false);
+                                                        
+                                                                solicitacao.add(
+                                                                    btnAceitar,
+                                                                    "cell 2 0,alignx center,aligny center"
+                                                                );
     }
 }
