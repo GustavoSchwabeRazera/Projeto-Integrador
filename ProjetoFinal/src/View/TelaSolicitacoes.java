@@ -20,7 +20,7 @@ import java.awt.Font;
 import javax.swing.BorderFactory;
 
 public class TelaSolicitacoes extends JFrame {
-
+	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 
@@ -71,7 +71,7 @@ public class TelaSolicitacoes extends JFrame {
 	public TelaSolicitacoes() {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1330, 721);
+		setBounds(100, 100, 1920, 1080);
 
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(175, 244, 198));

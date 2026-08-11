@@ -26,7 +26,7 @@ public class LivroController {
         this.viewCadastro = view;
         
         this.viewCadastro.getBtnAdicionar().addActionListener(e -> eventoBotaoAdicionar());
-        this.viewCadastro.getBtnVisualizar().addActionListener(e -> eventoBotaoVisualizar());
+        
     }
     
     private void eventoBotaoVisualizar() {
