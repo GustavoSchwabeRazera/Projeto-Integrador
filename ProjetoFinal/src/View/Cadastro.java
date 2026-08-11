@@ -132,13 +132,13 @@ public class Cadastro extends JFrame {
 	    lblNewLabel_1_1_1_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 30));
 	    panel.add(lblNewLabel_1_1_1_1_1_1, "cell 0 17 6 1,alignx center");
 	    
+	    JPanel panel_1 = new JPanel();
+	    panel_1.setVisible(false);
+	    
 	    
 	    comboBox = new JComboBox();
 	    comboBox.setModel(new DefaultComboBoxModel(Generos.values()));
-	    panel.add(comboBox, "cell 2 18,growx");
-	    
-	    JPanel panel_1 = new JPanel();
-	    panel_1.setVisible(false);
+	    panel.add(comboBox, "cell 2 18,growx,height 42!");
 	    
 	    
 	    botaoCadastrar = new JButton("");

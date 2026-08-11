@@ -22,9 +22,9 @@ import java.awt.Font;
 import javax.swing.BorderFactory;
 
 public class TelaSolicitacoes extends JFrame {
-
-    private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
+	
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
 
     /**
      * Painel com cantos arredondados
@@ -49,7 +49,8 @@ public class TelaSolicitacoes extends JFrame {
                 RenderingHints.VALUE_ANTIALIAS_ON
             );
 
-            g2.setColor(getBackground());
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1920, 1080);
 
             g2.fillRoundRect(
                 0,
