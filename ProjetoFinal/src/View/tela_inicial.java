@@ -56,7 +56,7 @@ import java.awt.Font;
 
 			lblNewLabel_3.setIcon(new ImageIcon(imagemRedimensionada));
 
-			contentPane.add(lblNewLabel_3, "flowy,cell 0 0,alignx center");
+			contentPane.add(lblNewLabel_3, "flowy,cell 0 0,alignx left,aligny top");
 			
 			//pesquisar
 			JButton btnPesquisar = new JButton();
@@ -129,7 +129,7 @@ import java.awt.Font;
 			btnPerfil.setContentAreaFilled(false);
 			btnPerfil.setFocusPainted(false);
 
-			contentPane.add(btnPerfil, "cell 4 0,aligny center");
+			contentPane.add(btnPerfil, "cell 4 0,alignx right,aligny top");
 			
 			JLabel lblNewLabel_1 = new JLabel("");
 			contentPane.add(lblNewLabel_1, "cell 4 0");
@@ -174,12 +174,12 @@ import java.awt.Font;
 
 			btnCalendario.setIcon(new ImageIcon(imgCalendario));
 
-			contentPane.add(btnCalendario, "cell 4 7");
+			contentPane.add(btnCalendario, "cell 4 7,alignx right");
 			
 			//historico
 			btnHistorico.setIcon(new ImageIcon(imgHistorico));
 
-			contentPane.add(btnHistorico, "cell 0 8");
+			contentPane.add(btnHistorico, "cell 0 8,alignx left,aligny bottom");
 			
 			// notificação
 			JButton btnNotificacao = new JButton("");
@@ -203,6 +203,6 @@ import java.awt.Font;
 
 			btnNotificacao.setIcon(new ImageIcon(imgNotificacao));
 
-			contentPane.add(btnNotificacao, "cell 4 8,alignx left");
+			contentPane.add(btnNotificacao, "cell 4 8,alignx right");
 	
 	}}

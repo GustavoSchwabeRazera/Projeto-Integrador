@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 import java.awt.Color;
 import java.awt.Toolkit;
+import java.awt.Image;
 
 public class JanelaEditar extends JFrame {
 
@@ -27,7 +28,11 @@ public class JanelaEditar extends JFrame {
     private JButton btnSalvar;
 
     public JanelaEditar() {
-    	setIconImage(Toolkit.getDefaultToolkit().getImage(JanelaEditar.class.getResource("/imagens/Logo.png")));
+
+        setIconImage(Toolkit.getDefaultToolkit().getImage(
+            JanelaEditar.class.getResource("/imagens/Logo.png")
+        ));
+
         setTitle("Editar Livro");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setBounds(100, 100, 568, 413);
@@ -36,49 +41,113 @@ public class JanelaEditar extends JFrame {
         contentPane = new JPanel();
         contentPane.setBackground(new Color(175, 244, 198));
         contentPane.setBorder(new EmptyBorder(15, 15, 15, 15));
+
         setContentPane(contentPane);
-        contentPane.setLayout(new MigLayout("", "[][grow]", "[][][][][][grow]"));
+
+        contentPane.setLayout(
+            new MigLayout("", "[][grow]", "[][][][][][][89.00,grow]")
+        );
 
         Font fonteLabels = new Font("Tahoma", Font.BOLD, 14);
 
-        contentPane.add(new JLabel("Nome:"), "cell 0 0,alignx trailing");
+        // Nome
+        JLabel lblNome = new JLabel("Nome:");
+        lblNome.setFont(fonteLabels);
+        contentPane.add(lblNome, "cell 0 0 1 2,alignx trailing");
+
         txtNome = new JTextField();
-        contentPane.add(txtNome, "cell 1 0,growx");
+        contentPane.add(txtNome, "cell 1 1,growx");
 
-        contentPane.add(new JLabel("Editora:"), "cell 0 1,alignx trailing");
+
+        // Editora
+        JLabel lblEditora = new JLabel("Editora:");
+        lblEditora.setFont(fonteLabels);
+        contentPane.add(lblEditora, "cell 0 2,alignx trailing");
+
         txtEditora = new JTextField();
-        contentPane.add(txtEditora, "cell 1 1,growx");
+        contentPane.add(txtEditora, "cell 1 2,growx");
 
-        contentPane.add(new JLabel("Ano:"), "cell 0 2,alignx trailing");
+
+        // Ano
+        JLabel lblAno = new JLabel("Ano:");
+        lblAno.setFont(fonteLabels);
+        contentPane.add(lblAno, "cell 0 3,alignx trailing");
+
         txtAno = new JTextField();
-        contentPane.add(txtAno, "cell 1 2,growx");
+        contentPane.add(txtAno, "cell 1 3,growx");
 
-        contentPane.add(new JLabel("Autor:"), "cell 0 3,alignx trailing");
+
+        // Autor
+        JLabel lblAutor = new JLabel("Autor:");
+        lblAutor.setFont(fonteLabels);
+        contentPane.add(lblAutor, "cell 0 4,alignx trailing");
+
         txtAutor = new JTextField();
-        contentPane.add(txtAutor, "cell 1 3,growx");
+        contentPane.add(txtAutor, "cell 1 4,growx");
 
-        contentPane.add(new JLabel("Gênero:"), "cell 0 4,alignx trailing");
+
+        // Gênero
+        JLabel lblGenero = new JLabel("Gênero:");
+        lblGenero.setFont(fonteLabels);
+        contentPane.add(lblGenero, "cell 0 5,alignx trailing");
+
         comboBox = new JComboBox();
         comboBox.setModel(new DefaultComboBoxModel(Generos.values()));
-        contentPane.add(comboBox, "cell 1 4,growx");
+        contentPane.add(comboBox, "cell 1 5,growx");
 
+
+        // Botão Salvar
         btnSalvar = new JButton("");
         btnSalvar.setContentAreaFilled(false);
         btnSalvar.setBorderPainted(false);
-        btnSalvar.setIcon(new ImageIcon(JanelaEditar.class.getResource("/imagens/Alteracao.png")));
+
+        // Carrega a imagem original
+        ImageIcon iconeOriginal = new ImageIcon(
+            JanelaEditar.class.getResource("/imagens/SalvarAlteracao.png")
+        );
+
+        // Diminui somente a imagem
+        Image imagem = iconeOriginal.getImage().getScaledInstance(
+            175, 75, Image.SCALE_SMOOTH
+        );
+
+        btnSalvar.setIcon(new ImageIcon(imagem));
+
         btnSalvar.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        	}
+            public void actionPerformed(ActionEvent e) {
+            }
         });
+
         btnSalvar.setFont(new Font("Tahoma", Font.BOLD, 14));
-        contentPane.add(btnSalvar, "cell 0 5 2 1,alignx center,aligny bottom");
+
+        contentPane.add(
+            btnSalvar,
+            "cell 0 6 2 1,alignx center,aligny bottom"
+        );
     }
 
-    
-    public JTextField getTxtNome() { return txtNome; }
-    public JTextField getTxtEditora() { return txtEditora; }
-    public JTextField getTxtAno() { return txtAno; }
-    public JTextField getTxtAutor() { return txtAutor; }
-    public JComboBox getComboBox() { return comboBox; }
-    public JButton getBtnSalvar() { return btnSalvar; }
+
+    public JTextField getTxtNome() {
+        return txtNome;
+    }
+
+    public JTextField getTxtEditora() {
+        return txtEditora;
+    }
+
+    public JTextField getTxtAno() {
+        return txtAno;
+    }
+
+    public JTextField getTxtAutor() {
+        return txtAutor;
+    }
+
+    public JComboBox getComboBox() {
+        return comboBox;
+    }
+
+    public JButton getBtnSalvar() {
+        return btnSalvar;
+    }
 }
