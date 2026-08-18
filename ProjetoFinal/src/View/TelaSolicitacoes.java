@@ -102,6 +102,7 @@ public class TelaSolicitacoes extends JFrame {
     public TelaSolicitacoes() {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         setBounds(100, 100, 1920, 1080);
 
         contentPane = new JPanel();

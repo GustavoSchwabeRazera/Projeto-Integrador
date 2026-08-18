@@ -35,6 +35,7 @@ public class JanelaEditar extends JFrame {
 
         setTitle("Editar Livro");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         setBounds(100, 100, 568, 413);
         setLocationRelativeTo(null);
 

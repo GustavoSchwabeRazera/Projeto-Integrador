@@ -61,6 +61,7 @@ public class TelaLogin extends JFrame {
 
 		setTitle("Capas Vivas");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setSize(1920, 1080);
 		setLocationRelativeTo(null);
 
