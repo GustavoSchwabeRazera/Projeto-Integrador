@@ -53,6 +53,10 @@ public class TelaLogin extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+    public JButton getBotaoEntrar() {
+        return botaoCadastrar;
+    }
+
 	public TelaLogin() {
 
 		setTitle("Capas Vivas");

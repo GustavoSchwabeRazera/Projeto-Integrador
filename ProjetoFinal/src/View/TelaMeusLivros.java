@@ -23,6 +23,9 @@ public class TelaMeusLivros extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private JButton btnHome;
+	private JButton btnPerfil;
+	private JButton btnMostrarMais;
 
 	// =====================================================
 	// PAINEL COM CANTOS ARREDONDADOS
@@ -129,7 +132,7 @@ public class TelaMeusLivros extends JFrame {
 		// BOTÃO HOME
 		// =====================================================
 
-		JButton btnHome = new JButton("");
+		btnHome = new JButton("");
 
 		btnHome.setIcon(
 				new ImageIcon(
@@ -219,7 +222,7 @@ public class TelaMeusLivros extends JFrame {
 		// PERFIL
 		// =====================================================
 
-		JButton btnPerfil = new JButton();
+		btnPerfil = new JButton();
 
 		ImageIcon perfil = new ImageIcon(
 				TelaMeusLivros.class.getResource(
@@ -458,4 +461,17 @@ public class TelaMeusLivros extends JFrame {
 
 		return livro;
 	}
+
+    public JButton getBtnHome() {
+        return btnHome;
+    }
+
+    public JButton getBtnPerfil() {
+        return btnPerfil;
+    }
+
+    public JButton getBtnMostrarMais() {
+        return btnMostrarMais;
+    }
+
 }

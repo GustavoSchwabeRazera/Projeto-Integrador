@@ -25,6 +25,10 @@ public class TelaSolicitacoes extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private JButton btnHome;
+	private JButton btnPerfil;
+	private JButton btnExcluir;
+	private JButton btnAceitar;
 
     /**
      * Painel com cantos arredondados
@@ -119,7 +123,7 @@ public class TelaSolicitacoes extends JFrame {
         // BOTÃO HOME
         // =====================================================
 
-        JButton btnHome = new JButton("");
+        btnHome = new JButton("");
 
         // =====================================================
         // TAMANHO DO BOTÃO
@@ -157,13 +161,6 @@ public class TelaSolicitacoes extends JFrame {
         btnHome.setBorderPainted(false);
         btnHome.setContentAreaFilled(false);
         btnHome.setFocusPainted(false);
-
-        btnHome.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
 
         contentPane.add(
             btnHome,
@@ -213,14 +210,7 @@ public class TelaSolicitacoes extends JFrame {
         // PERFIL
         // =====================================================
 
-        JButton btnPerfil = new JButton();
-
-        btnPerfil.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
+        btnPerfil = new JButton();
 
         ImageIcon perfil = new ImageIcon(
             TelaSolicitacoes.class.getResource("/imagens/perfil3.png")
@@ -381,22 +371,18 @@ public class TelaSolicitacoes extends JFrame {
         
                
                 
-                JButton btnNewButton = new JButton("");
-                btnNewButton.setBorderPainted(false);
-                btnNewButton.setContentAreaFilled(false);
-                btnNewButton.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/excluirdim.png")));
-                solicitacao.add(btnNewButton, "cell 1 0");
+                btnExcluir = new JButton("");
+                btnExcluir.setBorderPainted(false);
+                btnExcluir.setContentAreaFilled(false);
+                btnExcluir.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/excluirdim.png")));
+                solicitacao.add(btnExcluir, "cell 1 0");
                 
                 
                         // =====================================================
                         // BOTÃO ACEITAR
                         // =====================================================
                 
-                        JButton btnAceitar = new JButton("");
-                        btnAceitar.addActionListener(new ActionListener() {
-                        	public void actionPerformed(ActionEvent e) {
-                        	}
-                        });
+                        btnAceitar = new JButton("");
                         btnAceitar.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/verificadim.png")));
                         
                                 btnAceitar.setFont(
@@ -420,4 +406,21 @@ public class TelaSolicitacoes extends JFrame {
                                                                     "cell 2 0,alignx center,aligny center"
                                                                 );
     }
+
+    public JButton getBtnHome() {
+        return btnHome;
+    }
+
+    public JButton getBtnPerfil() {
+        return btnPerfil;
+    }
+
+    public JButton getBtnExcluir() {
+        return btnExcluir;
+    }
+
+    public JButton getBtnAceitar() {
+        return btnAceitar;
+    }
+
 }

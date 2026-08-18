@@ -20,6 +20,10 @@ import java.awt.Component;
 	
 		private static final long serialVersionUID = 1L;
 		private JPanel contentPane;
+		private JButton btnPesquisar;
+		private JButton btnMeusLivros;
+		private JButton btnSolicitacoes;
+		private JButton btnPerfil;
 	
 		/**
 		 * Launch the application.
@@ -61,11 +65,7 @@ import java.awt.Component;
 			contentPane.add(lblNewLabel_3, "flowy,cell 0 0,alignx left");
 			
 			//pesquisar
-			JButton btnPesquisar = new JButton();
-			btnPesquisar.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-				}
-			});
+			btnPesquisar = new JButton();
 			
 			//pesquisar
 			ImageIcon pesquisar = new ImageIcon(tela_inicial.class.getResource("/imagens/pesquisar.png"));
@@ -75,26 +75,16 @@ import java.awt.Component;
 			contentPane.add(lblNewLabel_3_2, "flowx,cell 4 0");
 			
 			//perfil
-			JButton btnPerfil = new JButton();
+			btnPerfil = new JButton("");
 			btnPerfil.setFont(new Font("Tahoma", Font.BOLD, 11));
-			btnPerfil.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-				}
-			});
-			
-					
-						
-						JButton btnNewButton = new JButton("");
-						btnNewButton.setBorderPainted(false);
-						btnNewButton.setIcon(new ImageIcon(tela_inicial.class.getResource("/imagens/FotoPerfil.png")));
-						btnNewButton.setContentAreaFilled(false);
-						contentPane.add(btnNewButton, "flowy,cell 5 0");
-						btnPerfil.setIcon(new ImageIcon());
-						btnPerfil.setBorderPainted(false);
-						btnPerfil.setContentAreaFilled(false);
-						btnPerfil.setFocusPainted(false);
-						
-									contentPane.add(btnPerfil, "cell 5 0,growy");
+
+			// Adicionamos a imagem DIRETAMENTE no btnPerfil
+			btnPerfil.setIcon(new ImageIcon(tela_inicial.class.getResource("/imagens/FotoPerfil.png")));
+			btnPerfil.setBorderPainted(false);
+			btnPerfil.setContentAreaFilled(false);
+			btnPerfil.setFocusPainted(false);
+
+			contentPane.add(btnPerfil, "flowy,cell 5 0,growy");
 			
 			JLabel lblNewLabel = new JLabel("Bem-Vindo!");
 			lblNewLabel.setForeground(new Color(10, 86, 27));
@@ -109,12 +99,8 @@ import java.awt.Component;
 			contentPane.add(btnPesquisar, "cell 1 6,alignx center");
 			
 			//meus livros
-			JButton btnMeusLivros = new JButton();
+			btnMeusLivros = new JButton();
 			btnMeusLivros.setAlignmentX(Component.RIGHT_ALIGNMENT);
-			btnMeusLivros.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-				}
-			});
 
 			ImageIcon livros = new ImageIcon(tela_inicial.class.getResource("/imagens/meus livros.png"));
 			Image imgLivros = livros.getImage().getScaledInstance(295, 115, Image.SCALE_SMOOTH);
@@ -127,7 +113,7 @@ import java.awt.Component;
 			contentPane.add(btnMeusLivros, "cell 2 6,alignx center");			
 			
 			//solicitacoes
-			JButton btnSolicitacoes = new JButton();
+			btnSolicitacoes = new JButton();
 
 			ImageIcon solicitacoes = new ImageIcon(tela_inicial.class.getResource("/imagens/solicitacoes.png"));
 			Image imgSolicitacoes = solicitacoes.getImage().getScaledInstance(295, 115, Image.SCALE_SMOOTH);
@@ -218,4 +204,22 @@ import java.awt.Component;
 									
 												contentPane.add(btnNotificacao, "cell 5 9,alignx center");
 	
-	}}
+	}
+
+    public JButton getBtnPesquisar() {
+        return btnPesquisar;
+    }
+
+    public JButton getBtnMeusLivros() {
+        return btnMeusLivros;
+    }
+
+    public JButton getBtnSolicitacoes() {
+        return btnSolicitacoes;
+    }
+
+    public JButton getBtnPerfil() {
+        return btnPerfil;
+    }
+    }
+

@@ -22,6 +22,8 @@ public class Perfil extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private JButton btnHome;
+	private JButton btnAlterarCadastro;
 
 	/**
 	 * Launch the application.
@@ -186,9 +188,13 @@ public class Perfil extends JFrame {
 		contentPane.setLayout(new MigLayout("", "[30px][350px,grow][650px,grow][30px]", "[30px][50px][40px][380px][40px][60px][30px,grow]"));
 
 		// Ícone da Casa (Home) - Canto Superior Esquerdo
-		JLabel lblCasa = new JLabel("");
-		lblCasa.setIcon(carregarIconeRedimensionado("/imagens/casa 2.png", 0.78));
-		contentPane.add(lblCasa, "cell 1 1, alignx left, aligny center");
+		btnHome = new JButton("");
+		btnHome.setIcon(carregarIconeRedimensionado("/imagens/casa 2.png", 0.78));
+		btnHome.setBorderPainted(false);
+		btnHome.setContentAreaFilled(false);
+		btnHome.setFocusPainted(false);
+		btnHome.setOpaque(false);
+		contentPane.add(btnHome, "cell 1 1, alignx left, aligny center");
 
 		// Título "Perfil" - Centralizado no Topo
 		JLabel lblPerfil = new JLabel("Perfil");
@@ -238,7 +244,7 @@ public class Perfil extends JFrame {
 		contentPane.add(panelDados, "cell 2 3, alignx center, aligny center");
 
 		// Botão "Alterar cadastro" centralizado abaixo dos blocos principais - agora com cantos arredondados
-		RoundedButton btnAlterarCadastro = new RoundedButton("Alterar cadastro", 40);
+		btnAlterarCadastro = new RoundedButton("Alterar cadastro", 40);
 		btnAlterarCadastro.setBackground(new Color(114, 219, 145));
 		btnAlterarCadastro.setForeground(Color.BLACK);
 		btnAlterarCadastro.setFont(new Font("Tahoma", Font.BOLD, 20));
@@ -262,4 +268,13 @@ public class Perfil extends JFrame {
 
 		contentPane.add(panelLateralDireita, "cell 3 3 1 4, alignx right, aligny bottom");
 	}
+
+    public JButton getBtnHome() {
+        return btnHome;
+    }
+
+    public JButton getBtnAlterarCadastro() {
+        return btnAlterarCadastro;
+    }
+
 }
