@@ -18,6 +18,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.BorderFactory;
 
 import net.miginfocom.swing.MigLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class TelaMeusLivros extends JFrame {
 
@@ -125,7 +127,7 @@ public class TelaMeusLivros extends JFrame {
 		// =====================================================
 
 		contentPane.setLayout(
-				new MigLayout("", "[200,grow][200,grow][200,grow][200,grow][200,grow]", "[113.00,grow][][grow][grow][grow][grow][grow][grow][grow][grow]")
+				new MigLayout("", "[200,grow][344.00,grow][561.00,grow][200,grow][200,grow]", "[113.00,grow][][grow][grow][grow][grow][grow][grow][grow][grow]")
 		);
 
 
@@ -157,66 +159,10 @@ public class TelaMeusLivros extends JFrame {
 
 		contentPane.add(
 				btnHome,
-				"cell 0 0,alignx left,aligny center"
+				"cell 0 0,alignx left,aligny top"
 		);
 
-
-		// =====================================================
-		// LOCALIZAÇÃO
-		// =====================================================
-
-		JLabel lblLocalizacao = new JLabel(
-				" Gaspar - SC"
-		);
-
-		lblLocalizacao.setIcon(
-				new ImageIcon(
-						TelaMeusLivros.class.getResource(
-								"/imagens/loc.png"
-						)
-				)
-		);
-
-		lblLocalizacao.setFont(
-				new Font(
-						"Tahoma",
-						Font.PLAIN,
-						24
-				)
-		);
-
-		contentPane.add(
-				lblLocalizacao,
-				"cell 0 0,alignx left,gapx 40,aligny center"
-		);
-
-
-		// =====================================================
-		// LOGO
-		// =====================================================
-
-		JLabel lblLogo = new JLabel("");
-
-		ImageIcon logo = new ImageIcon(
-				TelaMeusLivros.class.getResource(
-						"/imagens/Logo.png"
-				)
-		);
-
-		Image imagemLogo = logo.getImage().getScaledInstance(
-				180,
-				90,
-				Image.SCALE_SMOOTH
-		);
-
-		lblLogo.setIcon(
-				new ImageIcon(imagemLogo)
-		);
-
-		contentPane.add(
-				lblLogo,
-				"cell 1 0 2 1,alignx center,aligny center"
-		);
+		
 
 
 		// =====================================================
@@ -236,6 +182,11 @@ public class TelaMeusLivros extends JFrame {
 				50,
 				Image.SCALE_SMOOTH
 		);
+		
+		
+		
+		
+		
 
 		btnPerfil.setIcon(
 				new ImageIcon(imgPerfil)
@@ -316,7 +267,7 @@ public class TelaMeusLivros extends JFrame {
 		// =====================================================
 
 		JLabel livro1 = criarLivro(
-				"/imagens/LivroDemo.png"
+				"/imagens/livroDemo.png"
 		);
 
 		painelLivros.add(
@@ -330,7 +281,7 @@ public class TelaMeusLivros extends JFrame {
 		// =====================================================
 
 		JLabel livro2 = criarLivro(
-				"/imagens/LivroDemo.png"
+				"/imagens/livroDemo.png"
 		);
 
 		painelLivros.add(
@@ -344,7 +295,7 @@ public class TelaMeusLivros extends JFrame {
 		// =====================================================
 
 		JLabel livro3 = criarLivro(
-				"/imagens/LivroDemo.png"
+				"/imagens/livroDemo.png"
 		);
 
 		painelLivros.add(
@@ -358,7 +309,7 @@ public class TelaMeusLivros extends JFrame {
 		// =====================================================
 
 		JLabel livro4 = criarLivro(
-				"/imagens/LivroDemo.png"
+				"/imagens/livroDemo.png"
 		);
 
 		painelLivros.add(
@@ -372,7 +323,7 @@ public class TelaMeusLivros extends JFrame {
 		// =====================================================
 
 		JLabel livro5 = criarLivro(
-				"/imagens/LivroDemo.png"
+				"/imagens/livroDemo.png"
 		);
 
 		painelLivros.add(
@@ -386,7 +337,7 @@ public class TelaMeusLivros extends JFrame {
 		// =====================================================
 
 		JLabel livro6 = criarLivro(
-				"/imagens/LivroDemo.png"
+				"/imagens/livroDemo.png"
 		);
 
 		painelLivros.add(
@@ -435,6 +386,10 @@ public class TelaMeusLivros extends JFrame {
 				btnMostrarMais,
 				"cell 4 1 2 1,alignx right,aligny bottom"
 		);
+		
+		JLabel lblNewLabel = new JLabel("");
+		lblNewLabel.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/Logo.png")));
+		contentPane.add(lblNewLabel, "cell 1 0 3 1,alignx center");
 	}
 
 
