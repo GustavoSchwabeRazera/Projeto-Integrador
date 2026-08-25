@@ -25,6 +25,7 @@ public class tela_inicial extends JFrame {
     private JButton btnMeusLivros;
     private JButton btnSolicitacoes;
     private JButton btnPerfil;
+    private JButton btnSair;
 
     /**
      * Launch the application.
@@ -128,7 +129,6 @@ public class tela_inicial extends JFrame {
         // =========================================================
 
         btnPerfil = new JButton("");
-
         btnPerfil.setFont(
             new Font("Tahoma", Font.BOLD, 11)
         );
@@ -147,6 +147,13 @@ public class tela_inicial extends JFrame {
             btnPerfil,
             "flowy,cell 8 0,growy"
         );
+        
+        btnSair = new JButton("");
+        btnSair.setFocusPainted(false);
+        btnSair.setBorderPainted(false);
+        btnSair.setContentAreaFilled(false);
+        btnSair.setIcon(new ImageIcon(tela_inicial.class.getResource("/imagens/sairAjustado.png")));
+        contentPane.add(btnSair, "cell 8 1");
 
         // =========================================================
         // BEM-VINDO
@@ -395,5 +402,8 @@ public class tela_inicial extends JFrame {
 
     public JButton getBtnPerfil() {
         return btnPerfil;
+    }
+    public JButton getBtnSair() {
+    	return btnSair;
     }
 }

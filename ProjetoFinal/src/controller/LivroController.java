@@ -7,6 +7,7 @@ import javax.swing.UIManager;
 import View.Cadastro;
 import View.Perfil;
 import View.PesquisarLivro;
+import View.TelaCriarConta;
 import View.TelaLogin;
 import View.TelaMeusLivros;
 import View.TelaSolicitacoes;
@@ -25,6 +26,7 @@ public class LivroController {
     private final TelaMeusLivros telaMeusLivros;
     private final Perfil perfil;
     private final Cadastro cadastro;
+    private final TelaCriarConta CriarConta;
 
     /*
      * Construtor principal: mantém compatibilidade com o seu Main atual.
@@ -32,13 +34,14 @@ public class LivroController {
     public LivroController(LivroTableModel modelo, Cadastro view) {
         this.livroModel = modelo;
         this.cadastro = view;
-
+        this.CriarConta = new TelaCriarConta();
         this.telaLogin = new TelaLogin();
         this.telaInicial = new tela_inicial();
         this.pesquisarLivro = new PesquisarLivro();
         this.telaSolicitacoes = new TelaSolicitacoes();
         this.telaMeusLivros = new TelaMeusLivros();
         this.perfil = new Perfil();
+        
         
 
         configurarEventos();
@@ -57,6 +60,13 @@ public class LivroController {
         // LOGIN
         // =========================
         telaLogin.getBotaoEntrar().addActionListener(e -> abrirHome());
+        telaLogin.getLblCadastro().addActionListener(e -> abrirCriarConta());
+        
+        //==========================
+        // Criar Conta
+        //==========================
+        CriarConta.getBotaoCadastrar().addActionListener(e -> abrirHome());
+        CriarConta.getBotaoEntrar().addActionListener(e -> iniciar());
 
         // =========================
         // HOME
@@ -65,6 +75,7 @@ public class LivroController {
         telaInicial.getBtnMeusLivros().addActionListener(e -> abrirMeusLivros());
         telaInicial.getBtnSolicitacoes().addActionListener(e -> abrirSolicitacoes());
         telaInicial.getBtnPerfil().addActionListener(e -> abrirPerfil());
+        telaInicial.getBtnSair().addActionListener(e -> iniciar());
 
         // =========================
         // PESQUISA
@@ -141,6 +152,10 @@ public class LivroController {
         esconderTodas();
         cadastro.setVisible(true);
     }
+    private void abrirCriarConta() {
+    	esconderTodas();
+    	CriarConta.setVisible(true);
+    }
 
     private void esconderTodas() {
         telaLogin.setVisible(false);
@@ -150,6 +165,7 @@ public class LivroController {
         telaMeusLivros.setVisible(false);
         perfil.setVisible(false);
         cadastro.setVisible(false);
+        CriarConta.setVisible(false);
     }
 
     // =========================================================

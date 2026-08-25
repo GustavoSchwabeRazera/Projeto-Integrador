@@ -17,6 +17,8 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Image;
 import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 
 
@@ -26,11 +28,8 @@ public class TelaLogin extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtNome;
 	private JPasswordField txtSenha;
-	
-	
-	
-
 	private JButton botaoCadastrar;
+	private JButton lblCadastro;
 	
 	
 
@@ -234,9 +233,26 @@ public class TelaLogin extends JFrame {
 		// LINK CADASTRO
 		// ======================================
 
-		JLabel lblCadastro = new JLabel("<HTML><U>Criar conta</U></HTML>");
+		lblCadastro = new JButton("<HTML><U>Criar conta</U></HTML>");
+		lblCadastro.setContentAreaFilled(false);
+		lblCadastro.setBorderPainted(false);
+		lblCadastro.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		
+			
 		lblCadastro.setForeground(new Color(24, 125, 45));
 		lblCadastro.setFont(new Font("Segoe UI", Font.BOLD, 15));
 
 		panelLogin.add(lblCadastro, "cell 0 10,alignx center");
+	}
+
+	public JButton getLblCadastro() {
+		return lblCadastro;
+	}
+
+	public void setLblCadastro(JButton lblCadastro) {
+		this.lblCadastro = lblCadastro;
 	}}
