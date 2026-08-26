@@ -65,7 +65,7 @@ public class tela_inicial extends JFrame {
 
         setContentPane(contentPane);
 
-        contentPane.setLayout(new MigLayout("", "[][][197.00][172.00,grow][480][480,grow][480,grow][261.00,grow][153.00,grow]", "[113.00,grow][][][grow][grow][grow][grow][grow][71.00,grow][54.00,grow][grow]"));
+        contentPane.setLayout(new MigLayout("", "[][][197.00][172.00,grow][449.00][480,grow][480,grow][261.00,grow][153.00,grow]", "[113.00,grow][][][grow][grow][grow][grow][grow][71.00,grow][54.00,grow][grow]"));
 
         ImageIcon logoOriginal = new ImageIcon(
             tela_inicial.class.getResource("/imagens/Logo.png")
@@ -371,7 +371,7 @@ public class tela_inicial extends JFrame {
                                         
                                                 contentPane.add(
                                                     btnHistorico,
-                                                    "cell 0 9 3 1,alignx right,aligny bottom"
+                                                    "cell 0 9 3 1,alignx left,aligny center"
                                                 );
 
         btnNotificacao.setIcon(

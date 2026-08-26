@@ -17,6 +17,8 @@ import javax.swing.JButton;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.SwingConstants;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Perfil extends JFrame {
 
@@ -246,6 +248,10 @@ public class Perfil extends JFrame {
 
 		// Botão "Alterar cadastro" centralizado abaixo dos blocos principais - agora com cantos arredondados
 		btnAlterarCadastro = new RoundedButton("Alterar cadastro", 40);
+		btnAlterarCadastro.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnAlterarCadastro.setBackground(new Color(114, 219, 145));
 		btnAlterarCadastro.setForeground(Color.BLACK);
 		btnAlterarCadastro.setFont(new Font("Tahoma", Font.BOLD, 20));

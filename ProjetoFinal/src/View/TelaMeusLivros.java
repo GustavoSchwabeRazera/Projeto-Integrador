@@ -189,7 +189,7 @@ public class TelaMeusLivros extends JFrame {
 		
 
 		btnPerfil.setIcon(
-				new ImageIcon(imgPerfil)
+				new ImageIcon(TelaMeusLivros.class.getResource("/imagens/FotoPerfil.png"))
 		);
 
 		btnPerfil.setBorderPainted(false);

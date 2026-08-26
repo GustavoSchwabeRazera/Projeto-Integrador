@@ -60,11 +60,7 @@ public class PesquisarLivro extends JFrame {
         setContentPane(contentPane);
 
         contentPane.setLayout(
-            new MigLayout(
-                "",
-                "[][grow][][][1070.00,grow][51.00,grow]",
-                "[][][35.00,grow][105.00,grow][104.00,grow][][][grow]"
-            )
+            new MigLayout("", "[][grow][][][1070.00,grow][51.00,grow]", "[][][35.00,grow][105.00,grow][104.00,grow][][][grow]")
         );
 
 
@@ -113,7 +109,7 @@ public class PesquisarLivro extends JFrame {
             );
 
         btnPerfil.setIcon(
-            new ImageIcon(imagemPerfilRedimensionada)
+            new ImageIcon(PesquisarLivro.class.getResource("/imagens/FotoPerfil.png"))
         );
 
 
@@ -127,7 +123,7 @@ public class PesquisarLivro extends JFrame {
 
         contentPane.add(
             btnPerfil,
-            "cell 5 0,alignx right"
+            "cell 5 0,alignx right,aligny center"
         );
 
 
@@ -272,6 +268,10 @@ public class PesquisarLivro extends JFrame {
         // =====================================================
 
         btnPesquisar = new JButton("");
+        btnPesquisar.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        	}
+        });
 
         btnPesquisar.setBorderPainted(false);
         btnPesquisar.setContentAreaFilled(false);
@@ -284,8 +284,8 @@ public class PesquisarLivro extends JFrame {
 
         Image imagemPesquisarRedimensionada = pesquisar.getImage()
             .getScaledInstance(
-                200,
-                75,
+                300,
+                125,
                 Image.SCALE_SMOOTH
             );
 
