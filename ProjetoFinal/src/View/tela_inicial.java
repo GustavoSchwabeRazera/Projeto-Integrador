@@ -26,6 +26,7 @@ public class tela_inicial extends JFrame {
     private JButton btnSolicitacoes;
     private JButton btnPerfil;
     private JButton btnSair;
+    private JButton btnCalendario;
 
     /**
      * Launch the application.
@@ -299,14 +300,10 @@ public class tela_inicial extends JFrame {
             Image.SCALE_SMOOTH
         );
 
-        JButton btnCalendario = new JButton("");
+        btnCalendario = new JButton("");
 
-        btnCalendario.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                }
-            }
-        );
+     
+           
 
         btnCalendario.setContentAreaFilled(false);
         btnCalendario.setBorderPainted(false);
@@ -406,4 +403,8 @@ public class tela_inicial extends JFrame {
     public JButton getBtnSair() {
     	return btnSair;
     }
+
+	public JButton getBtnCalendario() {
+		return btnCalendario;
+	}
 }

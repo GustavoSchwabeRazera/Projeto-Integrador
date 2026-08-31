@@ -12,8 +12,10 @@ import View.TelaLogin;
 import View.TelaMeusLivros;
 import View.TelaSolicitacoes;
 import View.tela_inicial;
+import View.Calendario;
 import model.Livro;
 import model.LivroTableModel;
+
 
 public class LivroController {
 
@@ -27,6 +29,7 @@ public class LivroController {
     private final Perfil perfil;
     private final Cadastro cadastro;
     private final TelaCriarConta CriarConta;
+    private final Calendario calendario;
 
     /*
      * Construtor principal: mantém compatibilidade com o seu Main atual.
@@ -41,6 +44,7 @@ public class LivroController {
         this.telaSolicitacoes = new TelaSolicitacoes();
         this.telaMeusLivros = new TelaMeusLivros();
         this.perfil = new Perfil();
+        this.calendario = new Calendario();
         
         
 
@@ -76,6 +80,7 @@ public class LivroController {
         telaInicial.getBtnSolicitacoes().addActionListener(e -> abrirSolicitacoes());
         telaInicial.getBtnPerfil().addActionListener(e -> abrirPerfil());
         telaInicial.getBtnSair().addActionListener(e -> iniciar());
+        telaInicial.getBtnCalendario().addActionListener(e -> abrirCalendario());
 
         // =========================
         // PESQUISA
@@ -108,6 +113,12 @@ public class LivroController {
         // CADASTRO
         // =========================
         cadastro.getBtnAdicionar().addActionListener(e -> adicionarLivro());
+        // =========================
+        // Calendario
+        // =========================
+        calendario.getBtnHome().addActionListener(e -> abrirHome());
+        
+        
     }
 
     // =========================================================
@@ -156,6 +167,10 @@ public class LivroController {
     	esconderTodas();
     	CriarConta.setVisible(true);
     }
+    private void abrirCalendario() {
+    	esconderTodas();
+    	calendario.setVisible(true);
+    }
 
     private void esconderTodas() {
         telaLogin.setVisible(false);
@@ -166,6 +181,7 @@ public class LivroController {
         perfil.setVisible(false);
         cadastro.setVisible(false);
         CriarConta.setVisible(false);
+        calendario.setVisible(false);
     }
 
     // =========================================================
