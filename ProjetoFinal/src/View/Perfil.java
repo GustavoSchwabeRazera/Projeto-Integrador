@@ -182,6 +182,7 @@ public class Perfil extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		setBounds(100, 100, 1300, 721);
+		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setLocationRelativeTo(null);
 
 		contentPane = new JPanel();
