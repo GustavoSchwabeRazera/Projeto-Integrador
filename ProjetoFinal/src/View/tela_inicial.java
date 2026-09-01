@@ -125,9 +125,7 @@ public class tela_inicial extends JFrame {
             "flowx,cell 7 0"
         );
 
-        // =========================================================
         // PERFIL
-        // =========================================================
 
         btnPerfil = new JButton("");
         btnPerfil.setFont(
@@ -345,9 +343,7 @@ public class tela_inicial extends JFrame {
             }
         );
         
-                // =========================================================
                 // HISTÓRICO
-                // =========================================================
         
                 JButton btnHistorico = new JButton("");
                 
@@ -358,8 +354,11 @@ public class tela_inicial extends JFrame {
                                 btnHistorico.addActionListener(
                                     new ActionListener() {
                                         public void actionPerformed(ActionEvent e) {
+<<<<<<< HEAD
                                             
                                             dispose();
+=======
+>>>>>>> origin/main
                                         }
                                     }
                                 );

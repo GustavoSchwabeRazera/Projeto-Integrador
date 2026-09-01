@@ -162,9 +162,7 @@ public class TelaMeusLivros extends JFrame {
 
 		contentPane.add(lblMeusLivros, "cell 0 1 5 1,alignx center");
 
-		// =====================================================
 		// PAINEL VERDE DOS LIVROS
-		// =====================================================
 
 		RoundedPanel painelLivros = new RoundedPanel(
 

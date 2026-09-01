@@ -4,7 +4,7 @@ import java.awt.Color;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import View.Cadastro;
+import View.Cadastro_Livro;
 import View.Perfil;
 import View.PesquisarLivro;
 import View.TelaCriarConta;
@@ -13,6 +13,8 @@ import View.TelaMeusLivros;
 import View.TelaSolicitacoes;
 import View.tela_inicial;
 import View.Calendario;
+import View.Cadastro_usuario;
+
 import model.Livro;
 import model.LivroTableModel;
 
@@ -27,16 +29,17 @@ public class LivroController {
     private final TelaSolicitacoes telaSolicitacoes;
     private final TelaMeusLivros telaMeusLivros;
     private final Perfil perfil;
-    private final Cadastro cadastro;
+    private final Cadastro_Livro cadastro_livro;
     private final TelaCriarConta CriarConta;
     private final Calendario calendario;
+    private final Cadastro_usuario cadastro_usuario;
 
     /*
      * Construtor principal: mantém compatibilidade com o seu Main atual.
      */
-    public LivroController(LivroTableModel modelo, Cadastro view) {
+    public LivroController(LivroTableModel modelo, Cadastro_Livro view) {
         this.livroModel = modelo;
-        this.cadastro = view;
+        this.cadastro_livro = view;
         this.CriarConta = new TelaCriarConta();
         this.telaLogin = new TelaLogin();
         this.telaInicial = new tela_inicial();
@@ -45,6 +48,7 @@ public class LivroController {
         this.telaMeusLivros = new TelaMeusLivros();
         this.perfil = new Perfil();
         this.calendario = new Calendario();
+        this.cadastro_usuario = new Cadastro_usuario();
         
         
 
@@ -55,7 +59,7 @@ public class LivroController {
      * Construtor alternativo caso queira iniciar sem criar Cadastro no Main.
      */
     public LivroController(LivroTableModel modelo) {
-        this(modelo, new Cadastro());
+        this(modelo, new Cadastro_Livro());
     }
 
     private void configurarEventos() {
@@ -107,16 +111,21 @@ public class LivroController {
         // PERFIL
         // =========================
         perfil.getBtnHome().addActionListener(e -> abrirHome());
-        perfil.getBtnAlterarCadastro().addActionListener(e -> abrirCadastro());
+        perfil.getBtnAlterarCadastro().addActionListener(e -> abrirCadastroUsuario());
 
         // =========================
-        // CADASTRO
+        // CADASTRO LIVROS
         // =========================
-        cadastro.getBtnAdicionar().addActionListener(e -> adicionarLivro());
+        cadastro_livro.getBtnAdicionar().addActionListener(e -> adicionarLivro());
         // =========================
         // Calendario
         // =========================
         calendario.getBtnHome().addActionListener(e -> abrirHome());
+        
+        // =========================
+        // CADASTRO USUARIO
+        // =========================
+        cadastro_usuario.getBtnHome().addActionListener(e -> abrirHome());
         
         
     }
@@ -159,9 +168,9 @@ public class LivroController {
         perfil.setVisible(true);
     }
 
-    private void abrirCadastro() {
+    private void abrirCadastroLivro() {
         esconderTodas();
-        cadastro.setVisible(true);
+        cadastro_livro.setVisible(true);
     }
     private void abrirCriarConta() {
     	esconderTodas();
@@ -171,6 +180,10 @@ public class LivroController {
     	esconderTodas();
     	calendario.setVisible(true);
     }
+    private void abrirCadastroUsuario() {
+    	esconderTodas();
+    	cadastro_usuario.setVisible(true);
+    }
 
     private void esconderTodas() {
         telaLogin.setVisible(false);
@@ -179,9 +192,10 @@ public class LivroController {
         telaSolicitacoes.setVisible(false);
         telaMeusLivros.setVisible(false);
         perfil.setVisible(false);
-        cadastro.setVisible(false);
+        cadastro_livro.setVisible(false);
         CriarConta.setVisible(false);
         calendario.setVisible(false);
+        cadastro_usuario.setVisible(false);
     }
 
     // =========================================================
@@ -190,11 +204,11 @@ public class LivroController {
 
     private void adicionarLivro() {
         try {
-            String nome = cadastro.getTxtNome().getText().trim();
-            String editora = cadastro.getTxtEditora().getText().trim();
-            String autor = cadastro.getTxtAutor().getText().trim();
-            String genero = cadastro.getComboBox().getSelectedItem().toString();
-            String anoTexto = cadastro.getTxtAno().getText().trim();
+            String nome = cadastro_livro.getTxtNome().getText().trim();
+            String editora = cadastro_livro.getTxtEditora().getText().trim();
+            String autor = cadastro_livro.getTxtAutor().getText().trim();
+            String genero = cadastro_livro.getComboBox().getSelectedItem().toString();
+            String anoTexto = cadastro_livro.getTxtAno().getText().trim();
 
             if (nome.isEmpty() || editora.isEmpty() || autor.isEmpty()
                     || genero.isEmpty() || anoTexto.isEmpty()) {
@@ -229,10 +243,10 @@ public class LivroController {
     }
 
     private void limparCadastro() {
-        cadastro.getTxtNome().setText("");
-        cadastro.getTxtEditora().setText("");
-        cadastro.getTxtAno().setText("");
-        cadastro.getTxtAutor().setText("");
+        cadastro_livro.getTxtNome().setText("");
+        cadastro_livro.getTxtEditora().setText("");
+        cadastro_livro.getTxtAno().setText("");
+        cadastro_livro.getTxtAutor().setText("");
     }
 
     // =========================================================
@@ -312,7 +326,7 @@ public class LivroController {
         return perfil;
     }
 
-    public Cadastro getCadastro() {
-        return cadastro;
+    public Cadastro_Livro getCadastro() {
+        return cadastro_livro;
     }
 }
