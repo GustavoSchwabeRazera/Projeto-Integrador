@@ -2,7 +2,7 @@ package Main;
 
 import controller.LivroController;
 import model.LivroTableModel;
-import View.Cadastro;
+import View.Cadastro_Livro;
 
 public class Main {
 
@@ -10,7 +10,7 @@ public class Main {
 
         LivroTableModel model = new LivroTableModel();
 
-        Cadastro view = new Cadastro();
+        Cadastro_Livro view = new Cadastro_Livro();
 
         LivroController controller = new LivroController(model, view);
 

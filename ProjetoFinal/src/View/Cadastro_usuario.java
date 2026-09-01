@@ -35,10 +35,10 @@ public class Cadastro_usuario extends JFrame {
 	private JLabel lblNewLabel_5;
 	private JTextField txtLoc;
 	private JButton botaoEntrar;
-	private JButton btnNewButton;
 	private JComboBox comboBox;
     private UsuarioTableModel model = new UsuarioTableModel();
     private TelaUsuario tela = new TelaUsuario();
+    private JButton btnHome;
 	/**
 	 * Launch the application.
 	 */
@@ -46,7 +46,7 @@ public class Cadastro_usuario extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Cadastro frame = new Cadastro();
+					Cadastro_Livro frame = new Cadastro_Livro();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -74,88 +74,84 @@ public class Cadastro_usuario extends JFrame {
 	    contentPane.setBackground(new Color(175, 244, 198));
 	    contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 	    setContentPane(contentPane);
-	    contentPane.setLayout(new MigLayout("", "[98.00][86.00][150.00,grow][51.00][118.00]", "[][][][][grow][][][]"));
-
-	    JLabel lblNewLabel = new JLabel("");
-	    lblNewLabel.setIcon(new ImageIcon(Cadastro.class.getResource("/imagens/Logo.png")));
-	    contentPane.add(lblNewLabel, "cell 0 0 1 2");
+	    contentPane.setLayout(new MigLayout("", "[98.00][86.00][150.00,grow][51.00][118.00]", "[][][][][][grow][][][]"));
+	    	    
+	    	    btnHome = new JButton("");
+	    	    btnHome.setContentAreaFilled(false);
+	    	    btnHome.setBorderPainted(false);
+	    	    btnHome.setIcon(new ImageIcon(Cadastro_usuario.class.getResource("/imagens/LogoCasa.png")));
+	    	    contentPane.add(btnHome, "cell 0 0,alignx center");
+	    
+	    	    JLabel lblNewLabel = new JLabel("");
+	    	    lblNewLabel.setIcon(new ImageIcon(Cadastro_usuario.class.getResource("/imagens/LogoPequena.png")));
+	    	    contentPane.add(lblNewLabel, "cell 0 1 5 1,alignx center");
 	    
 	    JLabel lblNewLabel_2 = new JLabel("Cadastro de Usuário:");
 	    lblNewLabel_2.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 48));
-	    contentPane.add(lblNewLabel_2, "cell 2 1,alignx center,aligny bottom");
+	    contentPane.add(lblNewLabel_2, "cell 0 4 5 1,alignx center,aligny bottom");
 	    
 	    panel = new ImagePanel();
 	    panel.setOpaque(false);
-	    contentPane.add(panel, "cell 2 4,grow");
-	    panel.setLayout(new MigLayout("", "[126.00][grow][][][453.00,grow][grow]", "[39.00][][][40.00][][][50.00][][][44.00][][][27.00][][][][11.00][]"));
+	    contentPane.add(panel, "cell 2 5,grow");
+	    panel.setLayout(new MigLayout("", "[126.00][314.00,grow][403.00,grow][grow]", "[39.00][][][40.00][][][50.00][][][44.00][][][27.00][][][][][11.00][]"));
 	    
 	    lblNewLabel_1 = new JLabel("NOME:");
 	    lblNewLabel_1.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 23));
 	    lblNewLabel_1.setHorizontalAlignment(SwingConstants.RIGHT);
-	    panel.add(lblNewLabel_1, "cell 0 1 6 1,alignx center");
+	    panel.add(lblNewLabel_1, "cell 1 1 2 1,alignx center");
 	    
 	    txtNome = new JTextField();
-	    panel.add(txtNome, "cell 1 2 4 1,growx");
+	    panel.add(txtNome, "cell 1 2 2 1,growx");
 	    txtNome.setColumns(10);
 	    
 	    lblNewLabel_3 = new JLabel("E-MAIL:");
 	    lblNewLabel_3.setHorizontalAlignment(SwingConstants.RIGHT);
 	    lblNewLabel_3.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 23));
-	    panel.add(lblNewLabel_3, "cell 0 4 6 1,alignx center");
+	    panel.add(lblNewLabel_3, "cell 1 4 2 1,alignx center");
 	    
 	    txtEmail = new JTextField();
-	    panel.add(txtEmail, "cell 1 5 4 1,growx");
+	    panel.add(txtEmail, "cell 1 5 2 1,growx");
 	    txtEmail.setColumns(10);
 	    
 	    lblNewLabel_4 = new JLabel("DEFINIR SENHA:");
 	    lblNewLabel_4.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_4.setFont(new Font("Tahoma", Font.BOLD, 23));
-	    panel.add(lblNewLabel_4, "cell 0 7 6 1,alignx center");
+	    panel.add(lblNewLabel_4, "cell 1 7 2 1,alignx center");
 	    
 	    txtSenha = new JTextField();
-	    panel.add(txtSenha, "cell 1 8 4 1,growx");
+	    panel.add(txtSenha, "cell 1 8 2 1,growx");
 	    txtSenha.setColumns(10);
 	    
 	    lblNewLabel_5 = new JLabel("LOCALIZAÇÃO(\"Cidade/Estado\"):");
 	    lblNewLabel_5.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_5.setFont(new Font("Tahoma", Font.BOLD, 23));
-	    panel.add(lblNewLabel_5, "cell 0 10 6 1,alignx center");
+	    panel.add(lblNewLabel_5, "cell 1 10 2 1,alignx center");
 	    
 	    txtLoc = new JTextField();
 	    txtLoc.setColumns(10);
-	    panel.add(txtLoc, "cell 1 11 4 1,growx");
+	    panel.add(txtLoc, "cell 1 11 2 1,growx");
 	    
 	    JLabel lblNewLabel_6 = new JLabel("GÊNERO:");
 	    lblNewLabel_6.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_6.setFont(new Font("Tahoma", Font.BOLD, 23));
-	    panel.add(lblNewLabel_6, "cell 0 13 6 1,alignx center");
+	    panel.add(lblNewLabel_6, "cell 1 13 2 1,alignx center");
+	    
+	    comboBox = new JComboBox();
+	    comboBox.setModel(new DefaultComboBoxModel(genero.values()));
+	    panel.add(comboBox, "cell 1 14 2 1,growx");
 	    
 	    botaoEntrar = new JButton("");
 	    botaoEntrar.setContentAreaFilled(false);
 	    botaoEntrar.setBorderPainted(false);
-	    botaoEntrar.setIcon(new ImageIcon(Cadastro.class.getResource("/imagens/BotaoEntrar.png")));
+	    botaoEntrar.setIcon(new ImageIcon(Cadastro_Livro.class.getResource("/imagens/BotaoCerto.png")));
 	    botaoEntrar.addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
 	        }
 	    });
-	    
-	    comboBox = new JComboBox();
-	    comboBox.setModel(new DefaultComboBoxModel(genero.values()));
-	    panel.add(comboBox, "cell 1 14 4 1,growx");
-	    panel.add(botaoEntrar, "cell 0 17 3 1,alignx right");
-	    
-	    btnNewButton = new JButton("");
-	    btnNewButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
-	    	}
-	    });
-	    btnNewButton.setContentAreaFilled(false);
-	    btnNewButton.setBorderPainted(false);
-	    btnNewButton.setIcon(new ImageIcon(Cadastro.class.getResource("/imagens/Group 10.png")));
-	    panel.add(btnNewButton, "cell 3 17 2 1,alignx left");
+	    panel.add(botaoEntrar, "flowx,cell 1 16 2 1,alignx center");
 	    }
 	
 
@@ -213,4 +209,11 @@ public class Cadastro_usuario extends JFrame {
 	public JButton getBtnMostrarTabela() {
 	    return btnNewButton;
 	}
+
+
+	public JButton getBtnHome() {
+		return btnHome;
+	}
+
+
 }
