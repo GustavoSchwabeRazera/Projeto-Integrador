@@ -358,8 +358,7 @@ public class tela_inicial extends JFrame {
                                 btnHistorico.addActionListener(
                                     new ActionListener() {
                                         public void actionPerformed(ActionEvent e) {
-                                            tela_historico telaHistorico = new tela_historico();
-                                            telaHistorico.setVisible(true);
+                                            
                                             dispose();
                                         }
                                     }

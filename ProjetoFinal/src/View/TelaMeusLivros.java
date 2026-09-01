@@ -49,21 +49,11 @@ public class TelaMeusLivros extends JFrame {
 
 			Graphics2D g2 = (Graphics2D) g.create();
 
-			g2.setRenderingHint(
-					RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON
-			);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			g2.setColor(getBackground());
 
-			g2.fillRoundRect(
-					0,
-					0,
-					getWidth() - 1,
-					getHeight() - 1,
-					radius,
-					radius
-			);
+			g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
 
 			g2.dispose();
 
@@ -111,25 +101,18 @@ public class TelaMeusLivros extends JFrame {
 
 		contentPane = new JPanel();
 
-		contentPane.setBackground(
-				new Color(175, 244, 198)
-		);
+		contentPane.setBackground(new Color(175, 244, 198));
 
-		contentPane.setBorder(
-				new EmptyBorder(5, 5, 5, 5)
-		);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
-
 
 		// =====================================================
 		// MIGLAYOUT PRINCIPAL
 		// =====================================================
 
-		contentPane.setLayout(
-				new MigLayout("", "[200,grow][344.00,grow][561.00,grow][200,grow][200,grow]", "[113.00,grow][][grow][grow][grow][grow][grow][grow][grow][grow]")
-		);
-
+		contentPane.setLayout(new MigLayout("", "[200,grow][344.00,grow][561.00,grow][200,grow][200,grow]",
+				"[113.00,grow][][grow][grow][grow][grow][grow][grow][grow][grow]"));
 
 		// =====================================================
 		// BOTÃO HOME
@@ -137,33 +120,17 @@ public class TelaMeusLivros extends JFrame {
 
 		btnHome = new JButton("");
 
-		btnHome.setIcon(
-				new ImageIcon(
-						TelaMeusLivros.class.getResource(
-								"/imagens/casa 1.png"
-						)
-				)
-		);
+		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
 
-		btnHome.setFont(
-				new Font("Tahoma", Font.PLAIN, 28)
-		);
+		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
 
-		btnHome.setForeground(
-				new Color(10, 86, 27)
-		);
+		btnHome.setForeground(new Color(10, 86, 27));
 
 		btnHome.setBorderPainted(false);
 		btnHome.setContentAreaFilled(false);
 		btnHome.setFocusPainted(false);
 
-		contentPane.add(
-				btnHome,
-				"cell 0 0,alignx left,aligny top"
-		);
-
-		
-
+		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
 		// =====================================================
 		// PERFIL
@@ -171,62 +138,29 @@ public class TelaMeusLivros extends JFrame {
 
 		btnPerfil = new JButton();
 
-		ImageIcon perfil = new ImageIcon(
-				TelaMeusLivros.class.getResource(
-						"/imagens/perfil3.png"
-				)
-		);
+		ImageIcon perfil = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
 
-		Image imgPerfil = perfil.getImage().getScaledInstance(
-				50,
-				50,
-				Image.SCALE_SMOOTH
-		);
-		
-		
-		
-		
-		
+		Image imgPerfil = perfil.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 
-		btnPerfil.setIcon(
-				new ImageIcon(TelaMeusLivros.class.getResource("/imagens/FotoPerfil.png"))
-		);
+		btnPerfil.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/FotoPerfil.png")));
 
 		btnPerfil.setBorderPainted(false);
 		btnPerfil.setContentAreaFilled(false);
 		btnPerfil.setFocusPainted(false);
 
-		contentPane.add(
-				btnPerfil,
-				"cell 4 0,alignx right,aligny top"
-		);
-
+		contentPane.add(btnPerfil, "cell 4 0,alignx right,aligny top");
 
 		// =====================================================
 		// TÍTULO
 		// =====================================================
 
-		JLabel lblMeusLivros = new JLabel(
-				"Meus Livros"
-		);
+		JLabel lblMeusLivros = new JLabel("Meus Livros");
 
-		lblMeusLivros.setForeground(
-				new Color(10, 86, 27)
-		);
+		lblMeusLivros.setForeground(new Color(10, 86, 27));
 
-		lblMeusLivros.setFont(
-				new Font(
-						"Tahoma",
-						Font.BOLD,
-						34
-				)
-		);
+		lblMeusLivros.setFont(new Font("Tahoma", Font.BOLD, 34));
 
-		contentPane.add(
-				lblMeusLivros,
-				"cell 0 1 5 1,alignx center"
-		);
-
+		contentPane.add(lblMeusLivros, "cell 0 1 5 1,alignx center");
 
 		// =====================================================
 		// PAINEL VERDE DOS LIVROS
@@ -234,164 +168,87 @@ public class TelaMeusLivros extends JFrame {
 
 		RoundedPanel painelLivros = new RoundedPanel(
 
-				new MigLayout(
-						"insets 20 35 25 35",
-						"[grow][grow][grow][grow][grow][grow]",
-						"[grow][]"
-				),
+				new MigLayout("insets 20 35 25 35", "[grow][grow][grow][grow][grow][grow]", "[grow][]"),
 
-				40
-		);
+				40);
 
-		painelLivros.setBackground(
-				new Color(36, 107, 45)
-		);
+		painelLivros.setBackground(new Color(36, 107, 45));
 
-		painelLivros.setBorder(
-				BorderFactory.createEmptyBorder(
-						20,
-						35,
-						25,
-						35
-				)
-		);
+		painelLivros.setBorder(BorderFactory.createEmptyBorder(20, 35, 25, 35));
 
-		contentPane.add(
-				painelLivros,
-				"cell 0 2 5 8,grow"
-		);
-
+		contentPane.add(painelLivros, "cell 0 2 5 8,grow");
 
 		// =====================================================
 		// LIVRO 1
 		// =====================================================
 
-		JLabel livro1 = criarLivro(
-				"/imagens/livroDemo.png"
-		);
+		JLabel livro1 = criarLivro("/imagens/livroDemo.png");
 
-		painelLivros.add(
-				livro1,
-				"cell 0 0,alignx center,aligny top"
-		);
-
+		painelLivros.add(livro1, "cell 0 0,alignx center,aligny top");
 
 		// =====================================================
 		// LIVRO 2
 		// =====================================================
 
-		JLabel livro2 = criarLivro(
-				"/imagens/livroDemo.png"
-		);
+		JLabel livro2 = criarLivro("/imagens/livroDemo.png");
 
-		painelLivros.add(
-				livro2,
-				"cell 1 0,alignx center,aligny top"
-		);
-
+		painelLivros.add(livro2, "cell 1 0,alignx center,aligny top");
 
 		// =====================================================
 		// LIVRO 3
 		// =====================================================
 
-		JLabel livro3 = criarLivro(
-				"/imagens/livroDemo.png"
-		);
+		JLabel livro3 = criarLivro("/imagens/livroDemo.png");
 
-		painelLivros.add(
-				livro3,
-				"cell 2 0,alignx center,aligny top"
-		);
-
+		painelLivros.add(livro3, "cell 2 0,alignx center,aligny top");
 
 		// =====================================================
 		// LIVRO 4
 		// =====================================================
 
-		JLabel livro4 = criarLivro(
-				"/imagens/livroDemo.png"
-		);
+		JLabel livro4 = criarLivro("/imagens/livroDemo.png");
 
-		painelLivros.add(
-				livro4,
-				"cell 3 0,alignx center,aligny top"
-		);
-
+		painelLivros.add(livro4, "cell 3 0,alignx center,aligny top");
 
 		// =====================================================
 		// LIVRO 5
 		// =====================================================
 
-		JLabel livro5 = criarLivro(
-				"/imagens/livroDemo.png"
-		);
+		JLabel livro5 = criarLivro("/imagens/livroDemo.png");
 
-		painelLivros.add(
-				livro5,
-				"cell 4 0,alignx center,aligny top"
-		);
-
+		painelLivros.add(livro5, "cell 4 0,alignx center,aligny top");
 
 		// =====================================================
 		// LIVRO 6
 		// =====================================================
 
-		JLabel livro6 = criarLivro(
-				"/imagens/livroDemo.png"
-		);
+		JLabel livro6 = criarLivro("/imagens/livroDemo.png");
 
-		painelLivros.add(
-				livro6,
-				"cell 5 0,alignx center,aligny top"
-		);
+		painelLivros.add(livro6, "cell 5 0,alignx center,aligny top");
 
+		ImageIcon cadastrarIcon = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/BotaoCadastrar.png"));
 
-		// =====================================================
-		// BOTÃO MOSTRAR MAIS
-		// =====================================================
+		Image imagemCadastrar = cadastrarIcon.getImage().getScaledInstance(250, 100, Image.SCALE_SMOOTH);
 
-		JButton btnMostrarMais = new JButton(
-				"Mostrar Mais  +"
-		);
+		JButton btnNewButton = new JButton("");
 
-		btnMostrarMais.setFont(
-				new Font(
-						"Tahoma",
-						Font.PLAIN,
-						24
-				)
-		);
+		btnNewButton.setContentAreaFilled(false);
+		btnNewButton.setBorderPainted(false);
+		btnNewButton.setFocusPainted(false);
 
-		btnMostrarMais.setForeground(
-				new Color(120, 210, 120)
-		);
+		btnNewButton.setIcon(new ImageIcon(imagemCadastrar));
 
-		btnMostrarMais.setBackground(
-				new Color(10, 80, 25)
-		);
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 
-		btnMostrarMais.setBorder(
-				BorderFactory.createEmptyBorder(
-						8,
-						35,
-						8,
-						35
-				)
-		);
+		painelLivros.add(btnNewButton, "cell 0 1 6 1,alignx center,aligny center");
 
-		btnMostrarMais.setFocusPainted(false);
-		btnMostrarMais.setBorderPainted(false);
-
-		painelLivros.add(
-				btnMostrarMais,
-				"cell 4 1 2 1,alignx right,aligny bottom"
-		);
-		
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/Logo.png")));
 		contentPane.add(lblNewLabel, "cell 1 0 3 1,alignx center");
 	}
-
 
 	// =====================================================
 	// MÉTODO PARA CRIAR A CAPA DO LIVRO
@@ -401,33 +258,25 @@ public class TelaMeusLivros extends JFrame {
 
 		JLabel livro = new JLabel();
 
-		ImageIcon icone = new ImageIcon(
-				TelaMeusLivros.class.getResource(caminho)
-		);
+		ImageIcon icone = new ImageIcon(TelaMeusLivros.class.getResource(caminho));
 
-		Image imagem = icone.getImage().getScaledInstance(
-				135,
-				170,
-				Image.SCALE_SMOOTH
-		);
+		Image imagem = icone.getImage().getScaledInstance(135, 170, Image.SCALE_SMOOTH);
 
-		livro.setIcon(
-				new ImageIcon(imagem)
-		);
+		livro.setIcon(new ImageIcon(imagem));
 
 		return livro;
 	}
 
-    public JButton getBtnHome() {
-        return btnHome;
-    }
+	public JButton getBtnHome() {
+		return btnHome;
+	}
 
-    public JButton getBtnPerfil() {
-        return btnPerfil;
-    }
+	public JButton getBtnPerfil() {
+		return btnPerfil;
+	}
 
-    public JButton getBtnMostrarMais() {
-        return btnMostrarMais;
-    }
+	public JButton getBtnMostrarMais() {
+		return btnMostrarMais;
+	}
 
 }
