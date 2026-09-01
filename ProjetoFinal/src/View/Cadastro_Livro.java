@@ -17,7 +17,7 @@ import javax.swing.SwingConstants;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
-public class Cadastro extends JFrame {
+public class Cadastro_Livro extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -38,7 +38,7 @@ public class Cadastro extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Cadastro frame = new Cadastro();
+					Cadastro_Livro frame = new Cadastro_Livro();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -50,7 +50,7 @@ public class Cadastro extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Cadastro() {
+	public Cadastro_Livro() {
 	    setBackground(new Color(128, 255, 0));
 	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -66,7 +66,7 @@ public class Cadastro extends JFrame {
 	    JLabel lblNewLabel = new JLabel("");
 
 	    ImageIcon logoOriginal = new ImageIcon(
-	            Cadastro.class.getResource("/imagens/Logo.png"));
+	            Cadastro_Livro.class.getResource("/imagens/Logo.png"));
 
 	    Image logoRedimensionada = logoOriginal.getImage().getScaledInstance(
 	            300,
@@ -144,7 +144,7 @@ public class Cadastro extends JFrame {
 	    botaoCadastrar = new JButton("");
 	    botaoCadastrar.setContentAreaFilled(false);
 	    botaoCadastrar.setBorderPainted(false);
-	    botaoCadastrar.setIcon(new ImageIcon(Cadastro.class.getResource("/imagens/BotaoCerto.png")));
+	    botaoCadastrar.setIcon(new ImageIcon(Cadastro_Livro.class.getResource("/imagens/BotaoCerto.png")));
 	    panel.add(botaoCadastrar, "cell 2 20");
 	    panel.add(panel_1, "cell 1 23,grow");
 	    
