@@ -228,9 +228,7 @@ public class TelaMeusLivros extends JFrame {
 		);
 
 
-		// =====================================================
 		// PAINEL VERDE DOS LIVROS
-		// =====================================================
 
 		RoundedPanel painelLivros = new RoundedPanel(
 

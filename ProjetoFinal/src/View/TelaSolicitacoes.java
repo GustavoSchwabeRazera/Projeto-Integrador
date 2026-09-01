@@ -246,7 +246,7 @@ public class TelaSolicitacoes extends JFrame {
             ),
             40
         );
-        painelSolicitacoes.setForeground(new Color(0, 128, 0));
+        painelSolicitacoes.setForeground(new Color(10, 86, 27));
 
         painelSolicitacoes.setBackground(
             new Color(36, 107, 45)
