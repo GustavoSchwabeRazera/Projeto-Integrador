@@ -1,6 +1,10 @@
 package controller;
 
 import java.awt.Color;
+
+import java.sql.SQLException;
+import java.util.List;
+
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -12,6 +16,7 @@ import View.TelaLogin;
 import View.TelaMeusLivros;
 import View.TelaSolicitacoes;
 import View.tela_inicial;
+import dao.LivroDAO;
 import View.Calendario;
 import View.Cadastro_usuario;
 
@@ -34,11 +39,14 @@ public class LivroController {
     private final Calendario calendario;
     private final Cadastro_usuario cadastro_usuario;
 
+	private LivroDAO livroDAO;
+
     /*
      * Construtor principal: mantém compatibilidade com o seu Main atual.
      */
-    public LivroController(LivroTableModel modelo, Cadastro_Livro view) {
+    public LivroController(LivroDAO livroDAO, LivroTableModel modelo, Cadastro_Livro view) {
         this.livroModel = modelo;
+        this.livroDAO = livroDAO;
         this.cadastro_livro = view;
         this.CriarConta = new TelaCriarConta();
         this.telaLogin = new TelaLogin();
@@ -58,8 +66,8 @@ public class LivroController {
     /*
      * Construtor alternativo caso queira iniciar sem criar Cadastro no Main.
      */
-    public LivroController(LivroTableModel modelo) {
-        this(modelo, new Cadastro_Livro());
+    public LivroController(LivroDAO livroDAO, LivroTableModel modelo) {
+        this(livroDAO, modelo, new Cadastro_Livro());
     }
 
     private void configurarEventos() {
@@ -226,6 +234,8 @@ public class LivroController {
                     autor,
                     genero
             );
+            
+         //   livroDAO.inserir(livro);
 
             livroModel.adicionarLivro(livro);
 
@@ -260,6 +270,16 @@ public class LivroController {
             mostrarMensagem("Digite o nome do livro para pesquisar.");
             return;
         }
+
+        
+      
+
+       try {
+		List<Livro> listaLivros = livroDAO.buscarLivrosPorNome(texto);
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 
         /*
          * A busca visual depende do método de pesquisa disponível no seu

@@ -206,9 +206,7 @@ public class Cadastro_usuario extends JFrame {
 	public TelaUsuario criarTelaUsuario() {
 	    return new TelaUsuario();
 	}
-	public JButton getBtnMostrarTabela() {
-	    return btnNewButton;
-	}
+	
 
 
 	public JButton getBtnHome() {

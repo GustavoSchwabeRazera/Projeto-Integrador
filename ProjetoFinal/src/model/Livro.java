@@ -7,6 +7,8 @@ public class Livro {
 	private int anoLancamento;
 	private String autor;
 	private String genero;
+	
+	
 	public Livro(String nome, String editora, int anoLancamento, String autor, String genero) {
 		super();
 		this.nome = nome;

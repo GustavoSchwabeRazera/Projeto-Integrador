@@ -354,11 +354,10 @@ public class tela_inicial extends JFrame {
                                 btnHistorico.addActionListener(
                                     new ActionListener() {
                                         public void actionPerformed(ActionEvent e) {
-<<<<<<< HEAD
+
                                             
                                             dispose();
-=======
->>>>>>> origin/main
+
                                         }
                                     }
                                 );
