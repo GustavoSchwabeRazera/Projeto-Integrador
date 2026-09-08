@@ -29,6 +29,7 @@ public class Cadastro_Livro extends JFrame {
 	
 	private JComboBox comboBox;
 	private JButton botaoCadastrar;
+	private JTextField textField;
 	
 
 	/**
@@ -85,9 +86,10 @@ public class Cadastro_Livro extends JFrame {
 	    JPanel panel = new ImagePanel();
 	    panel.setOpaque(false);
 	    contentPane.add(panel, "cell 2 4,grow");
-	    panel.setLayout(new MigLayout("", "[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]", "[73.00][][][28.00][][][][24.00][][][][][27.00][][][][31.00][35.00][][31.00][][][][grow]"));
+	    panel.setLayout(new MigLayout("", "[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]", "[73.00][][][28.00][][][][24.00][][][][][27.00][][][][31.00][35.00][][31.00][][][][][][grow]"));
 	    
-	    JLabel lblNewLabel_1 = new JLabel("Nome do Livro");
+	    JLabel lblNewLabel_1 = new JLabel("TÍTULO DO LIVRO:");
+	    lblNewLabel_1.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
 	    lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 30));
 	    panel.add(lblNewLabel_1, "cell 0 1 6 1,alignx center");
@@ -97,7 +99,8 @@ public class Cadastro_Livro extends JFrame {
 	    panel.add(txtNome, "cell 2 2,growx,h 42!");
 	    txtNome.setColumns(10);
 	    
-	    JLabel lblNewLabel_1_1_1 = new JLabel("Editora");
+	    JLabel lblNewLabel_1_1_1 = new JLabel("EDITORA:");
+	    lblNewLabel_1_1_1.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
 	    lblNewLabel_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 30));
 	    panel.add(lblNewLabel_1_1_1, "cell 0 4 6 1,growx");
@@ -105,56 +108,69 @@ public class Cadastro_Livro extends JFrame {
 	    txtEditora = new JTextField();
 	    txtEditora.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 	    txtEditora.setColumns(10);
-	    panel.add(txtEditora, "cell 2 6,growx,h 42!");
+	    panel.add(txtEditora, "cell 2 5,growx,height 42!");
 	    
-	    JLabel lblNewLabel_1_1_1_1 = new JLabel("Ano de Lançamento");
+	    JLabel lblNewLabel_1_1_1_1 = new JLabel("DATA DE LANÇAMENTO:");
+	    lblNewLabel_1_1_1_1.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_1_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
 	    lblNewLabel_1_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 30));
-	    panel.add(lblNewLabel_1_1_1_1, "cell 0 9 6 1,alignx center");
+	    panel.add(lblNewLabel_1_1_1_1, "cell 2 7,alignx center");
 	    
 	    txtAno = new JTextField();
 	    txtAno.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 	    txtAno.setColumns(10);
-	    panel.add(txtAno, "cell 2 11,growx,h 42!");
+	    panel.add(txtAno, "cell 2 8,growx,height 42!");
 	    
-	    JLabel lblNewLabel_1_1_1_1_1 = new JLabel("Autor");
+	    JLabel lblNewLabel_1_1_1_1_1 = new JLabel("AUTOR:");
+	    lblNewLabel_1_1_1_1_1.setForeground(new Color(10, 86, 27));
 	    lblNewLabel_1_1_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
 	    lblNewLabel_1_1_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 30));
-	    panel.add(lblNewLabel_1_1_1_1_1, "cell 0 13 6 1,growx");
+	    panel.add(lblNewLabel_1_1_1_1_1, "cell 2 10,growx");
 	    
 	    txtAutor = new JTextField();
 	    txtAutor.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 	    txtAutor.setColumns(10);
-	    panel.add(txtAutor, "cell 2 15,growx,h 42!");
-	    
-	    JLabel lblNewLabel_1_1_1_1_1_1 = new JLabel("Genero");
-	    lblNewLabel_1_1_1_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
-	    lblNewLabel_1_1_1_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 30));
-	    panel.add(lblNewLabel_1_1_1_1_1_1, "cell 0 17 6 1,alignx center");
+	    panel.add(txtAutor, "cell 2 11,growx,height 42!");
 	    
 	    JPanel panel_1 = new JPanel();
 	    panel_1.setVisible(false);
 	    
+	    JLabel lblNewLabel_1_1_1_1_1_1 = new JLabel("GÊNERO:");
+	    lblNewLabel_1_1_1_1_1_1.setForeground(new Color(10, 86, 27));
+	    lblNewLabel_1_1_1_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
+	    lblNewLabel_1_1_1_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 30));
+	    panel.add(lblNewLabel_1_1_1_1_1_1, "cell 2 13,alignx center");
+	    
 	    
 	    comboBox = new JComboBox();
 	    comboBox.setModel(new DefaultComboBoxModel(Generos.values()));
-	    panel.add(comboBox, "cell 2 18,growx,height 42!");
+	    panel.add(comboBox, "cell 2 14,growx,height 42!");
+	    
+	    JLabel lblNewLabel_3 = new JLabel("ISBN:");
+	    lblNewLabel_3.setForeground(new Color(10, 86, 27));
+	    lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 30));
+	    panel.add(lblNewLabel_3, "cell 2 16");
+	    
+	    textField = new JTextField();
+	    textField.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+	    textField.setColumns(10);
+	    panel.add(textField, "cell 2 17,growx");
 	    
 	    
 	    botaoCadastrar = new JButton("");
 	    botaoCadastrar.setContentAreaFilled(false);
 	    botaoCadastrar.setBorderPainted(false);
 	    botaoCadastrar.setIcon(new ImageIcon(Cadastro_Livro.class.getResource("/imagens/BotaoCerto.png")));
-	    panel.add(botaoCadastrar, "cell 2 20");
-	    panel.add(panel_1, "cell 1 23,grow");
+	    panel.add(botaoCadastrar, "cell 2 23");
+	    panel.add(panel_1, "cell 1 25,grow");
 	    
 	    JPanel panel_2 = new JPanel();
 	    panel_2.setVisible(false);
-	    panel.add(panel_2, "cell 2 23");
+	    panel.add(panel_2, "cell 2 25");
 	    
 	    JPanel panel_3 = new JPanel();
 	    panel_3.setVisible(false);
-	    panel.add(panel_3, "cell 3 23,grow");
+	    panel.add(panel_3, "cell 3 25,grow");
 	}
 
 	

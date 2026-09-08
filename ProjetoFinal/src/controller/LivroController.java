@@ -11,6 +11,7 @@ import javax.swing.UIManager;
 import View.Cadastro_Livro;
 import View.Perfil;
 import View.PesquisarLivro;
+import View.TelaAlterarCadastro;
 import View.TelaCriarConta;
 import View.TelaLogin;
 import View.TelaMeusLivros;
@@ -18,8 +19,6 @@ import View.TelaSolicitacoes;
 import View.tela_inicial;
 import dao.LivroDAO;
 import View.Calendario;
-import View.Cadastro_usuario;
-
 import model.Livro;
 import model.LivroTableModel;
 
@@ -37,7 +36,7 @@ public class LivroController {
     private final Cadastro_Livro cadastro_livro;
     private final TelaCriarConta CriarConta;
     private final Calendario calendario;
-    private final Cadastro_usuario cadastro_usuario;
+    private final TelaAlterarCadastro alterarCadastro;
 
 	private LivroDAO livroDAO;
 
@@ -56,7 +55,7 @@ public class LivroController {
         this.telaMeusLivros = new TelaMeusLivros();
         this.perfil = new Perfil();
         this.calendario = new Calendario();
-        this.cadastro_usuario = new Cadastro_usuario();
+        this.alterarCadastro = new TelaAlterarCadastro();
         
         
 
@@ -119,8 +118,7 @@ public class LivroController {
         // PERFIL
         // =========================
         perfil.getBtnHome().addActionListener(e -> abrirHome());
-        perfil.getBtnAlterarCadastro().addActionListener(e -> abrirCadastroUsuario());
-
+        perfil.getBtnAlterarCadastro().addActionListener(e -> abrirAlterarCadastro());
         // =========================
         // CADASTRO LIVROS
         // =========================
@@ -133,7 +131,6 @@ public class LivroController {
         // =========================
         // CADASTRO USUARIO
         // =========================
-        cadastro_usuario.getBtnHome().addActionListener(e -> abrirHome());
         
         
     }
@@ -188,10 +185,14 @@ public class LivroController {
     	esconderTodas();
     	calendario.setVisible(true);
     }
-    private void abrirCadastroUsuario() {
+    
+    private void abrirAlterarCadastro() {
     	esconderTodas();
-    	cadastro_usuario.setVisible(true);
+    	alterarCadastro.setVisible(true);
     }
+                                        
+
+   
 
     private void esconderTodas() {
         telaLogin.setVisible(false);
@@ -203,7 +204,6 @@ public class LivroController {
         cadastro_livro.setVisible(false);
         CriarConta.setVisible(false);
         calendario.setVisible(false);
-        cadastro_usuario.setVisible(false);
     }
 
     // =========================================================
