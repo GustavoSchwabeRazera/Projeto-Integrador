@@ -9,11 +9,11 @@ import java.awt.LayoutManager;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -28,10 +28,17 @@ import javax.swing.BorderFactory;
 
 import net.miginfocom.swing.MigLayout;
 
+import com.toedter.calendar.JCalendar;
+import com.toedter.calendar.IDateEvaluator;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -49,17 +56,12 @@ public class Calendario extends JFrame {
     private static final Color VERDE_ESCURO      = new Color(10, 86, 27);   // textos/título
     private static final Color VERDE_PAINEL      = new Color(36, 107, 45);  // painel principal
     private static final Color VERDE_CARD        = new Color(174, 244, 198); // cards internos
-    private static final Color VERDE_HOJE        = new Color(255, 255, 255); // destaque "hoje"
-    private static final Color VERDE_SELECIONADO = new Color(10, 86, 27);   // dia selecionado
     private static final Color DOURADO_EVENTO    = new Color(230, 178, 44); // marcador de evento
 
     private JPanel contentPane;
     private JButton btnHome;
 
-    private JButton btnMesAnterior;
-    private JButton btnMesProximo;
-    private JLabel lblMesAno;
-    private JPanel painelDias;
+    private JCalendar calendario;
 
     private JLabel lblDataSelecionada;
     private DefaultListModel<String> modeloEventos;
@@ -68,9 +70,7 @@ public class Calendario extends JFrame {
     private JButton btnAdicionarEvento;
     private JButton btnRemoverEvento;
 
-    private YearMonth mesAtual;
     private LocalDate dataSelecionada;
-    private JButton botaoDiaSelecionado;
     private final Map<LocalDate, List<String>> eventosPorData = new LinkedHashMap<>();
 
     /**
@@ -143,8 +143,6 @@ public class Calendario extends JFrame {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         setBounds(100, 100, 1920, 1080);
 
-        mesAtual = YearMonth.now();
-
         contentPane = new JPanel();
         contentPane.setBackground(VERDE_FUNDO);
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -206,31 +204,29 @@ public class Calendario extends JFrame {
             "cell 0 1 5 1,alignx center"
         );
 
-        
-        
-                // =====================================================
-                // TÍTULO
-                // =====================================================
-        
-                JLabel lblCalendario = new JLabel("Calendário");
-                
-                        lblCalendario.setForeground(VERDE_ESCURO);
-                        lblCalendario.setFont(new Font("Tahoma", Font.BOLD, 34));
-                        
-                                contentPane.add(
-                                    lblCalendario,
-                                    "cell 2 2,alignx center"
-                                );
+        // =====================================================
+        // TÍTULO
+        // =====================================================
+
+        JLabel lblCalendario = new JLabel("Calendário");
+
+        lblCalendario.setForeground(VERDE_ESCURO);
+        lblCalendario.setFont(new Font("Tahoma", Font.BOLD, 34));
+
+        contentPane.add(
+            lblCalendario,
+            "cell 2 2,alignx center"
+        );
 
         // =====================================================
-        // PAINEL DO CALENDÁRIO (esquerda)
+        // PAINEL DO CALENDÁRIO (esquerda) - agora usando JCalendar
         // =====================================================
 
         RoundedPanel painelCalendario = new RoundedPanel(
             new MigLayout(
-                "insets 25 30 25 30",
+                "insets 25 30 25 30, fill",
                 "[grow]",
-                "[]15[]15[grow]"
+                "[grow]"
             ),
             40
         );
@@ -242,54 +238,57 @@ public class Calendario extends JFrame {
             "cell 0 4 3 8,grow"
         );
 
-        // ---- navegação de mês ----
+        calendario = new JCalendar(new Locale("pt", "BR"));
+        calendario.setWeekOfYearVisible(false);
+        estilizarCalendario(calendario);
 
-        JPanel painelNavegacao = new JPanel(
-            new MigLayout(
-                "insets 0",
-                "[]push[grow,center]push[]",
-                "[]"
-            )
-        );
-        painelNavegacao.setOpaque(false);
+        // marca com uma bolinha dourada os dias que já têm evento cadastrado
+        calendario.getDayChooser().addDateEvaluator(new IDateEvaluator() {
 
-        btnMesAnterior = new JButton("<");
-        estilizarBotaoNavegacao(btnMesAnterior);
+            @Override
+            public boolean isSpecial(Date date) {
+                LocalDate data = converterParaLocalDate(date);
+                List<String> eventos = eventosPorData.get(data);
+                return eventos != null && !eventos.isEmpty();
+            }
 
-        lblMesAno = new JLabel("", javax.swing.SwingConstants.CENTER);
-        lblMesAno.setForeground(Color.WHITE);
-        lblMesAno.setFont(new Font("Tahoma", Font.BOLD, 24));
+            @Override
+            public Color getSpecialForegroundColor() {
+                return VERDE_ESCURO;
+            }
 
-        btnMesProximo = new JButton(">");
-        estilizarBotaoNavegacao(btnMesProximo);
+            @Override
+            public Color getSpecialBackroundColor() {
+                return DOURADO_EVENTO;
+            }
 
-        painelNavegacao.add(btnMesAnterior, "cell 0 0");
-        painelNavegacao.add(lblMesAno, "cell 1 0,growx");
-        painelNavegacao.add(btnMesProximo, "cell 2 0");
+            @Override
+            public String getSpecialTooltip() {
+                return "Há eventos nesse dia";
+            }
 
-        painelCalendario.add(painelNavegacao, "cell 0 0,growx");
+            @Override
+            public boolean isInvalid(Date date) {
+                return false;
+            }
 
-        // ---- cabeçalho dos dias da semana ----
+            @Override
+            public Color getInvalidForegroundColor() {
+                return null;
+            }
 
-        JPanel painelCabecalhoSemana = new JPanel(new GridLayout(1, 7, 6, 6));
-        painelCabecalhoSemana.setOpaque(false);
+            @Override
+            public Color getInvalidBackroundColor() {
+                return null;
+            }
 
-        String[] diasSemana = {"Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"};
-        for (String dia : diasSemana) {
-            JLabel lblDia = new JLabel(dia, javax.swing.SwingConstants.CENTER);
-            lblDia.setForeground(Color.WHITE);
-            lblDia.setFont(new Font("Tahoma", Font.BOLD, 14));
-            painelCabecalhoSemana.add(lblDia);
-        }
+            @Override
+            public String getInvalidTooltip() {
+                return null;
+            }
+        });
 
-        painelCalendario.add(painelCabecalhoSemana, "cell 0 1,growx");
-
-        // ---- grade de dias ----
-
-        painelDias = new JPanel(new GridLayout(6, 7, 6, 6));
-        painelDias.setOpaque(false);
-
-        painelCalendario.add(painelDias, "cell 0 2,grow");
+        painelCalendario.add(calendario, "cell 0 0,grow");
 
         // =====================================================
         // PAINEL DE EVENTOS (direita)
@@ -357,17 +356,14 @@ public class Calendario extends JFrame {
         // AÇÕES
         // =====================================================
 
-        btnMesAnterior.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mesAtual = mesAtual.minusMonths(1);
-                atualizarGradeCalendario();
-            }
-        });
-
-        btnMesProximo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mesAtual = mesAtual.plusMonths(1);
-                atualizarGradeCalendario();
+        // dispara sempre que o usuário troca o dia (ou navega de mês/ano e clica num dia)
+        calendario.addPropertyChangeListener("date", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                Date novaData = calendario.getDate();
+                if (novaData != null) {
+                    selecionarData(converterParaLocalDate(novaData));
+                }
             }
         });
 
@@ -389,95 +385,25 @@ public class Calendario extends JFrame {
             }
         });
 
-        atualizarGradeCalendario();
+        // seleciona hoje já na abertura da tela
+        selecionarData(LocalDate.now());
     }
 
     // =====================================================
-    // MONTA A GRADE DE DIAS DO MÊS ATUAL
+    // CONVERSÃO Date <-> LocalDate
     // =====================================================
-    private void atualizarGradeCalendario() {
-
-        painelDias.removeAll();
-        botaoDiaSelecionado = null;
-
-        String nomeMes = mesAtual.getMonth().getDisplayName(TextStyle.FULL, new Locale("pt", "BR"));
-        nomeMes = nomeMes.substring(0, 1).toUpperCase() + nomeMes.substring(1);
-        lblMesAno.setText(nomeMes + " de " + mesAtual.getYear());
-
-        LocalDate primeiroDia = mesAtual.atDay(1);
-        int offset = primeiroDia.getDayOfWeek().getValue() % 7; // Domingo = 0
-        int diasNoMes = mesAtual.lengthOfMonth();
-
-        for (int i = 0; i < offset; i++) {
-            JLabel vazio = new JLabel("");
-            painelDias.add(vazio);
-        }
-
-        for (int dia = 1; dia <= diasNoMes; dia++) {
-            LocalDate data = mesAtual.atDay(dia);
-            painelDias.add(criarBotaoDia(data));
-        }
-
-        int totalCelulas = offset + diasNoMes;
-        int restante = (7 - (totalCelulas % 7)) % 7;
-        for (int i = 0; i < restante; i++) {
-            painelDias.add(new JLabel(""));
-        }
-
-        painelDias.revalidate();
-        painelDias.repaint();
-    }
-
-    // =====================================================
-    // CRIA UM BOTÃO DE DIA COM VISUAL CONSISTENTE
-    // =====================================================
-    private JButton criarBotaoDia(final LocalDate data) {
-
-        JButton botao = new JButton(String.valueOf(data.getDayOfMonth()));
-        botao.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        botao.setFocusPainted(false);
-        botao.setOpaque(true);
-        botao.setBorderPainted(true);
-
-        boolean temEvento = eventosPorData.containsKey(data) && !eventosPorData.get(data).isEmpty();
-        boolean ehHoje = data.equals(LocalDate.now());
-
-        if (ehHoje) {
-            botao.setBackground(VERDE_HOJE);
-            botao.setForeground(VERDE_ESCURO);
-            botao.setBorder(BorderFactory.createLineBorder(VERDE_ESCURO, 2));
-        } else {
-            botao.setBackground(VERDE_CARD);
-            botao.setForeground(VERDE_ESCURO);
-            botao.setBorder(BorderFactory.createLineBorder(VERDE_PAINEL, 1));
-        }
-
-        if (temEvento) {
-            botao.setText("<html><center>" + data.getDayOfMonth() + "<br><font color='#E6B22C'>&#9679;</font></center></html>");
-        }
-
-        botao.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                selecionarData(data, botao);
-            }
-        });
-
-        return botao;
+    private LocalDate converterParaLocalDate(Date date) {
+        return Instant.ofEpochMilli(date.getTime())
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate();
     }
 
     // =====================================================
     // SELEÇÃO DE DATA
     // =====================================================
-    private void selecionarData(LocalDate data, JButton botaoClicado) {
+    private void selecionarData(LocalDate data) {
 
         dataSelecionada = data;
-
-        if (botaoDiaSelecionado != null) {
-            botaoDiaSelecionado.setBorder(BorderFactory.createLineBorder(VERDE_PAINEL, 1));
-        }
-
-        botaoClicado.setBorder(BorderFactory.createLineBorder(VERDE_SELECIONADO, 3));
-        botaoDiaSelecionado = botaoClicado;
 
         String[] diasSemana = {"domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"};
         DayOfWeek dow = data.getDayOfWeek();
@@ -526,9 +452,8 @@ public class Calendario extends JFrame {
         campoNovoEvento.setText("");
 
         atualizarListaEventos();
-        atualizarGradeCalendario();
-        // reseleciona visualmente a data após redesenhar a grade
-        realcarBotaoDaDataSelecionada();
+        // repinta a grade do JCalendar pra mostrar/atualizar a bolinha dourada do dia
+        calendario.getDayChooser().repaint();
     }
 
     private void removerEventoSelecionado() {
@@ -547,38 +472,46 @@ public class Calendario extends JFrame {
         }
 
         atualizarListaEventos();
-        atualizarGradeCalendario();
-        realcarBotaoDaDataSelecionada();
-    }
-
-    // Depois de redesenhar a grade, reencontra e realça o botão do dia selecionado
-    private void realcarBotaoDaDataSelecionada() {
-        if (dataSelecionada == null) return;
-
-        for (java.awt.Component c : painelDias.getComponents()) {
-            if (c instanceof JButton) {
-                JButton b = (JButton) c;
-                String texto = ((JButton) c).getText().replaceAll("<[^>]*>", "").trim();
-                if (texto.equals(String.valueOf(dataSelecionada.getDayOfMonth()))
-                        && mesAtual.equals(YearMonth.from(dataSelecionada))) {
-                    b.setBorder(BorderFactory.createLineBorder(VERDE_SELECIONADO, 3));
-                    botaoDiaSelecionado = b;
-                    break;
-                }
-            }
-        }
+        calendario.getDayChooser().repaint();
     }
 
     // =====================================================
     // ESTILOS AUXILIARES
     // =====================================================
-    private void estilizarBotaoNavegacao(JButton botao) {
-        botao.setFont(new Font("Tahoma", Font.BOLD, 22));
-        botao.setForeground(Color.WHITE);
-        botao.setBorderPainted(false);
-        botao.setContentAreaFilled(false);
-        botao.setFocusPainted(false);
-        botao.setPreferredSize(new Dimension(40, 40));
+
+    /**
+     * Aplica a paleta de cores do sistema (verde escuro/dourado) ao JCalendar.
+     * A API da lib expõe estilização de: fundo/fonte geral (propaga pros
+     * componentes internos), linha de cabeçalho dos dias da semana e as
+     * cores do texto de domingo x dias úteis. O combo de mês e o campo de
+     * ano também são pegos manualmente para ficarem no mesmo tom.
+     */
+    private void estilizarCalendario(JCalendar calendario) {
+
+        calendario.setBackground(Color.WHITE);
+        calendario.setForeground(VERDE_ESCURO);
+        calendario.setFont(new Font("Tahoma", Font.PLAIN, 14));
+
+        // linha "Dom Seg Ter Qua Qui Sex Sáb"
+        calendario.setDecorationBackgroundColor(VERDE_PAINEL);
+        calendario.setWeekdayForeground(Color.WHITE);
+        calendario.setSundayForeground(DOURADO_EVENTO);
+
+        calendario.getDayChooser().setBackground(Color.WHITE);
+
+        // combo de mês (ex: "Janeiro")
+        Object comboMes = calendario.getMonthChooser().getComboBox();
+        if (comboMes instanceof JComboBox) {
+            JComboBox<?> combo = (JComboBox<?>) comboMes;
+            combo.setBackground(Color.WHITE);
+            combo.setForeground(VERDE_ESCURO);
+            combo.setFont(new Font("Tahoma", Font.BOLD, 14));
+        }
+
+        // campo/spinner de ano
+        calendario.getYearChooser().setBackground(Color.WHITE);
+        calendario.getYearChooser().setForeground(VERDE_ESCURO);
+        calendario.getYearChooser().setFont(new Font("Tahoma", Font.BOLD, 14));
     }
 
     private void estilizarBotaoAcao(JButton botao, Color cor) {
@@ -597,7 +530,9 @@ public class Calendario extends JFrame {
         return btnHome;
     }
 
-   
+    public JCalendar getCalendario() {
+        return calendario;
+    }
 
     public LocalDate getDataSelecionada() {
         return dataSelecionada;
