@@ -34,7 +34,6 @@ public class LivroDAO {
 
         stmt.executeUpdate();
 
-        stmt.close();
     }
 
     // READ - Listar todos os livros
@@ -88,13 +87,12 @@ public class LivroDAO {
             );
 
             rs.close();
-            stmt.close();
-
+        
             return livro;
         }
 
         rs.close();
-        stmt.close();
+    
 
         return null;
     }
@@ -119,7 +117,7 @@ public class LivroDAO {
 
         stmt.executeUpdate();
 
-        stmt.close();
+        
     }
 
     // DELETE - Excluir livro
@@ -133,7 +131,7 @@ public class LivroDAO {
 
         stmt.executeUpdate();
 
-        stmt.close();
+       
     }
 
 	public List<Livro> buscarLivrosPorNome(String texto) throws SQLException {
@@ -159,7 +157,7 @@ public class LivroDAO {
 	        }
 
 	        rs.close();
-	        stmt.close();
+	       
 
 	        return livros;
 	}

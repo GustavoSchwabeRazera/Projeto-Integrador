@@ -249,10 +249,19 @@ public class TelaLogin extends JFrame {
 		panelLogin.add(lblCadastro, "cell 0 10,alignx center");
 	}
 
-	public JButton getLblCadastro() {
-		return lblCadastro;
-	}
-
 	public void setLblCadastro(JButton lblCadastro) {
 		this.lblCadastro = lblCadastro;
-	}}
+	}
+	public JTextField getTxtNome() {
+	    return txtNome;
+	}
+
+	public JPasswordField getTxtSenha() {
+	    return txtSenha;
+	}
+	public JButton getLblCadastro() {
+	    return lblCadastro;
+	}
+
+
+}

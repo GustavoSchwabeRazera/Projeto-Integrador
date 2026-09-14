@@ -27,6 +27,7 @@ public class tela_inicial extends JFrame {
     private JButton btnPerfil;
     private JButton btnSair;
     private JButton btnCalendario;
+    private JButton btnHistorico;
 
     /**
      * Launch the application.
@@ -345,7 +346,7 @@ public class tela_inicial extends JFrame {
         
                 // HISTÓRICO
         
-                JButton btnHistorico = new JButton("");
+                btnHistorico = new JButton("");
                 
                         btnHistorico.setBorderPainted(false);
                         btnHistorico.setContentAreaFilled(false);
@@ -406,5 +407,8 @@ public class tela_inicial extends JFrame {
 
 	public JButton getBtnCalendario() {
 		return btnCalendario;
+	}
+	public JButton getBtnHistorico() {
+		return btnHistorico;
 	}
 }

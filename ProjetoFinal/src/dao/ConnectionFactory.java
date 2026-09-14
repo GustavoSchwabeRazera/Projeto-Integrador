@@ -5,19 +5,20 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionFactory {
-	
-	private static Connection conn;
-	
+
+    private static Connection conn;
+
     public static Connection getConnection() throws SQLException {
-    	
-    	if(ConnectionFactory.conn == null) {
+
+        if (conn == null || conn.isClosed()) {
+
             String url = "jdbc:mysql://localhost:3306/capasvivas";
             String usuario = "root";
             String senha = "admin";
 
-            ConnectionFactory.conn = DriverManager.getConnection(url, usuario, senha);
-    		
-    	}
-    	return ConnectionFactory.conn;
+            conn = DriverManager.getConnection(url, usuario, senha);
+        }
+
+        return conn;
     }
 }

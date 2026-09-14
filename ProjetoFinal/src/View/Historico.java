@@ -22,6 +22,7 @@ public class Historico extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private JButton btnHome;
 
 	/**
 	 * Launch the application.
@@ -66,6 +67,7 @@ public class Historico extends JFrame {
 	public Historico() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1920, 1080);
+		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		contentPane = new JPanel();
 		contentPane.setForeground(new Color(10, 86, 27));
 		contentPane.setBackground(new Color(175, 244, 198));
@@ -73,16 +75,16 @@ public class Historico extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new MigLayout("", "[307.00,grow][300.00,grow][grow][338.00,grow][322.00,grow]", "[grow][grow][grow][grow][grow]"));
 		
-		JButton btnNewButton = new JButton("");
-		btnNewButton.setDefaultCapable(false);
-		btnNewButton.setBorderPainted(false);
-		btnNewButton.setContentAreaFilled(false);
-		btnNewButton.setIcon(new ImageIcon(Historico.class.getResource("/imagens/casa 1.png")));
-		btnNewButton.addActionListener(new ActionListener() {
+		 btnHome = new JButton("");
+		btnHome.setDefaultCapable(false);
+		btnHome.setBorderPainted(false);
+		btnHome.setContentAreaFilled(false);
+		btnHome.setIcon(new ImageIcon(Historico.class.getResource("/imagens/casa 1.png")));
+		btnHome.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		contentPane.add(btnNewButton, "cell 0 0,alignx left");
+		contentPane.add(btnHome, "cell 0 0,alignx left");
 		
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setIcon(new ImageIcon(Historico.class.getResource("/imagens/LogoPequena.png")));
@@ -100,5 +102,14 @@ public class Historico extends JFrame {
 
 		
 	}
+
+	public JButton getBtnHome() {
+		return btnHome;
+	}
+
+	public void setBtnHome(JButton btnHome) {
+		this.btnHome = btnHome;
+	}
+	
 
 }

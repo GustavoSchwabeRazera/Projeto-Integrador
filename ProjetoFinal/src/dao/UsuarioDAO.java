@@ -3,6 +3,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
 public class UsuarioDAO {
 
@@ -33,6 +34,22 @@ public class UsuarioDAO {
             stmt.setString(6, dataMySQL);
 
             stmt.executeUpdate();
+        }
+    }
+    public boolean login(String email, String senha) throws SQLException {
+
+        String sql = "SELECT * FROM Usuarios WHERE email = ? AND senha = ?";
+
+        Connection conn = ConnectionFactory.getConnection();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+            stmt.setString(2, senha);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
         }
     }
 }

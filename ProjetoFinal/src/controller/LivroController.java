@@ -22,6 +22,7 @@ import View.Calendario;
 import model.Livro;
 import model.LivroTableModel;
 import dao.UsuarioDAO;
+import View.Historico;
 
 public class LivroController {
 
@@ -38,6 +39,7 @@ public class LivroController {
     private final TelaCriarConta CriarConta;
     private final Calendario calendario;
     private final TelaAlterarCadastro alterarCadastro;
+    private final Historico historico;
 
 	private LivroDAO livroDAO;
 
@@ -58,6 +60,7 @@ public class LivroController {
         this.calendario = new Calendario();
         this.alterarCadastro = new TelaAlterarCadastro();
         this.usuarioDAO = new UsuarioDAO();
+        this.historico = new Historico();
         
         
 
@@ -76,13 +79,14 @@ public class LivroController {
         // =========================
         // LOGIN
         // =========================
-        telaLogin.getBotaoEntrar().addActionListener(e -> abrirHome());
+    
+        telaLogin.getBotaoEntrar().addActionListener(e -> validarLogin());
         telaLogin.getLblCadastro().addActionListener(e -> abrirCriarConta());
         
         //==========================
         // Criar Conta
         //==========================
-        CriarConta.getBotaoCadastrar().addActionListener(e -> abrirHome());
+        CriarConta.getBotaoCadastrar().addActionListener(e -> cadastrarUsuario());
         CriarConta.getBotaoEntrar().addActionListener(e -> iniciar());
 
         // =========================
@@ -94,6 +98,7 @@ public class LivroController {
         telaInicial.getBtnPerfil().addActionListener(e -> abrirPerfil());
         telaInicial.getBtnSair().addActionListener(e -> iniciar());
         telaInicial.getBtnCalendario().addActionListener(e -> abrirCalendario());
+        telaInicial.getBtnHistorico().addActionListener(e -> abrirHistorico());
 
         // =========================
         // PESQUISA
@@ -129,13 +134,11 @@ public class LivroController {
         // Calendario
         // =========================
         calendario.getBtnHome().addActionListener(e -> abrirHome());
-        
         // =========================
-        // CADASTRO USUARIO
+        // HISTORICO
         // =========================
-        CriarConta.getBotaoCadastrar().addActionListener(e -> cadastrarUsuario());
-
-        CriarConta.getBotaoEntrar().addActionListener(e -> iniciar());
+      historico.getBtnHome().addActionListener(e -> abrirHome());
+    
         
     }
 
@@ -194,6 +197,10 @@ public class LivroController {
     	esconderTodas();
     	alterarCadastro.setVisible(true);
     }
+    private void abrirHistorico() {
+    	esconderTodas();
+    	historico.setVisible(true);
+    }
                                         
 
    
@@ -225,11 +232,6 @@ public class LivroController {
 
         String senha = new String(CriarConta.getTxtSenha().getPassword());
         String confirmarSenha = new String(CriarConta.getTxtConfirmarSenha().getPassword());
-        
-        if (senha.length() > 20) {
-            mostrarMensagem("A senha deve ter no máximo 20 caracteres.");
-            return;
-        }
 
         if (nome.isEmpty() || email.isEmpty() || telefone.isEmpty()
                 || cpf.isEmpty() || dataNascimento.contains("_")
@@ -239,8 +241,12 @@ public class LivroController {
             return;
         }
 
-        if (!senha.equals(confirmarSenha)) {
+        if (senha.length() > 20) {
+            mostrarMensagem("A senha deve ter no máximo 20 caracteres.");
+            return;
+        }
 
+        if (!senha.equals(confirmarSenha)) {
             mostrarMensagem("As senhas não são iguais.");
             return;
         }
@@ -248,7 +254,6 @@ public class LivroController {
         cpf = cpf.replaceAll("\\D", "");
 
         if (cpf.length() != 11) {
-
             mostrarMensagem("CPF deve possuir 11 números.");
             return;
         }
@@ -264,6 +269,7 @@ public class LivroController {
                 dataNascimento
             );
 
+            // Só chega aqui se o cadastro deu certo
             mostrarMensagem("Cadastro realizado com sucesso!");
 
             iniciar();
@@ -277,6 +283,8 @@ public class LivroController {
             } else {
                 mostrarMensagem("Erro ao cadastrar usuário.");
             }
+
+            // ❌ NÃO coloque iniciar() aqui
         }
     }
     
@@ -322,6 +330,41 @@ public class LivroController {
         }
     }
 
+    
+    private void validarLogin() {
+
+        String email = telaLogin.getTxtNome().getText().trim();
+
+        String senha = new String(
+            telaLogin.getTxtSenha().getPassword()
+        );
+
+        if (email.isEmpty() || senha.isEmpty()) {
+            mostrarMensagem("Preencha o e-mail e a senha.");
+            return;
+        }
+
+        try {
+
+            boolean loginValido = usuarioDAO.login(email, senha);
+
+            if (loginValido) {
+
+                telaLogin.dispose();
+                abrirHome();
+
+            } else {
+
+                mostrarMensagem("E-mail ou senha incorretos.");
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            mostrarMensagem("Erro ao acessar o banco de dados.");
+        }
+    }
+    
     private void limparCadastro() {
         cadastro_livro.getTxtNome().setText("");
         cadastro_livro.getTxtEditora().setText("");
