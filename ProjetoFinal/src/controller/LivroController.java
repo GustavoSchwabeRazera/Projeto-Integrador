@@ -21,12 +21,13 @@ import dao.LivroDAO;
 import View.Calendario;
 import model.Livro;
 import model.LivroTableModel;
-
+import dao.UsuarioDAO;
 
 public class LivroController {
 
     private final LivroTableModel livroModel;
 
+    private final UsuarioDAO usuarioDAO;
     private final TelaLogin telaLogin;
     private final tela_inicial telaInicial;
     private final PesquisarLivro pesquisarLivro;
@@ -56,6 +57,7 @@ public class LivroController {
         this.perfil = new Perfil();
         this.calendario = new Calendario();
         this.alterarCadastro = new TelaAlterarCadastro();
+        this.usuarioDAO = new UsuarioDAO();
         
         
 
@@ -131,7 +133,9 @@ public class LivroController {
         // =========================
         // CADASTRO USUARIO
         // =========================
-        
+        CriarConta.getBotaoCadastrar().addActionListener(e -> cadastrarUsuario());
+
+        CriarConta.getBotaoEntrar().addActionListener(e -> iniciar());
         
     }
 
@@ -204,12 +208,78 @@ public class LivroController {
         cadastro_livro.setVisible(false);
         CriarConta.setVisible(false);
         calendario.setVisible(false);
+        alterarCadastro.setVisible(false);
     }
 
     // =========================================================
     // CADASTRO -> MODEL
     // =========================================================
 
+    private void cadastrarUsuario() {
+
+        String nome = CriarConta.getTxtNome().getText().trim();
+        String email = CriarConta.getTxtEmail().getText().trim();
+        String telefone = CriarConta.getTxtTelefone().getText().trim();
+        String cpf = CriarConta.getTxtCpf().getText().trim();
+        String dataNascimento = CriarConta.getTxtDataNascimento().getText().trim();
+
+        String senha = new String(CriarConta.getTxtSenha().getPassword());
+        String confirmarSenha = new String(CriarConta.getTxtConfirmarSenha().getPassword());
+        
+        if (senha.length() > 20) {
+            mostrarMensagem("A senha deve ter no máximo 20 caracteres.");
+            return;
+        }
+
+        if (nome.isEmpty() || email.isEmpty() || telefone.isEmpty()
+                || cpf.isEmpty() || dataNascimento.contains("_")
+                || senha.isEmpty() || confirmarSenha.isEmpty()) {
+
+            mostrarMensagem("Preencha todos os campos.");
+            return;
+        }
+
+        if (!senha.equals(confirmarSenha)) {
+
+            mostrarMensagem("As senhas não são iguais.");
+            return;
+        }
+
+        cpf = cpf.replaceAll("\\D", "");
+
+        if (cpf.length() != 11) {
+
+            mostrarMensagem("CPF deve possuir 11 números.");
+            return;
+        }
+
+        try {
+
+            usuarioDAO.cadastrar(
+                cpf,
+                nome,
+                telefone,
+                email,
+                senha,
+                dataNascimento
+            );
+
+            mostrarMensagem("Cadastro realizado com sucesso!");
+
+            iniciar();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            if (e.getMessage().contains("Duplicate")) {
+                mostrarMensagem("Este CPF já está cadastrado.");
+            } else {
+                mostrarMensagem("Erro ao cadastrar usuário.");
+            }
+        }
+    }
+    
     private void adicionarLivro() {
         try {
             String nome = cadastro_livro.getTxtNome().getText().trim();
