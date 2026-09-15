@@ -40,6 +40,7 @@ public class LivroController {
     private final Calendario calendario;
     private final TelaAlterarCadastro alterarCadastro;
     private final Historico historico;
+    private String emailUsuarioLogado;
 
 	private LivroDAO livroDAO;
 
@@ -82,6 +83,8 @@ public class LivroController {
     
         telaLogin.getBotaoEntrar().addActionListener(e -> validarLogin());
         telaLogin.getLblCadastro().addActionListener(e -> abrirCriarConta());
+        
+        telaLogin.getTxtSenha().addActionListener(e -> validarLogin());
         
         //==========================
         // Criar Conta
@@ -176,7 +179,33 @@ public class LivroController {
     }
 
     private void abrirPerfil() {
+
+        try {
+
+            String[] dados =
+                    usuarioDAO.buscarUsuarioPorEmail(emailUsuarioLogado);
+
+            if (dados != null) {
+
+            	perfil.atualizarDados(
+                        dados[0], // nome
+                        dados[1], // email
+                        dados[2], // telefone
+                        dados[3]  // data de nascimento
+                    );
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem(
+                    "Erro ao carregar os dados do perfil."
+            );
+        }
+
         esconderTodas();
+
         perfil.setVisible(true);
     }
 
@@ -333,10 +362,7 @@ public class LivroController {
     private void validarLogin() {
 
         String email = telaLogin.getTxtNome().getText().trim();
-
-        String senha = new String(
-            telaLogin.getTxtSenha().getPassword()
-        );
+        String senha = new String(telaLogin.getTxtSenha().getPassword());
 
         if (email.isEmpty() || senha.isEmpty()) {
             mostrarMensagem("Preencha o e-mail e a senha.");
@@ -349,7 +375,9 @@ public class LivroController {
 
             if (loginValido) {
 
-                telaLogin.dispose();
+                emailUsuarioLogado = email;
+
+                telaLogin.setVisible(false);
                 abrirHome();
 
             } else {
