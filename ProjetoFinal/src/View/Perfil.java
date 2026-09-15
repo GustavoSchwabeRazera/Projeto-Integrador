@@ -26,6 +26,10 @@ public class Perfil extends JFrame {
 	private JPanel contentPane;
 	private JButton btnHome;
 	private JButton btnAlterarCadastro;
+	private JLabel lblNomeUser;
+	private JLabel lblEmailUser;
+	private JLabel lblTelefone;
+	private JLabel lblDataDeNascimento;
 
 	/**
 	 * Launch the application.
@@ -225,25 +229,25 @@ public class Perfil extends JFrame {
 				new MigLayout("", "[20px][580px][20px]", "[20px][50px][50px][50px][50px][20px]"), 30);
 		panelDados.setBackground(new Color(25, 90, 45)); // Verde escuro idêntico ao do bloco
 
-		JLabel lblNomeUser = new JLabel("Nome de usuário:   Gustavo S. Razera");
+		lblNomeUser = new JLabel("Nome de usuário:");
 		lblNomeUser.setForeground(Color.WHITE);
 		lblNomeUser.setFont(new Font("Tahoma", Font.BOLD, 18));
 		panelDados.add(lblNomeUser, "cell 1 1, alignx left");
 
-		JLabel lblEmailUser = new JLabel("E-Mail:   gugarazera@gmail.com");
+		lblEmailUser = new JLabel("E-Mail:");
 		lblEmailUser.setForeground(Color.WHITE);
 		lblEmailUser.setFont(new Font("Tahoma", Font.BOLD, 18));
 		panelDados.add(lblEmailUser, "cell 1 2, alignx left");
 
-		JLabel lblSenhaUser = new JLabel("Senha:   f*****35");
-		lblSenhaUser.setForeground(Color.WHITE);
-		lblSenhaUser.setFont(new Font("Tahoma", Font.BOLD, 18));
-		panelDados.add(lblSenhaUser, "cell 1 3, alignx left");
+		lblTelefone = new JLabel("Telefone:");
+		lblTelefone.setForeground(Color.WHITE);
+		lblTelefone.setFont(new Font("Tahoma", Font.BOLD, 18));
+		panelDados.add(lblTelefone, "cell 1 3, alignx left");
 
-		JLabel lblLocalizacaoUser = new JLabel("Localização:   Gaspar, SC");
-		lblLocalizacaoUser.setForeground(Color.WHITE);
-		lblLocalizacaoUser.setFont(new Font("Tahoma", Font.BOLD, 18));
-		panelDados.add(lblLocalizacaoUser, "cell 1 4, alignx left");
+		lblDataDeNascimento = new JLabel("Data de Nascimento:");
+		lblDataDeNascimento.setForeground(Color.WHITE);
+		lblDataDeNascimento.setFont(new Font("Tahoma", Font.BOLD, 18));
+		panelDados.add(lblDataDeNascimento, "cell 1 4, alignx left");
 
 		contentPane.add(panelDados, "cell 2 3, alignx center, aligny center");
 
@@ -276,7 +280,13 @@ public class Perfil extends JFrame {
 
 		contentPane.add(panelLateralDireita, "cell 3 3 1 4, alignx right, aligny bottom");
 	}
+	public void atualizarDados(String nome, String email, String telefone, String dataNascimento) {
 
+		lblNomeUser.setText("Nome de usuário:   " + nome);
+		lblEmailUser.setText("E-Mail:   " + email);
+		lblTelefone.setText("Telefone:   " + telefone);
+		lblDataDeNascimento.setText("Data de Nascimento:   " + dataNascimento);
+	}
     public JButton getBtnHome() {
         return btnHome;
     }

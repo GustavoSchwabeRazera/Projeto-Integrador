@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 
 public class UsuarioDAO {
+	
 
     public void cadastrar(String cpf, String nome, String telefone,
                           String email, String senha, String dataNascimento)
@@ -51,5 +53,40 @@ public class UsuarioDAO {
                 return rs.next();
             }
         }
+    }
+    
+    public String[] buscarUsuarioPorEmail(String email) throws SQLException {
+
+        String sql = "SELECT nome, email, telefone, data_nascimento "
+                   + "FROM Usuarios WHERE email = ?";
+
+        Connection conn = ConnectionFactory.getConnection();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+
+                    String dataNascimento = "";
+
+                    if (rs.getDate("data_nascimento") != null) {
+                        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+                        dataNascimento = formato.format(rs.getDate("data_nascimento"));
+                    }
+
+                    return new String[] {
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("telefone"),
+                        dataNascimento
+                    };
+                }
+            }
+        }
+
+        return null;
     }
 }
