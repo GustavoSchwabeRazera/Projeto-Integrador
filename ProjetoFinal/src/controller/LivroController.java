@@ -292,7 +292,6 @@ public class LivroController {
         try {
             String nome = cadastro_livro.getTxtNome().getText().trim();
             String editora = cadastro_livro.getTxtEditora().getText().trim();
-            String autor = cadastro_livro.getTxtAutor().getText().trim();
             String genero = cadastro_livro.getComboBox().getSelectedItem().toString();
             String anoTexto = cadastro_livro.getTxtAno().getText().trim();
 
@@ -369,7 +368,6 @@ public class LivroController {
         cadastro_livro.getTxtNome().setText("");
         cadastro_livro.getTxtEditora().setText("");
         cadastro_livro.getTxtAno().setText("");
-        cadastro_livro.getTxtAutor().setText("");
     }
 
     // =========================================================
