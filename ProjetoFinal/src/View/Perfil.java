@@ -1,24 +1,28 @@
 package View;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.RenderingHints;
-import java.awt.geom.RoundRectangle2D;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JLabel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Ellipse2D;
+import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import java.awt.Color;
-import java.awt.Font;
-import javax.swing.SwingConstants;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import net.miginfocom.swing.MigLayout;
+import java.awt.Toolkit;
 
 public class Perfil extends JFrame {
 
@@ -26,10 +30,12 @@ public class Perfil extends JFrame {
 	private JPanel contentPane;
 	private JButton btnHome;
 	private JButton btnAlterarCadastro;
+	private JButton btnAlterarFoto; 
 	private JLabel lblNomeUser;
 	private JLabel lblEmailUser;
 	private JLabel lblTelefone;
 	private JLabel lblDataDeNascimento;
+	private CircularImageLabel lblFoto;
 
 	/**
 	 * Launch the application.
@@ -72,7 +78,7 @@ public class Perfil extends JFrame {
 	}
 
 	/**
-	 * Botão com cantos arredondados (usado no botão "Alterar cadastro").
+	 * Botão com cantos arredondados.
 	 */
 	private static class RoundedButton extends JButton {
 		private static final long serialVersionUID = 1L;
@@ -129,17 +135,14 @@ public class Perfil extends JFrame {
 	}
 
 	/**
-	 * Label que desenha a própria imagem já recortada em cantos arredondados
-	 * (sem nenhum fundo por trás, então não sobra "branco" nas quinas).
+	 * Componente que exibe a imagem em formato circular (círculo perfeito).
 	 */
-	private static class RoundedImageLabel extends JPanel {
+	private static class CircularImageLabel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		private Image image;
-		private final int radius;
 
-		public RoundedImageLabel(Image image, int radius) {
+		public CircularImageLabel(Image image) {
 			this.image = image;
-			this.radius = radius;
 			setOpaque(false);
 		}
 
@@ -156,15 +159,39 @@ public class Perfil extends JFrame {
 			}
 			Graphics2D g2 = (Graphics2D) g.create();
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g2.setClip(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), radius, radius));
-			g2.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+			int size = Math.min(getWidth(), getHeight());
+			int xOffset = (getWidth() - size) / 2;
+			int yOffset = (getHeight() - size) / 2;
+
+			// Define o corte circular
+			g2.setClip(new Ellipse2D.Float(xOffset, yOffset, size, size));
+
+			int imgWidth = image.getWidth(this);
+			int imgHeight = image.getHeight(this);
+
+			if (imgWidth > 0 && imgHeight > 0) {
+				// Calcula a escala para cobrir o círculo sem distorcer
+				double scaleWidth = (double) size / imgWidth;
+				double scaleHeight = (double) size / imgHeight;
+				double scale = Math.max(scaleWidth, scaleHeight);
+
+				int drawWidth = (int) (imgWidth * scale);
+				int drawHeight = (int) (imgHeight * scale);
+
+				int x = xOffset + (size - drawWidth) / 2;
+				int y = yOffset + (size - drawHeight) / 2;
+
+				g2.drawImage(image, x, y, drawWidth, drawHeight, this);
+			}
+
 			g2.dispose();
 		}
 	}
 
 	/**
-	 * Carrega um ícone a partir do classpath já redimensionado proporcionalmente
-	 * (escala menor que 1.0 deixa o ícone menor que o original).
+	 * Carrega um ícone a partir do classpath redimensionado proporcionalmente.
 	 */
 	private static ImageIcon carregarIconeRedimensionado(String caminho, double escala) {
 		java.net.URL url = Perfil.class.getResource(caminho);
@@ -177,6 +204,32 @@ public class Perfil extends JFrame {
 		int novaAltura = Math.max((int) Math.round(original.getIconHeight() * escala), 1);
 		Image imagemRedimensionada = original.getImage().getScaledInstance(novaLargura, novaAltura, Image.SCALE_SMOOTH);
 		return new ImageIcon(imagemRedimensionada);
+	}
+
+	/**
+	 * Ação para selecionar e carregar a foto do usuário através do JFileChooser.
+	 */
+	private void selecionarEAtualizarFoto() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Selecione uma foto de perfil");
+		
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Imagens (*.png, *.jpg, *.jpeg, *.gif)", "png", "jpg", "jpeg", "gif");
+		fileChooser.setFileFilter(filter);
+
+		int resultado = fileChooser.showOpenDialog(this);
+		if (resultado == JFileChooser.APPROVE_OPTION) {
+			File arquivoSelecionado = fileChooser.getSelectedFile();
+			try {
+				lblFoto.removeAll(); // Limpa imagens internas se existirem
+				
+				ImageIcon iconeOriginal = new ImageIcon(arquivoSelecionado.getAbsolutePath());
+				lblFoto.setImage(iconeOriginal.getImage());
+				lblFoto.revalidate();
+				lblFoto.repaint();
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(this, "Erro ao carregar a imagem selecionada.", "Erro", JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
 
 	/**
@@ -204,11 +257,11 @@ public class Perfil extends JFrame {
 		btnHome.setOpaque(false);
 		contentPane.add(btnHome, "cell 1 1, alignx left, aligny center");
 
-		// Título "Perfil" - Centralizado no Topo
-		JLabel lblPerfil = new JLabel("Perfil");
+		// Título "Informações" - Formatado igual ao "Foto de perfil:"
+		JLabel lblPerfil = new JLabel("Informações:");
 		lblPerfil.setForeground(new Color(19, 74, 38));
-		lblPerfil.setFont(new Font("Tahoma", Font.BOLD, 36));
-		contentPane.add(lblPerfil, "cell 2 1, alignx center, aligny center");
+		lblPerfil.setFont(new Font("Tahoma", Font.BOLD, 22));
+		contentPane.add(lblPerfil, "cell 2 2, alignx center, aligny bottom");
 
 		// Texto "Foto de perfil:" acima da foto
 		JLabel lblFotoPerfilText = new JLabel("Foto de perfil:");
@@ -216,18 +269,15 @@ public class Perfil extends JFrame {
 		lblFotoPerfilText.setFont(new Font("Tahoma", Font.BOLD, 22));
 		contentPane.add(lblFotoPerfilText, "cell 1 2, alignx center, aligny bottom");
 
-		// Espaço da foto do usuário (sem imagem por enquanto) — mantém o formato arredondado pronto para quando você adicionar a foto
-		RoundedImageLabel lblFoto = new RoundedImageLabel(null, 25);
-		contentPane.add(lblFoto, "cell 1 3, alignx center, aligny center, grow");
-		
-		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon(Perfil.class.getResource("/imagens/Rectangle 7.png")));
-		lblFoto.add(lblNewLabel);
+		// Espaço da foto em CÍRCULO com tamanho quadrado 280x280px
+		lblFoto = new CircularImageLabel(null);
+		lblFoto.setImage(Toolkit.getDefaultToolkit().getImage(Perfil.class.getResource("/imagens/perfil3.png")));
+		contentPane.add(lblFoto, "cell 1 3, width 280!, height 280!, alignx center, aligny center");
 
-		// Retângulo Verde Escuro de Fundo (Rectangle 7) contendo as informações - agora com cantos arredondados
+		// Retângulo Verde Escuro de Fundo contendo as informações
 		RoundedPanel panelDados = new RoundedPanel(
 				new MigLayout("", "[20px][580px][20px]", "[20px][50px][50px][50px][50px][20px]"), 30);
-		panelDados.setBackground(new Color(25, 90, 45)); // Verde escuro idêntico ao do bloco
+		panelDados.setBackground(new Color(25, 90, 45));
 
 		lblNomeUser = new JLabel("Nome de usuário:");
 		lblNomeUser.setForeground(Color.WHITE);
@@ -251,48 +301,63 @@ public class Perfil extends JFrame {
 
 		contentPane.add(panelDados, "cell 2 3, alignx center, aligny center");
 
-		// Botão "Alterar cadastro" centralizado abaixo dos blocos principais - agora com cantos arredondados
-		btnAlterarCadastro = new RoundedButton("Alterar cadastro", 40);
-		btnAlterarCadastro.addActionListener(new ActionListener() {
+		// Botão "Alterar foto"
+		btnAlterarFoto = new RoundedButton("Alterar foto", 40);
+		btnAlterarFoto.setBackground(new Color(114, 219, 145));
+		btnAlterarFoto.setForeground(Color.BLACK);
+		btnAlterarFoto.setFont(new Font("Tahoma", Font.BOLD, 20));
+		btnAlterarFoto.setMargin(new java.awt.Insets(10, 30, 10, 30));
+		btnAlterarFoto.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				selecionarEAtualizarFoto();
 			}
 		});
+		contentPane.add(btnAlterarFoto, "cell 1 5, alignx center, aligny center");
+
+		// Botão "Alterar cadastro"
+		btnAlterarCadastro = new RoundedButton("Alterar cadastro", 40);
 		btnAlterarCadastro.setBackground(new Color(114, 219, 145));
 		btnAlterarCadastro.setForeground(Color.BLACK);
 		btnAlterarCadastro.setFont(new Font("Tahoma", Font.BOLD, 20));
 		btnAlterarCadastro.setMargin(new java.awt.Insets(10, 30, 10, 30));
+		btnAlterarCadastro.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		contentPane.add(btnAlterarCadastro, "cell 2 5, alignx center, aligny center");
 
-		// Painel lateral para alinhar o Calendário e o Sino empilhados no canto inferior direito
+		// Painel lateral para alinhar Calendário e Sino
 		JPanel panelLateralDireita = new JPanel();
 		panelLateralDireita.setOpaque(false);
 		panelLateralDireita.setLayout(new MigLayout("", "[64px]", "[64px][15px][64px]"));
 
-		// Ícone do Calendário
 		JLabel lblCalendario = new JLabel("");
 		lblCalendario.setIcon(carregarIconeRedimensionado("/imagens/calendario.png", 0.78));
 		panelLateralDireita.add(lblCalendario, "cell 0 0, alignx center");
 
-		// Ícone do Sino (Notificações)
 		JLabel lblSino = new JLabel("");
 		lblSino.setIcon(carregarIconeRedimensionado("/imagens/sino.png", 0.78));
 		panelLateralDireita.add(lblSino, "cell 0 2, alignx center");
 
 		contentPane.add(panelLateralDireita, "cell 3 3 1 4, alignx right, aligny bottom");
 	}
-	public void atualizarDados(String nome, String email, String telefone, String dataNascimento) {
 
+	public void atualizarDados(String nome, String email, String telefone, String dataNascimento) {
 		lblNomeUser.setText("Nome de usuário:   " + nome);
 		lblEmailUser.setText("E-Mail:   " + email);
 		lblTelefone.setText("Telefone:   " + telefone);
 		lblDataDeNascimento.setText("Data de Nascimento:   " + dataNascimento);
 	}
-    public JButton getBtnHome() {
-        return btnHome;
-    }
 
-    public JButton getBtnAlterarCadastro() {
-        return btnAlterarCadastro;
-    }
+	public JButton getBtnHome() {
+		return btnHome;
+	}
 
+	public JButton getBtnAlterarCadastro() {
+		return btnAlterarCadastro;
+	}
+
+	public JButton getBtnAlterarFoto() {
+		return btnAlterarFoto;
+	}
 }
