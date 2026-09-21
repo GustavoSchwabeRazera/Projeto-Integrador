@@ -159,7 +159,7 @@ public class tela_inicial extends JFrame {
         // BEM-VINDO
         // =========================================================
 
-        JLabel lblNewLabel = new JLabel("Bem-Vindo!");
+        JLabel lblNewLabel = new JLabel("Bem-Vindo(a)!");
 
         lblNewLabel.setForeground(
             new Color(10, 86, 27)

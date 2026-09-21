@@ -1,9 +1,11 @@
 package controller;
 
 import java.awt.Color;
-
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -17,6 +19,7 @@ import View.TelaLogin;
 import View.TelaMeusLivros;
 import View.TelaSolicitacoes;
 import View.tela_inicial;
+import dao.ConnectionFactory;
 import dao.LivroDAO;
 import View.Calendario;
 import model.Livro;
@@ -41,7 +44,7 @@ public class LivroController {
     private final TelaAlterarCadastro alterarCadastro;
     private final Historico historico;
     private String emailUsuarioLogado;
-
+    private String cpfUsuarioLogado;
 	private LivroDAO livroDAO;
 
     /*
@@ -125,11 +128,6 @@ public class LivroController {
         telaSolicitacoes.getBtnExcluir().addActionListener(e -> excluirSolicitacao());
 
         // =========================
-        // PERFIL
-        // =========================
-        perfil.getBtnHome().addActionListener(e -> abrirHome());
-        perfil.getBtnAlterarCadastro().addActionListener(e -> abrirAlterarCadastro());
-        // =========================
         // CADASTRO LIVROS
         // =========================
         cadastro_livro.getBtnAdicionar().addActionListener(e -> adicionarLivro());
@@ -140,7 +138,32 @@ public class LivroController {
         // =========================
         // HISTORICO
         // =========================
-      historico.getBtnHome().addActionListener(e -> abrirHome());
+        historico.getBtnHome().addActionListener(e -> abrirHome());
+        
+        // =========================
+        // PERFIL
+        // =========================
+        perfil.getBtnHome().addActionListener(e -> abrirHome());
+        perfil.getBtnAlterarCadastro().addActionListener(e -> abrirAlterarCadastro());
+        perfil.getBtnAlterarFoto().addActionListener(e -> {
+
+            try {
+                perfil.selecionarEAtualizarFoto();
+                byte[] foto = perfil.getFotoSelecionada();
+
+                if (foto != null && foto.length > 0) {
+                    usuarioDAO.atualizarFoto(
+                            cpfUsuarioLogado,
+                            foto
+                    );
+                    mostrarMensagem("Foto atualizada com sucesso!");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                mostrarMensagem("Erro ao salvar a foto.");
+            }
+        });
+      
     
         
     }
@@ -182,26 +205,34 @@ public class LivroController {
 
         try {
 
-            String[] dados =
-                    usuarioDAO.buscarUsuarioPorEmail(emailUsuarioLogado);
+            // Define o CPF do usuário no Perfil
+            perfil.setCpfUsuario(cpfUsuarioLogado);
+
+            // Busca os dados do usuário
+            String[] dados = usuarioDAO.buscarUsuarioPorEmail(emailUsuarioLogado);
 
             if (dados != null) {
 
-            	perfil.atualizarDados(
-                        dados[0], // nome
-                        dados[1], // email
-                        dados[2], // telefone
-                        dados[3]  // data de nascimento
-                    );
+                perfil.atualizarDados(
+                    dados[0],
+                    dados[1],
+                    dados[2],
+                    dados[3]
+                );
+            }
+
+            // Busca a foto salva no banco
+            byte[] foto = usuarioDAO.buscarFoto(cpfUsuarioLogado);
+
+            if (foto != null && foto.length > 0) {
+                perfil.carregarFoto(foto);
             }
 
         } catch (SQLException e) {
 
             e.printStackTrace();
 
-            mostrarMensagem(
-                    "Erro ao carregar os dados do perfil."
-            );
+            mostrarMensagem("Erro ao carregar os dados do perfil.");
         }
 
         esconderTodas();
@@ -376,6 +407,8 @@ public class LivroController {
 
                 emailUsuarioLogado = email;
 
+                cpfUsuarioLogado = usuarioDAO.buscarCpfPorEmail(email);
+
                 telaLogin.setVisible(false);
                 abrirHome();
 
@@ -441,7 +474,11 @@ public class LivroController {
     // =========================================================
     // UTILITÁRIO
     // =========================================================
+    
+    
+    
 
+    
     private void mostrarMensagem(String mensagem) {
         UIManager.put("OptionPane.background", new Color(175, 244, 198));
         UIManager.put("Panel.background", new Color(175, 244, 198));
