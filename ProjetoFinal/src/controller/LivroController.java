@@ -102,7 +102,6 @@ public class LivroController {
         telaInicial.getBtnMeusLivros().addActionListener(e -> abrirMeusLivros());
         telaInicial.getBtnSolicitacoes().addActionListener(e -> abrirSolicitacoes());
         telaInicial.getBtnPerfil().addActionListener(e -> abrirPerfil());
-        telaInicial.getBtnSair().addActionListener(e -> iniciar());
         telaInicial.getBtnCalendario().addActionListener(e -> abrirCalendario());
         telaInicial.getBtnHistorico().addActionListener(e -> abrirHistorico());
 
@@ -156,6 +155,7 @@ public class LivroController {
                             cpfUsuarioLogado,
                             foto
                     );
+                    telaInicial.atualizarFotoPerfil(foto);
                     mostrarMensagem("Foto atualizada com sucesso!");
                 }
             } catch (SQLException ex) {
@@ -182,6 +182,20 @@ public class LivroController {
     // =========================================================
 
     private void abrirHome() {
+
+        try {
+
+            byte[] foto = usuarioDAO.buscarFoto(cpfUsuarioLogado);
+
+            if (foto != null && foto.length > 0) {
+                telaInicial.atualizarFotoPerfil(foto);
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+
         esconderTodas();
         telaInicial.setVisible(true);
     }
