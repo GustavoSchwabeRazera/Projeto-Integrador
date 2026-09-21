@@ -324,7 +324,7 @@ public class LivroController {
             String genero = cadastro_livro.getComboBox().getSelectedItem().toString();
             String anoTexto = cadastro_livro.getTxtAno().getText().trim();
 
-            if (nome.isEmpty() || editora.isEmpty() || autor.isEmpty()
+            if (nome.isEmpty() || editora.isEmpty() 
                     || genero.isEmpty() || anoTexto.isEmpty()) {
 
                 mostrarMensagem("Preencha todos os campos.");
@@ -337,7 +337,6 @@ public class LivroController {
                     nome,
                     editora,
                     anoLancamento,
-                    autor,
                     genero
             );
             

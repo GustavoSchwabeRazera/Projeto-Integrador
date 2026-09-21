@@ -48,10 +48,6 @@ public class LivroTableModel extends AbstractTableModel{
 		}
 		
 		if(columnIndex == 3) {
-			return livro.getAutor();
-		}
-		
-		if(columnIndex == 4) {
 			return livro.getGenero();
 		}
 		

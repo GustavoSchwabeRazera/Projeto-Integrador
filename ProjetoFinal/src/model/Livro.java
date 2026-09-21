@@ -9,12 +9,11 @@ public class Livro {
 	private String genero;
 	
 	
-	public Livro(String nome, String editora, int anoLancamento, String autor, String genero) {
+	public Livro(String nome, String editora, int anoLancamento, String genero) {
 		super();
 		this.nome = nome;
 		this.editora = editora;
 		this.anoLancamento = anoLancamento;
-		this.autor = autor;
 		this.genero = genero;
 	}
 	public String getNome() {
@@ -34,12 +33,6 @@ public class Livro {
 	}
 	public void setAnoLancamento(int anoLancamento) {
 		this.anoLancamento = anoLancamento;
-	}
-	public String getAutor() {
-		return autor;
-	}
-	public void setAutor(String autor) {
-		this.autor = autor;
 	}
 	public String getGenero() {
 		return genero;

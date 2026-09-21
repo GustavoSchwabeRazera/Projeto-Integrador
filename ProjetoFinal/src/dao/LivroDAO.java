@@ -29,7 +29,6 @@ public class LivroDAO {
         stmt.setString(1, livro.getNome());
         stmt.setString(2, livro.getEditora());
         stmt.setInt(3, livro.getAnoLancamento());
-        stmt.setString(4, livro.getAutor());
         stmt.setString(5, livro.getGenero());
 
         stmt.executeUpdate();
@@ -52,7 +51,6 @@ public class LivroDAO {
                 rs.getString("nome"),
                 rs.getString("editora"),
                 rs.getInt("ano_lancamento"),
-                rs.getString("autor"),
                 rs.getString("genero")
             );
 
@@ -82,7 +80,6 @@ public class LivroDAO {
                 rs.getString("nome"),
                 rs.getString("editora"),
                 rs.getInt("ano_lancamento"),
-                rs.getString("autor"),
                 rs.getString("genero")
             );
 
@@ -111,7 +108,6 @@ public class LivroDAO {
 
         stmt.setString(1, livro.getEditora());
         stmt.setInt(2, livro.getAnoLancamento());
-        stmt.setString(3, livro.getAutor());
         stmt.setString(4, livro.getGenero());
         stmt.setString(5, livro.getNome());
 
@@ -149,7 +145,6 @@ public class LivroDAO {
 	                rs.getString("nome"),
 	                rs.getString("editora"),
 	                rs.getInt("ano_lancamento"),
-	                rs.getString("autor"),
 	                rs.getString("genero")
 	            );
 
