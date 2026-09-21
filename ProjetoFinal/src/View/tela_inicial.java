@@ -13,6 +13,11 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Component;
+import javax.swing.SwingConstants;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 
 public class tela_inicial extends JFrame {
 
@@ -23,7 +28,6 @@ public class tela_inicial extends JFrame {
     private JButton btnMeusLivros;
     private JButton btnSolicitacoes;
     private JButton btnPerfil;
-    private JButton btnSair;
     private JButton btnCalendario;
     private JButton btnHistorico;
     private JButton btnNotificacao;   // <-- agora é ATRIBUTO da classe
@@ -78,24 +82,24 @@ public class tela_inicial extends JFrame {
         // PERFIL
         // =========================================================
         btnPerfil = new JButton("");
-        btnPerfil.setFont(new Font("Tahoma", Font.BOLD, 11));
-        btnPerfil.setIcon(new ImageIcon(tela_inicial.class.getResource("/imagens/FotoPerfil.png")));
+        btnPerfil.setFont(
+            new Font("Tahoma", Font.BOLD, 11)
+        );
+
+        btnPerfil.setIcon(
+            new ImageIcon(tela_inicial.class.getResource("/imagens/perfil3.png"))
+        );
+
         btnPerfil.setBorderPainted(false);
         btnPerfil.setContentAreaFilled(false);
         btnPerfil.setFocusPainted(false);
         btnPerfil.setCursor(new Cursor(Cursor.HAND_CURSOR));
         contentPane.add(btnPerfil, "flowy,cell 8 0,growy");
 
-        // =========================================================
-        // SAIR
-        // =========================================================
-        btnSair = new JButton("");
-        btnSair.setFocusPainted(false);
-        btnSair.setBorderPainted(false);
-        btnSair.setContentAreaFilled(false);
-        btnSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSair.setIcon(new ImageIcon(tela_inicial.class.getResource("/imagens/sairAjustado.png")));
-        contentPane.add(btnSair, "cell 8 1");
+        contentPane.add(
+            btnPerfil,
+            "flowy,cell 8 0,growy"
+        );
 
         // =========================================================
         // BEM-VINDO
@@ -104,6 +108,21 @@ public class tela_inicial extends JFrame {
         lblBemVindo.setForeground(new Color(10, 86, 27));
         lblBemVindo.setFont(new Font("Tahoma", Font.BOLD, 51));
         contentPane.add(lblBemVindo, "cell 5 3,alignx center");
+
+        JLabel lblNewLabel = new JLabel("Bem-Vindo(a)!");
+
+        lblNewLabel.setForeground(
+            new Color(10, 86, 27)
+        );
+
+        lblNewLabel.setFont(
+            new Font("Tahoma", Font.BOLD, 51)
+        );
+
+        contentPane.add(
+            lblNewLabel,
+            "cell 5 3,alignx center"
+        );
 
         // =========================================================
         // PESQUISAR
@@ -199,18 +218,100 @@ public class tela_inicial extends JFrame {
         // Sem ActionListener aqui: o LivroController é quem registra a ação.
         contentPane.add(btnNotificacao, "cell 8 9 1 2,alignx center");
     }
+    
+    public void atualizarFotoPerfil(byte[] foto) {
 
+        Image imagem;
+
+        // Se não tiver foto cadastrada
+        if (foto == null || foto.length == 0) {
+
+            ImageIcon fotoPadrao = new ImageIcon(
+                tela_inicial.class.getResource("/imagens/FotoPerfil.png")
+            );
+
+            imagem = fotoPadrao.getImage();
+
+        } else {
+
+            // Foto cadastrada no banco
+            imagem = new ImageIcon(foto).getImage();
+        }
+
+        int tamanho = 95;
+
+        BufferedImage circular = new BufferedImage(
+            tamanho,
+            tamanho,
+            BufferedImage.TYPE_INT_ARGB
+        );
+
+        Graphics2D g2 = circular.createGraphics();
+
+        g2.setRenderingHint(
+            RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON
+        );
+
+        g2.setClip(new Ellipse2D.Double(
+            0, 0, tamanho, tamanho
+        ));
+
+        int largura = imagem.getWidth(null);
+        int altura = imagem.getHeight(null);
+
+        double escala = Math.max(
+            (double) tamanho / largura,
+            (double) tamanho / altura
+        );
+
+        int novaLargura = (int) (largura * escala);
+        int novaAltura = (int) (altura * escala);
+
+        int x = (tamanho - novaLargura) / 2;
+        int y = (tamanho - novaAltura) / 2;
+
+        g2.drawImage(
+            imagem,
+            x,
+            y,
+            novaLargura,
+            novaAltura,
+            null
+        );
+
+        g2.dispose();
+
+        btnPerfil.setIcon(new ImageIcon(circular));
+
+        btnPerfil.revalidate();
+        btnPerfil.repaint();
+    }
     // =========================================================
     // GETTERS
     // =========================================================
 
-    public JButton getBtnPesquisar()    { return btnPesquisar; }
-    public JButton getBtnMeusLivros()   { return btnMeusLivros; }
-    public JButton getBtnSolicitacoes() { return btnSolicitacoes; }
-    public JButton getBtnPerfil()       { return btnPerfil; }
-    public JButton getBtnSair()         { return btnSair; }
-    public JButton getBtnCalendario()   { return btnCalendario; }
-    public JButton getBtnHistorico()    { return btnHistorico; }
-    public JButton getBtnNotificacao()  { return btnNotificacao; }
-    public JButton getBtnLogo()         { return btnLogo; }
+    public JButton getBtnPesquisar() {
+        return btnPesquisar;
+    }
+
+    public JButton getBtnMeusLivros() {
+        return btnMeusLivros;
+    }
+
+    public JButton getBtnSolicitacoes() {
+        return btnSolicitacoes;
+    }
+
+    public JButton getBtnPerfil() {
+        return btnPerfil;
+    }
+  
+
+	public JButton getBtnCalendario() {
+		return btnCalendario;
+	}
+	public JButton getBtnHistorico() {
+		return btnHistorico;
+	}
 }

@@ -36,6 +36,9 @@ public class Perfil extends JFrame {
 	private JLabel lblTelefone;
 	private JLabel lblDataDeNascimento;
 	private CircularImageLabel lblFoto;
+	private byte[] fotoSelecionada;
+	private String cpfUsuario;
+
 
 	/**
 	 * Launch the application.
@@ -209,28 +212,54 @@ public class Perfil extends JFrame {
 	/**
 	 * Ação para selecionar e carregar a foto do usuário através do JFileChooser.
 	 */
-	private void selecionarEAtualizarFoto() {
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Selecione uma foto de perfil");
-		
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("Imagens (*.png, *.jpg, *.jpeg, *.gif)", "png", "jpg", "jpeg", "gif");
-		fileChooser.setFileFilter(filter);
+	
+	public void selecionarEAtualizarFoto() {
 
-		int resultado = fileChooser.showOpenDialog(this);
-		if (resultado == JFileChooser.APPROVE_OPTION) {
-			File arquivoSelecionado = fileChooser.getSelectedFile();
-			try {
-				lblFoto.removeAll(); // Limpa imagens internas se existirem
-				
-				ImageIcon iconeOriginal = new ImageIcon(arquivoSelecionado.getAbsolutePath());
-				lblFoto.setImage(iconeOriginal.getImage());
-				lblFoto.revalidate();
-				lblFoto.repaint();
-			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(this, "Erro ao carregar a imagem selecionada.", "Erro", JOptionPane.ERROR_MESSAGE);
-			}
-		}
+	    JFileChooser fileChooser = new JFileChooser();
+
+	    FileNameExtensionFilter filtro =
+	            new FileNameExtensionFilter(
+	                    "Imagens (*.png, *.jpg, *.jpeg, *.gif)",
+	                    "png", "jpg", "jpeg", "gif"
+	            );
+
+	    fileChooser.setFileFilter(filtro);
+
+	    int resultado = fileChooser.showOpenDialog(this);
+
+	    if (resultado == JFileChooser.APPROVE_OPTION) {
+
+	        File arquivoSelecionado = fileChooser.getSelectedFile();
+
+	        try {
+
+	            // Converte a imagem para byte[]
+	            fotoSelecionada =
+	                    java.nio.file.Files.readAllBytes(
+	                            arquivoSelecionado.toPath()
+	                    );
+
+	            // Mostra a imagem imediatamente na tela
+	            ImageIcon imagem =
+	                    new ImageIcon(arquivoSelecionado.getAbsolutePath());
+
+	            lblFoto.setImage(imagem.getImage());
+
+	            lblFoto.revalidate();
+	            lblFoto.repaint();
+
+	        } catch (Exception e) {
+
+	            e.printStackTrace();
+
+	            JOptionPane.showMessageDialog(
+	                    this,
+	                    "Erro ao carregar a imagem."
+	            );
+	        }
+	    }
 	}
+
 
 	/**
 	 * Create the frame.
@@ -307,11 +336,8 @@ public class Perfil extends JFrame {
 		btnAlterarFoto.setForeground(Color.BLACK);
 		btnAlterarFoto.setFont(new Font("Tahoma", Font.BOLD, 20));
 		btnAlterarFoto.setMargin(new java.awt.Insets(10, 30, 10, 30));
-		btnAlterarFoto.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selecionarEAtualizarFoto();
-			}
-		});
+		
+			
 		contentPane.add(btnAlterarFoto, "cell 1 5, alignx center, aligny center");
 
 		// Botão "Alterar cadastro"
@@ -320,10 +346,7 @@ public class Perfil extends JFrame {
 		btnAlterarCadastro.setForeground(Color.BLACK);
 		btnAlterarCadastro.setFont(new Font("Tahoma", Font.BOLD, 20));
 		btnAlterarCadastro.setMargin(new java.awt.Insets(10, 30, 10, 30));
-		btnAlterarCadastro.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
+		
 		contentPane.add(btnAlterarCadastro, "cell 2 5, alignx center, aligny center");
 
 		// Painel lateral para alinhar Calendário e Sino
@@ -348,10 +371,31 @@ public class Perfil extends JFrame {
 		lblTelefone.setText("Telefone:   " + telefone);
 		lblDataDeNascimento.setText("Data de Nascimento:   " + dataNascimento);
 	}
+	public void setCpfUsuario(String cpfUsuario) {
+	    this.cpfUsuario = cpfUsuario;
+	}
+
+	public byte[] getFotoSelecionada() {
+	    return fotoSelecionada;
+	}
+
+	public void carregarFoto(byte[] foto) {
+
+	    if (foto != null && foto.length > 0) {
+
+	        ImageIcon imagem = new ImageIcon(foto);
+
+	        lblFoto.setImage(imagem.getImage());
+
+	        lblFoto.revalidate();
+	        lblFoto.repaint();
+	    }
+	}
 
 	public JButton getBtnHome() {
 		return btnHome;
 	}
+	
 
 	public JButton getBtnAlterarCadastro() {
 		return btnAlterarCadastro;

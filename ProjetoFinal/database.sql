@@ -58,11 +58,11 @@ FOREIGN KEY (ISBN) REFERENCES Livros(ISBN)
 );
 
 INSERT INTO Usuarios 
-(CPF, nome, telefone, email, data_nascimento, senha)
+(CPF, nome, telefone, email, data_nascimento, senha,foto)
 VALUES
-('12345678911', 'guilherme', '999999', 'gui@gmail', '2008-09-12', '123456'),
-('98765432100', 'Mariana', '988888888', 'mariana@gmail.com', '2007-05-23', 'senha123'),
-('45678912300', 'Lucas', '977777777', 'lucas@gmail.com', '2009-11-08', 'lucas123');
+('12345678911', 'guilherme', '999999', 'gui@gmail', '2008-09-12', '123456',   LOAD_FILE('/ProjetoFinal/src/imagens/FotoPerfil.png')),
+('98765432100', 'Mariana', '988888888', 'mariana@gmail.com', '2007-05-23', 'senha123',   LOAD_FILE('C:/ProjetoFinal/src/imagens/FotoPerfil.png')),
+('45678912300', 'Lucas', '977777777', 'lucas@gmail.com', '2009-11-08', 'lucas123',   LOAD_FILE('/ProjetoFinal/src/imagens/FotoPerfil.png'));
 
 
 

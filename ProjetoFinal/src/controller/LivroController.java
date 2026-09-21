@@ -1,8 +1,11 @@
 package controller;
 
 import java.awt.Color;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -19,7 +22,7 @@ import View.TelaMeusLivros;
 import View.TelaNotificacoes;
 import View.TelaSolicitacoes;
 import View.tela_inicial;
-
+import dao.ConnectionFactory;
 import dao.LivroDAO;
 import dao.UsuarioDAO;
 import model.Livro;
@@ -42,8 +45,12 @@ public class LivroController {
     private final TelaAlterarCadastro alterarCadastro;
     private final Historico historico;
     private String emailUsuarioLogado;
-    private LivroDAO livroDAO;
+    private String cpfUsuarioLogado;
+	private LivroDAO livroDAO;
 
+    /*
+     * Construtor principal: mantém compatibilidade com o seu Main atual.
+     */
     public LivroController(LivroDAO livroDAO, LivroTableModel modelo, Cadastro_Livro view) {
         this.livroModel = modelo;
         this.livroDAO = livroDAO;
@@ -83,7 +90,6 @@ public class LivroController {
         telaInicial.getBtnMeusLivros().addActionListener(e -> abrirMeusLivros());
         telaInicial.getBtnSolicitacoes().addActionListener(e -> abrirSolicitacoes());
         telaInicial.getBtnPerfil().addActionListener(e -> abrirPerfil());
-        telaInicial.getBtnSair().addActionListener(e -> iniciar());
         telaInicial.getBtnCalendario().addActionListener(e -> abrirCalendario());
         telaInicial.getBtnHistorico().addActionListener(e -> abrirHistorico());
 
@@ -105,27 +111,44 @@ public class LivroController {
         telaSolicitacoes.getBtnAceitar().addActionListener(e -> aceitarSolicitacao());
         telaSolicitacoes.getBtnExcluir().addActionListener(e -> excluirSolicitacao());
 
-        // NOTIFICAÇÕES
-        telaNotificacoes.getBtnHome().addActionListener(e -> abrirHome());
-        telaNotificacoes.getBtnPerfil().addActionListener(e -> abrirPerfil());
-        telaNotificacoes.getBtnAceitar().addActionListener(e -> aceitarSolicitacao());
-        telaNotificacoes.getBtnExcluir().addActionListener(e -> excluirSolicitacao());
-
-        // Clique no card da notificação abre a Tela de Solicitações
-        telaNotificacoes.addNotificacaoClickListener(e -> abrirSolicitacoes());
-
-        // PERFIL
-        perfil.getBtnHome().addActionListener(e -> abrirHome());
-        perfil.getBtnAlterarCadastro().addActionListener(e -> abrirAlterarCadastro());
-
+        // =========================
         // CADASTRO LIVROS
         cadastro_livro.getBtnAdicionar().addActionListener(e -> adicionarLivro());
 
         // CALENDÁRIO
         calendario.getBtnHome().addActionListener(e -> abrirHome());
-
-        // HISTÓRICO
+        // =========================
+        // HISTORICO
+        // =========================
         historico.getBtnHome().addActionListener(e -> abrirHome());
+        
+        // =========================
+        // PERFIL
+        // =========================
+        perfil.getBtnHome().addActionListener(e -> abrirHome());
+        perfil.getBtnAlterarCadastro().addActionListener(e -> abrirAlterarCadastro());
+        perfil.getBtnAlterarFoto().addActionListener(e -> {
+
+            try {
+                perfil.selecionarEAtualizarFoto();
+                byte[] foto = perfil.getFotoSelecionada();
+
+                if (foto != null && foto.length > 0) {
+                    usuarioDAO.atualizarFoto(
+                            cpfUsuarioLogado,
+                            foto
+                    );
+                    telaInicial.atualizarFotoPerfil(foto);
+                    mostrarMensagem("Foto atualizada com sucesso!");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                mostrarMensagem("Erro ao salvar a foto.");
+            }
+        });
+      
+    
+        
     }
 
     public void iniciar() {
@@ -134,6 +157,20 @@ public class LivroController {
     }
 
     private void abrirHome() {
+
+        try {
+
+            byte[] foto = usuarioDAO.buscarFoto(cpfUsuarioLogado);
+
+            if (foto != null && foto.length > 0) {
+                telaInicial.atualizarFotoPerfil(foto);
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+
         esconderTodas();
         telaInicial.setVisible(true);
     }
@@ -164,12 +201,33 @@ public class LivroController {
 
     private void abrirPerfil() {
         try {
+
+            // Define o CPF do usuário no Perfil
+            perfil.setCpfUsuario(cpfUsuarioLogado);
+
+            // Busca os dados do usuário
             String[] dados = usuarioDAO.buscarUsuarioPorEmail(emailUsuarioLogado);
+
             if (dados != null) {
-                perfil.atualizarDados(dados[0], dados[1], dados[2], dados[3]);
+
+                perfil.atualizarDados(
+                    dados[0],
+                    dados[1],
+                    dados[2],
+                    dados[3]
+                );
             }
+
+            // Busca a foto salva no banco
+            byte[] foto = usuarioDAO.buscarFoto(cpfUsuarioLogado);
+
+            if (foto != null && foto.length > 0) {
+                perfil.carregarFoto(foto);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
+
             mostrarMensagem("Erro ao carregar os dados do perfil.");
         }
         esconderTodas();
@@ -305,6 +363,9 @@ public class LivroController {
             boolean loginValido = usuarioDAO.login(email, senha);
             if (loginValido) {
                 emailUsuarioLogado = email;
+
+                cpfUsuarioLogado = usuarioDAO.buscarCpfPorEmail(email);
+
                 telaLogin.setVisible(false);
                 abrirHome();
             } else {
@@ -349,6 +410,14 @@ public class LivroController {
         mostrarMensagem("Solicitação excluída.");
     }
 
+    // =========================================================
+    // UTILITÁRIO
+    // =========================================================
+    
+    
+    
+
+    
     private void mostrarMensagem(String mensagem) {
         UIManager.put("OptionPane.background", new Color(175, 244, 198));
         UIManager.put("Panel.background", new Color(175, 244, 198));
