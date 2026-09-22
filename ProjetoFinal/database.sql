@@ -67,7 +67,7 @@ VALUES
 
 
 
---dados aleatórios para teste ->
+-- dados aleatórios para teste ->
 -- LIVROS
 INSERT INTO Livros
 (ISBN, fotoContraCapa, fotoCapa, status, CPF_dono, titulo, data_lancamento)
