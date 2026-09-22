@@ -10,7 +10,8 @@ nome VARCHAR(50) NOT NULL,
 telefone VARCHAR(20) NOT NULL,
 email VARCHAR(50) NOT NULL,
 data_nascimento DATE NOT NULL,
-senha VARCHAR(20) NOT NULL
+senha VARCHAR(20) NOT NULL,
+foto MEDIUMBLOB
 );
 
 -- Tabela de livros
