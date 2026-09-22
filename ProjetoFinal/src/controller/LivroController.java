@@ -94,7 +94,7 @@ public class LivroController {
         telaInicial.getBtnHistorico().addActionListener(e -> abrirHistorico());
 
         // SINO -> abre a tela de notificações
-       // telaInicial.getBtnNotificacao().addActionListener(e -> abrirNotificacoes());
+        //telaInicial.getBtnNotificacao().addActionListener(e -> abrirNotificacoes());
 
         // PESQUISA
         pesquisarLivro.getBtnHome().addActionListener(e -> abrirHome());

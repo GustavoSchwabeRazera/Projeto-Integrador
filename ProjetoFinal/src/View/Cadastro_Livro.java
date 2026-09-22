@@ -31,55 +31,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 
-// Botão arredondado
-
-class RoundedButton extends JButton {
-
-	
-	private static final long serialVersionUID = 1L;
-
-	public RoundedButton(String texto) {
-
-		super(texto);
-
-		setForeground(Color.WHITE);
-		setBackground(new Color(10, 86, 27));
-		setFont(new Font("Segoe UI", Font.BOLD, 16));
-
-		setFocusPainted(false);
-		setBorderPainted(false);
-		setContentAreaFilled(false);
-		setOpaque(false);
-	}
-
-	@Override
-	protected void paintComponent(Graphics g) {
-
-		Graphics2D g2 = (Graphics2D) g.create();
-
-		g2.setRenderingHint(
-				RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON
-		);
-
-		g2.setColor(new Color(10, 86, 27));
-
-		g2.fillRoundRect(
-				0,
-				0,
-				getWidth(),
-				getHeight(),
-				20,
-				20
-		);
-
-		g2.dispose();
-
-		super.paintComponent(g);
-	}
-}
-
-
 // Cadastro de livro
 public class Cadastro_Livro extends JFrame {
 
@@ -220,11 +171,7 @@ public class Cadastro_Livro extends JFrame {
 		);
 
 
-		panel.setLayout(new MigLayout(
-				"",
-				"[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]",
-				"[73.00][][][28.00][][][][24.00][][][][grow][27.00][][][][31.00][35.00][][31.00][][][][][][grow]"
-		));
+		panel.setLayout(new MigLayout("", "[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]", "[73.00][][][28.00][][][][][][][grow][27.00][][][][31.00][35.00][][][][grow]"));
 
 
 		// Título do livro
@@ -313,28 +260,6 @@ public class Cadastro_Livro extends JFrame {
 		);
 
 
-		// Data de lançamento
-		JLabel lblData =
-				new JLabel("DATA DE LANÇAMENTO:");
-
-		lblData.setForeground(
-				new Color(10, 86, 27)
-		);
-
-		lblData.setHorizontalAlignment(
-				SwingConstants.CENTER
-		);
-
-		lblData.setFont(
-				new Font("Tahoma", Font.BOLD, 30)
-		);
-
-		panel.add(
-				lblData,
-				"cell 2 7,alignx center"
-		);
-
-
 		txtAno = new JTextField();
 
 		txtAno.setFont(
@@ -352,7 +277,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				txtAno,
-				"cell 2 8,growx,height 42!"
+				"cell 2 7,growx,height 42!"
 		);
 
 
@@ -374,7 +299,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				lblAutor,
-				"cell 2 10,growx"
+				"cell 2 9,growx"
 		);
 
 
@@ -494,7 +419,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				painelAutores,
-				"cell 2 11,growx"
+				"cell 2 10,growx"
 		);
 
 
@@ -516,7 +441,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				lblGenero,
-				"cell 2 13,alignx center"
+				"cell 2 12,alignx center"
 		);
 
 
@@ -550,7 +475,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				comboBox,
-				"cell 2 14,growx,height 42!"
+				"cell 2 13,growx,height 42!"
 		);
 
 
@@ -568,7 +493,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				lblISBN,
-				"cell 2 16"
+				"cell 2 15"
 		);
 
 
@@ -594,7 +519,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				textField,
-				"cell 2 17,growx,height 42!"
+				"cell 2 16,growx,height 42!"
 		);
 
 
@@ -620,7 +545,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				botaoCadastrar,
-				"cell 2 23"
+				"cell 2 18"
 		);
 
 
@@ -632,7 +557,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				panel_1,
-				"cell 1 25,grow"
+				"cell 1 20,grow"
 		);
 
 
@@ -643,7 +568,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				panel_2,
-				"cell 2 25"
+				"cell 2 20"
 		);
 
 
@@ -654,7 +579,7 @@ public class Cadastro_Livro extends JFrame {
 
 		panel.add(
 				panel_3,
-				"cell 3 25,grow"
+				"cell 3 20,grow"
 		);
 
 	}
