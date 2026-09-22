@@ -1,653 +1,964 @@
 package View;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.BorderFactory;
-
-import net.miginfocom.swing.MigLayout;
-
-import java.awt.Color;
-
-import javax.swing.JButton;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-
-import java.awt.Font;
-import java.awt.Image;
-
+import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JList;
+import javax.swing.border.EmptyBorder;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import dao.AutorDAO;
+import dao.ConnectionFactory;
+import model.Autor;
+import net.miginfocom.swing.MigLayout;
 
 
 // Cadastro de livro
 public class Cadastro_Livro extends JFrame {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private JPanel contentPane;
+    private JPanel contentPane;
 
-	private JTextField txtNome;
-	private JTextField txtEditora;
-	private JTextField txtAno;
+    private JTextField txtNome;
+    private JTextField txtEditora;
+    private JTextField txtAno;
 
-	private JComboBox comboBox;
+    private JComboBox comboBox;
 
-	private JButton botaoCadastrar;
-	private JTextField textField;
+    private JButton botaoCadastrar;
 
-	private JList listaAutores;
+    private JTextField textField;
 
-	private JButton botaoNovoAutor;
-	private JButton botaoCadastrarAutor;
+    private JList<Autor> listaAutores;
 
+    private JButton botaoNovoAutor;
 
-	public static void main(String[] args) {
+    private JButton botaoCadastrarAutor;
 
-		EventQueue.invokeLater(new Runnable() {
 
-			public void run() {
+    public static void main(String[] args) {
 
-				try {
+        EventQueue.invokeLater(
+                new Runnable() {
 
-					Cadastro_Livro frame = new Cadastro_Livro();
+                    public void run() {
 
-					frame.setVisible(true);
+                        try {
 
-				} catch (Exception e) {
+                            Cadastro_Livro frame =
+                                    new Cadastro_Livro();
 
-					e.printStackTrace();
+                            frame.setVisible(true);
 
-				}
-			}
-		});
-	}
+                        } catch (Exception e) {
 
+                            e.printStackTrace();
 
-	public Cadastro_Livro() {
+                        }
+                    }
+                }
+        );
+    }
 
-		setBackground(new Color(128, 255, 0));
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public Cadastro_Livro() {
 
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setBackground(
+                new Color(128, 255, 0)
+        );
 
-		setSize(1920, 1080);
+        setDefaultCloseOperation(
+                JFrame.EXIT_ON_CLOSE
+        );
 
-		setLocationRelativeTo(null);
+        setExtendedState(
+                JFrame.MAXIMIZED_BOTH
+        );
 
+        setSize(
+                1920,
+                1080
+        );
 
-		contentPane = new JPanel();
+        setLocationRelativeTo(null);
 
-		contentPane.setBackground(
-				new Color(175, 244, 198)
-		);
 
-		contentPane.setBorder(
-				new EmptyBorder(5, 5, 5, 5)
-		);
+        contentPane =
+                new JPanel();
 
-		setContentPane(contentPane);
+        contentPane.setBackground(
+                new Color(175, 244, 198)
+        );
 
+        contentPane.setBorder(
+                new EmptyBorder(
+                        5,
+                        5,
+                        5,
+                        5
+                )
+        );
 
-		contentPane.setLayout(new MigLayout(
-				"",
-				"[98.00][86.00][150.00,grow][51.00][118.00]",
-				"[][][][][grow][][][][]"
-		));
+        setContentPane(
+                contentPane
+        );
 
 
-		// Logo
-		JLabel lblNewLabel = new JLabel("");
+        contentPane.setLayout(
+                new MigLayout(
+                        "",
+                        "[98.00][86.00][150.00,grow][51.00][118.00]",
+                        "[][][][][grow][][][][]"
+                )
+        );
 
-		ImageIcon logoOriginal = new ImageIcon(
-				Cadastro_Livro.class.getResource(
-						"/imagens/Logo.png"
-				)
-		);
 
-		Image logoRedimensionada =
-				logoOriginal.getImage().getScaledInstance(
-						300,
-						150,
-						Image.SCALE_SMOOTH
-				);
+        // =====================================================
+        // LOGO
+        // =====================================================
+
+        JLabel lblNewLabel =
+                new JLabel("");
+
+        ImageIcon logoOriginal =
+                new ImageIcon(
+                        Cadastro_Livro.class.getResource(
+                                "/imagens/Logo.png"
+                        )
+                );
+
+        Image logoRedimensionada =
+                logoOriginal.getImage()
+                        .getScaledInstance(
+                                300,
+                                150,
+                                Image.SCALE_SMOOTH
+                        );
+
+        lblNewLabel.setIcon(
+                new ImageIcon(
+                        logoRedimensionada
+                )
+        );
+
+        contentPane.add(
+                lblNewLabel,
+                "cell 0 0 1 2"
+        );
+
+
+        // =====================================================
+        // TÍTULO
+        // =====================================================
+
+        JLabel lblNewLabel_2 =
+                new JLabel(
+                        "Cadastro de Livros:"
+                );
+
+        lblNewLabel_2.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblNewLabel_2.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        48
+                )
+        );
+
+        contentPane.add(
+                lblNewLabel_2,
+                "cell 2 1,alignx center,aligny bottom"
+        );
+
+
+        // =====================================================
+        // PAINEL PRINCIPAL
+        // =====================================================
+
+        JPanel panel =
+                new ImagePanel();
+
+        panel.setForeground(
+                Color.WHITE
+        );
+
+        panel.setBackground(
+                new Color(10, 86, 27)
+        );
+
+        panel.setOpaque(false);
+
+        contentPane.add(
+                panel,
+                "cell 2 4,grow"
+        );
+
+
+        panel.setLayout(
+                new MigLayout(
+                        "",
+                        "[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]",
+                        "[73.00][][][28.00][][][][][][][][grow][27.00][][][][31.00][35.00][][][][grow]"
+                )
+        );
+
+
+        // =====================================================
+        // TÍTULO DO LIVRO
+        // =====================================================
+
+        JLabel lblTitulo =
+                new JLabel(
+                        "TÍTULO DO LIVRO:"
+                );
+
+        lblTitulo.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblTitulo.setHorizontalAlignment(
+                SwingConstants.CENTER
+        );
+
+        lblTitulo.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        30
+                )
+        );
+
+        panel.add(
+                lblTitulo,
+                "cell 0 1 6 1,alignx center"
+        );
+
+
+        txtNome =
+                new JTextField();
+
+        txtNome.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        16
+                )
+        );
+
+        txtNome.setColumns(10);
+
+        txtNome.setBorder(
+                BorderFactory.createLineBorder(
+                        new Color(10, 86, 27),
+                        2
+                )
+        );
+
+        panel.add(
+                txtNome,
+                "cell 2 2,growx,h 42!"
+        );
+
+
+        // =====================================================
+        // EDITORA
+        // =====================================================
+
+        JLabel lblEditora =
+                new JLabel(
+                        "EDITORA:"
+                );
+
+        lblEditora.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblEditora.setHorizontalAlignment(
+                SwingConstants.CENTER
+        );
+
+        lblEditora.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        30
+                )
+        );
+
+        panel.add(
+                lblEditora,
+                "cell 0 4 6 1,growx"
+        );
+
+
+        txtEditora =
+                new JTextField();
+
+        txtEditora.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        16
+                )
+        );
+
+        txtEditora.setColumns(10);
+
+        txtEditora.setBorder(
+                BorderFactory.createLineBorder(
+                        new Color(10, 86, 27),
+                        2
+                )
+        );
+
+        panel.add(
+                txtEditora,
+                "cell 2 5,growx,height 42!"
+        );
+
+
+        // =====================================================
+        // ANO DE LANÇAMENTO
+        // =====================================================
+
+        JLabel lblAno =
+                new JLabel(
+                        "ANO DE LANÇAMENTO:"
+                );
+
+        lblAno.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblAno.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        30
+                )
+        );
+
+        lblAno.setHorizontalAlignment(
+                SwingConstants.CENTER
+        );
+
+        panel.add(
+                lblAno,
+                "cell 0 7 6 1,growx"
+        );
+
+
+        txtAno =
+                new JTextField();
+
+        txtAno.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        16
+                )
+        );
+
+        txtAno.setColumns(10);
+
+        txtAno.setBorder(
+                BorderFactory.createLineBorder(
+                        new Color(10, 86, 27),
+                        2
+                )
+        );
+
+        panel.add(
+                txtAno,
+                "cell 2 8,growx,h 42!"
+        );
+
+
+        // =====================================================
+        // AUTOR
+        // =====================================================
+
+        JLabel lblAutor =
+                new JLabel(
+                        "AUTOR:"
+                );
+
+        lblAutor.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblAutor.setHorizontalAlignment(
+                SwingConstants.CENTER
+        );
+
+        lblAutor.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        30
+                )
+        );
+
+        panel.add(
+                lblAutor,
+                "cell 2 10,growx"
+        );
+
+
+        // =====================================================
+        // PAINEL DOS AUTORES
+        // =====================================================
+
+        JPanel painelAutores =
+                new JPanel();
+
+        painelAutores.setOpaque(false);
+
+        painelAutores.setLayout(
+                new MigLayout(
+                        "",
+                        "[grow]",
+                        "[][45!]"
+                )
+        );
+
+
+        // =====================================================
+        // LISTA
+        // =====================================================
+
+        JPanel painelListaAutores =
+                new JPanel();
+
+        painelListaAutores.setBackground(
+                Color.WHITE
+        );
+
+        painelListaAutores.setBorder(
+                BorderFactory.createLineBorder(
+                        new Color(10, 86, 27),
+                        2
+                )
+        );
+
+        painelListaAutores.setLayout(
+                new MigLayout(
+                        "",
+                        "[grow]",
+                        "[grow][]"
+                )
+        );
+
+
+        DefaultListModel<Autor> modeloAutores =
+                new DefaultListModel<>();
+
+
+        listaAutores =
+                new JList<Autor>(
+                        modeloAutores
+                );
+
+
+        listaAutores.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        18
+                )
+        );
+
+        listaAutores.setBorder(
+                null
+        );
+
+
+        /*
+         * Mostra somente o nome do autor no JList.
+         */
+        listaAutores.setCellRenderer(
+                new javax.swing.DefaultListCellRenderer() {
+
+                    private static final long serialVersionUID = 1L;
+
+                    @Override
+                    public java.awt.Component getListCellRendererComponent(
+                            JList<?> list,
+                            Object value,
+                            int index,
+                            boolean isSelected,
+                            boolean cellHasFocus) {
+
+                        super.getListCellRendererComponent(
+                                list,
+                                value,
+                                index,
+                                isSelected,
+                                cellHasFocus
+                        );
+
+                        if (value instanceof Autor) {
+
+                            Autor autor =
+                                    (Autor) value;
+
+                            setText(
+                                    autor.getNome()
+                            );
+                        }
+
+                        return this;
+                    }
+                }
+        );
+
+
+        painelListaAutores.add(
+                listaAutores,
+                "cell 0 0,grow"
+        );
+
+
+        // =====================================================
+        // BOTÃO NOVO AUTOR
+        // =====================================================
+
+        botaoCadastrarAutor =
+                new RoundedButton(
+                        "Cadastrar novo autor"
+                );
+
+
+        painelListaAutores.add(
+                botaoCadastrarAutor,
+                "cell 0 1,growx,height 40!"
+        );
+
+
+        /*
+         * AQUI ESTÁ A ALTERAÇÃO MAIS IMPORTANTE.
+         *
+         * Passamos "this" para Cadastro_Autor.
+         *
+         * Assim a tela de cadastro sabe qual
+         * Cadastro_Livro deve atualizar.
+         */
+        botaoCadastrarAutor.addActionListener(
+                new ActionListener() {
+
+                    public void actionPerformed(
+                            ActionEvent e) {
+
+                        Cadastro_Autor cadastroAutor =
+                                new Cadastro_Autor(
+                                        Cadastro_Livro.this
+                                );
+
+                        cadastroAutor.setVisible(
+                                true
+                        );
+                    }
+                }
+        );
+
+
+        painelAutores.add(
+                painelListaAutores,
+                "cell 0 0,growx,height 140!"
+        );
+
+
+        // =====================================================
+        // BOTÃO SELECIONAR
+        // =====================================================
+
+        botaoNovoAutor =
+                new RoundedButton(
+                        "Selecionar autor(es)"
+                );
+
+
+        painelAutores.add(
+                botaoNovoAutor,
+                "cell 0 1,growx,height 45!"
+        );
+
+
+        botaoNovoAutor.addActionListener(
+                new ActionListener() {
+
+                    public void actionPerformed(
+                            ActionEvent e) {
+
+                        // Seleção dos autores
+                    }
+                }
+        );
+
+
+        panel.add(
+                painelAutores,
+                "cell 2 11,growx"
+        );
+
+
+        // =====================================================
+        // GÊNERO
+        // =====================================================
+
+        JLabel lblGenero =
+                new JLabel(
+                        "GÊNERO:"
+                );
+
+        lblGenero.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblGenero.setHorizontalAlignment(
+                SwingConstants.CENTER
+        );
+
+        lblGenero.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        30
+                )
+        );
+
+        panel.add(
+                lblGenero,
+                "cell 2 13,alignx center"
+        );
+
+
+        comboBox =
+                new JComboBox();
+
+
+        comboBox.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        11
+                )
+        );
+
+        comboBox.setForeground(
+                new Color(10, 89, 27)
+        );
+
+        comboBox.setBackground(
+                Color.WHITE
+        );
+
+        comboBox.setBorder(
+                BorderFactory.createLineBorder(
+                        new Color(10, 86, 27),
+                        2
+                )
+        );
+
+
+        comboBox.setModel(
+                new DefaultComboBoxModel(
+                        Generos.values()
+                )
+        );
+
+
+        panel.add(
+                comboBox,
+                "cell 2 14,growx,height 42!"
+        );
+
+
+        // =====================================================
+        // ISBN
+        // =====================================================
+
+        JLabel lblISBN =
+                new JLabel(
+                        "ISBN:"
+                );
+
+        lblISBN.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblISBN.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        30
+                )
+        );
 
-		lblNewLabel.setIcon(
-				new ImageIcon(logoRedimensionada)
-		);
+        panel.add(
+                lblISBN,
+                "cell 2 16"
+        );
 
-		contentPane.add(
-				lblNewLabel,
-				"cell 0 0 1 2"
-		);
 
+        textField =
+                new JTextField();
 
-		// Título
-		JLabel lblNewLabel_2 =
-				new JLabel("Cadastro de Livros:");
+        textField.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        16
+                )
+        );
 
-		lblNewLabel_2.setForeground(
-				new Color(10, 86, 27)
-		);
+        textField.setColumns(10);
 
-		lblNewLabel_2.setFont(
-				new Font("Tahoma", Font.BOLD, 48)
-		);
+        textField.setBorder(
+                BorderFactory.createLineBorder(
+                        new Color(10, 86, 27),
+                        2
+                )
+        );
 
-		contentPane.add(
-				lblNewLabel_2,
-				"cell 2 1,alignx center,aligny bottom"
-		);
 
+        panel.add(
+                textField,
+                "cell 2 17,growx,height 42!"
+        );
 
-		// Painel principal
-		JPanel panel = new ImagePanel();
 
-		panel.setForeground(
-				new Color(255, 255, 255)
-		);
+        // =====================================================
+        // BOTÃO CADASTRAR LIVRO
+        // =====================================================
 
-		panel.setBackground(
-				new Color(10, 86, 27)
-		);
+        botaoCadastrar =
+                new JButton("");
 
-		panel.setOpaque(false);
+        botaoCadastrar.setContentAreaFilled(
+                false
+        );
 
-		contentPane.add(
-				panel,
-				"cell 2 4,grow"
-		);
+        botaoCadastrar.setBorderPainted(
+                false
+        );
 
+        botaoCadastrar.setIcon(
+                new ImageIcon(
+                        Cadastro_Livro.class.getResource(
+                                "/imagens/BotaoCerto.png"
+                        )
+                )
+        );
 
-		panel.setLayout(new MigLayout("", "[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]", "[73.00][][][28.00][][][][][][][grow][27.00][][][][31.00][35.00][][][][grow]"));
 
+        panel.add(
+                botaoCadastrar,
+                "cell 2 19"
+        );
 
-		// Título do livro
-		JLabel lblTitulo =
-				new JLabel("TÍTULO DO LIVRO:");
 
-		lblTitulo.setForeground(
-				new Color(10, 86, 27)
-		);
+        // =====================================================
+        // PAINÉIS OCULTOS
+        // =====================================================
 
-		lblTitulo.setHorizontalAlignment(
-				SwingConstants.CENTER
-		);
+        JPanel panel_1 =
+                new JPanel();
 
-		lblTitulo.setFont(
-				new Font("Tahoma", Font.BOLD, 30)
-		);
+        panel_1.setVisible(false);
 
-		panel.add(
-				lblTitulo,
-				"cell 0 1 6 1,alignx center"
-		);
+        panel.add(
+                panel_1,
+                "cell 1 21,grow"
+        );
 
 
-		txtNome = new JTextField();
+        JPanel panel_2 =
+                new JPanel();
 
-		txtNome.setFont(
-				new Font("Segoe UI", Font.PLAIN, 16)
-		);
+        panel_2.setVisible(false);
 
-		txtNome.setColumns(10);
+        panel.add(
+                panel_2,
+                "cell 2 21"
+        );
 
-		txtNome.setBorder(
-				BorderFactory.createLineBorder(
-						new Color(10, 86, 27),
-						2
-				)
-		);
 
-		panel.add(
-				txtNome,
-				"cell 2 2,growx,h 42!"
-		);
+        JPanel panel_3 =
+                new JPanel();
 
+        panel_3.setVisible(false);
 
-		// Editora
-		JLabel lblEditora =
-				new JLabel("EDITORA:");
+        panel.add(
+                panel_3,
+                "cell 3 21,grow"
+        );
 
-		lblEditora.setForeground(
-				new Color(10, 86, 27)
-		);
 
-		lblEditora.setHorizontalAlignment(
-				SwingConstants.CENTER
-		);
+        // =====================================================
+        // CARREGA AUTORES DO BANCO
+        // =====================================================
 
-		lblEditora.setFont(
-				new Font("Tahoma", Font.BOLD, 30)
-		);
+        carregarAutoresDoBanco();
+    }
 
-		panel.add(
-				lblEditora,
-				"cell 0 4 6 1,growx"
-		);
 
+    // =========================================================
+    // CARREGAR AUTORES DO BANCO
+    // =========================================================
 
-		txtEditora = new JTextField();
+    private void carregarAutoresDoBanco() {
 
-		txtEditora.setFont(
-				new Font("Segoe UI", Font.PLAIN, 16)
-		);
+        try {
 
-		txtEditora.setColumns(10);
+            AutorDAO autorDAO =
+                    new AutorDAO(
+                            ConnectionFactory.getConnection()
+                    );
 
-		txtEditora.setBorder(
-				BorderFactory.createLineBorder(
-						new Color(10, 86, 27),
-						2
-				)
-		);
+            carregarAutores(
+                    autorDAO.listarAutores()
+            );
 
-		panel.add(
-				txtEditora,
-				"cell 2 5,growx,height 42!"
-		);
+        } catch (Exception e) {
 
+            e.printStackTrace();
+        }
+    }
 
-		txtAno = new JTextField();
 
-		txtAno.setFont(
-				new Font("Segoe UI", Font.PLAIN, 16)
-		);
+    // =========================================================
+    // CARREGAR AUTORES NO JLIST
+    // =========================================================
 
-		txtAno.setColumns(10);
+    public void carregarAutores(
+            List<Autor> autores) {
 
-		txtAno.setBorder(
-				BorderFactory.createLineBorder(
-						new Color(10, 86, 27),
-						2
-				)
-		);
+        DefaultListModel<Autor> modelo =
+                (DefaultListModel<Autor>)
+                        listaAutores.getModel();
 
-		panel.add(
-				txtAno,
-				"cell 2 7,growx,height 42!"
-		);
 
+        modelo.clear();
 
-		// Autor
-		JLabel lblAutor =
-				new JLabel("AUTOR:");
 
-		lblAutor.setForeground(
-				new Color(10, 86, 27)
-		);
+        if (autores == null) {
+            return;
+        }
 
-		lblAutor.setHorizontalAlignment(
-				SwingConstants.CENTER
-		);
 
-		lblAutor.setFont(
-				new Font("Tahoma", Font.BOLD, 30)
-		);
+        for (Autor autor :
+                autores) {
 
-		panel.add(
-				lblAutor,
-				"cell 2 9,growx"
-		);
+            modelo.addElement(
+                    autor
+            );
+        }
+    }
 
 
-		// Área dos autores
-		JPanel painelAutores =
-				new JPanel();
+    // =========================================================
+    // GETTERS E SETTERS
+    // =========================================================
 
-		painelAutores.setOpaque(false);
+    public JTextField getTxtNome() {
 
-		painelAutores.setLayout(
-				new MigLayout(
-						"",
-						"[grow]",
-						"[][45!]"
-				)
-		);
+        return txtNome;
+    }
 
 
-		// Lista de autores
-		JPanel painelListaAutores =
-				new JPanel();
+    public void setTxtNome(
+            JTextField txtNome) {
 
-		painelListaAutores.setBackground(
-				Color.WHITE
-		);
+        this.txtNome =
+                txtNome;
+    }
 
-		painelListaAutores.setBorder(
-				BorderFactory.createLineBorder(
-						new Color(10, 86, 27),
-						2
-				)
-		);
 
-		painelListaAutores.setLayout(
-				new MigLayout(
-						"",
-						"[grow]",
-						"[grow][]"
-				)
-		);
+    public JTextField getTxtEditora() {
 
+        return txtEditora;
+    }
 
-		listaAutores =
-				new JList();
 
-		listaAutores.setFont(
-				new Font(
-						"Segoe UI",
-						Font.PLAIN,
-						18
-				)
-		);
+    public void setTxtEditora(
+            JTextField txtEditora) {
 
-		listaAutores.setBorder(null);
+        this.txtEditora =
+                txtEditora;
+    }
 
-		painelListaAutores.add(
-				listaAutores,
-				"cell 0 0,grow"
-		);
 
+    public JComboBox getComboBox() {
 
-		// Cadastrar novo autor
-		botaoCadastrarAutor =
-				new RoundedButton(
-						"Cadastrar novo autor"
-				);
+        return comboBox;
+    }
 
-		painelListaAutores.add(
-				botaoCadastrarAutor,
-				"cell 0 1,growx,height 40!"
-		);
 
-		botaoCadastrarAutor.addActionListener(
-				new ActionListener() {
+    public void setComboBox(
+            JComboBox comboBox) {
 
-					public void actionPerformed(
-							ActionEvent e
-					) {
+        this.comboBox =
+                comboBox;
+    }
 
-						// Abrir tela de cadastro de autor
 
-					}
-				}
-		);
+    public JButton getBtnAdicionar() {
 
+        return botaoCadastrar;
+    }
 
-		painelAutores.add(
-				painelListaAutores,
-				"cell 0 0,growx,height 140!"
-		);
 
+    public JList<Autor> getListaAutores() {
 
-		// Selecionar autor(es)
-		botaoNovoAutor =
-				new RoundedButton(
-						"Selecionar autor(es)"
-				);
+        return listaAutores;
+    }
 
-		painelAutores.add(
-				botaoNovoAutor,
-				"cell 0 1,growx,height 45!"
-		);
 
-		botaoNovoAutor.addActionListener(
-				new ActionListener() {
+    public JTextField getTxtAno() {
 
-					public void actionPerformed(
-							ActionEvent e
-					) {
+        return txtAno;
+    }
 
-						// Selecionar autor(es)
 
-					}
-				}
-		);
+    public void setTxtAno(
+            JTextField txtAno) {
 
+        this.txtAno =
+                txtAno;
+    }
 
-		panel.add(
-				painelAutores,
-				"cell 2 10,growx"
-		);
 
+    public JButton getBotaoNovoAutor() {
 
-		// Gênero
-		JLabel lblGenero =
-				new JLabel("GÊNERO:");
+        return botaoNovoAutor;
+    }
 
-		lblGenero.setForeground(
-				new Color(10, 86, 27)
-		);
 
-		lblGenero.setHorizontalAlignment(
-				SwingConstants.CENTER
-		);
+    public JButton getBotaoCadastrarAutor() {
 
-		lblGenero.setFont(
-				new Font("Tahoma", Font.BOLD, 30)
-		);
-
-		panel.add(
-				lblGenero,
-				"cell 2 12,alignx center"
-		);
-
-
-		comboBox =
-				new JComboBox();
-
-		comboBox.setFont(
-				new Font("Tahoma", Font.BOLD, 11)
-		);
-
-		comboBox.setForeground(
-				new Color(10, 89, 27)
-		);
-
-		comboBox.setBackground(
-				new Color(255, 255, 255)
-		);
-
-		comboBox.setBorder(
-				BorderFactory.createLineBorder(
-						new Color(10, 86, 27),
-						2
-				)
-		);
-
-		comboBox.setModel(
-				new DefaultComboBoxModel(
-						Generos.values()
-				)
-		);
-
-		panel.add(
-				comboBox,
-				"cell 2 13,growx,height 42!"
-		);
-
-
-		// ISBN
-		JLabel lblISBN =
-				new JLabel("ISBN:");
-
-		lblISBN.setForeground(
-				new Color(10, 86, 27)
-		);
-
-		lblISBN.setFont(
-				new Font("Tahoma", Font.BOLD, 30)
-		);
-
-		panel.add(
-				lblISBN,
-				"cell 2 15"
-		);
-
-
-		textField =
-				new JTextField();
-
-		textField.setFont(
-				new Font(
-						"Segoe UI",
-						Font.PLAIN,
-						16
-				)
-		);
-
-		textField.setColumns(10);
-
-		textField.setBorder(
-				BorderFactory.createLineBorder(
-						new Color(10, 86, 27),
-						2
-				)
-		);
-
-		panel.add(
-				textField,
-				"cell 2 16,growx,height 42!"
-		);
-
-
-		// Botão cadastrar
-		botaoCadastrar =
-				new JButton("");
-
-		botaoCadastrar.setContentAreaFilled(
-				false
-		);
-
-		botaoCadastrar.setBorderPainted(
-				false
-		);
-
-		botaoCadastrar.setIcon(
-				new ImageIcon(
-						Cadastro_Livro.class.getResource(
-								"/imagens/BotaoCerto.png"
-						)
-				)
-		);
-
-		panel.add(
-				botaoCadastrar,
-				"cell 2 18"
-		);
-
-
-		// Painéis ocultos
-		JPanel panel_1 =
-				new JPanel();
-
-		panel_1.setVisible(false);
-
-		panel.add(
-				panel_1,
-				"cell 1 20,grow"
-		);
-
-
-		JPanel panel_2 =
-				new JPanel();
-
-		panel_2.setVisible(false);
-
-		panel.add(
-				panel_2,
-				"cell 2 20"
-		);
-
-
-		JPanel panel_3 =
-				new JPanel();
-
-		panel_3.setVisible(false);
-
-		panel.add(
-				panel_3,
-				"cell 3 20,grow"
-		);
-
-	}
-
-
-	// Getters e setters
-
-	public JTextField getTxtNome() {
-		return txtNome;
-	}
-
-	public void setTxtNome(
-			JTextField txtNome
-	) {
-		this.txtNome = txtNome;
-	}
-
-
-	public JTextField getTxtEditora() {
-		return txtEditora;
-	}
-
-	public void setTxtEditora(
-			JTextField txtEditora
-	) {
-		this.txtEditora = txtEditora;
-	}
-
-
-	public JTextField getTxtAno() {
-		return txtAno;
-	}
-
-	public void setTxtAno(
-			JTextField txtAno
-	) {
-		this.txtAno = txtAno;
-	}
-
-
-	public JComboBox getComboBox() {
-		return this.comboBox;
-	}
-
-	public void setComboBox(
-			JComboBox comboBox
-	) {
-		this.comboBox = comboBox;
-	}
-
-
-	public JButton getBtnAdicionar() {
-		return botaoCadastrar;
-	}
-
-
-	public JList getListaAutores() {
-		return listaAutores;
-	}
-
-
-	public JButton getBotaoNovoAutor() {
-		return botaoNovoAutor;
-	}
-
-
-	public JButton getBotaoCadastrarAutor() {
-		return botaoCadastrarAutor;
-	}
-
+        return botaoCadastrarAutor;
+    }
 }

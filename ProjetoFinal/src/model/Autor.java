@@ -9,9 +9,13 @@ public class Autor {
     public Autor() {
     }
 
-    public Autor(int id_autor, String nome, String nacionalidade) {
+    public Autor(
+            int id_autor,
+            String nome,
+            String nacionalidade) {
+
         this.id_autor = id_autor;
-        this.nome = nome;	
+        this.nome = nome;
         this.nacionalidade = nacionalidade;
     }
 
@@ -37,5 +41,10 @@ public class Autor {
 
     public void setNacionalidade(String nacionalidade) {
         this.nacionalidade = nacionalidade;
+    }
+
+    @Override
+    public String toString() {
+        return nome;
     }
 }

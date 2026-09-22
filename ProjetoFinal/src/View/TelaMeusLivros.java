@@ -209,9 +209,12 @@ public class TelaMeusLivros extends JFrame {
 
 		painelLivros.add(livro6, "cell 5 0,alignx center,aligny top");
 
-		ImageIcon cadastrarIcon = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/BotaoCadastrar.png"));
+		ImageIcon cadastrarIcon = new ImageIcon(
+		        TelaMeusLivros.class.getResource("/imagens/BotaoCadastrar.png")
+		);
 
-		Image imagemCadastrar = cadastrarIcon.getImage().getScaledInstance(250, 100, Image.SCALE_SMOOTH);
+		Image imagemCadastrar = cadastrarIcon.getImage()
+		        .getScaledInstance(250, 100, Image.SCALE_SMOOTH);
 
 		JButton btnNewButton = new JButton("");
 
@@ -222,11 +225,16 @@ public class TelaMeusLivros extends JFrame {
 		btnNewButton.setIcon(new ImageIcon(imagemCadastrar));
 
 		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
+		    public void actionPerformed(ActionEvent e) {
+		        Cadastro_Livro telaCadastro = new Cadastro_Livro();
+		        telaCadastro.setVisible(true);
+		    }
 		});
 
-		painelLivros.add(btnNewButton, "cell 0 1 6 1,alignx center,aligny center");
+		painelLivros.add(
+		        btnNewButton,
+		        "cell 0 1 6 1,alignx center,aligny center"
+		);
 
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/Logo.png")));

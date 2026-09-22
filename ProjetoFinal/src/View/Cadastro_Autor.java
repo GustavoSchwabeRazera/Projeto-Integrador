@@ -1,410 +1,662 @@
 package View;
 
-
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.JComboBox;
+import javax.swing.border.EmptyBorder;
 
+import dao.AutorDAO;
+import dao.ConnectionFactory;
+import model.Autor;
 import net.miginfocom.swing.MigLayout;
 
 
 // Botão arredondado
 class RoundedButton extends JButton {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public RoundedButton(String texto) {
+    public RoundedButton(String texto) {
 
-		super(texto);
+        super(texto);
 
-		setForeground(Color.WHITE);
-		setBackground(new Color(10, 86, 27));
-		setFont(new Font("Segoe UI", Font.BOLD, 16));
+        setForeground(Color.WHITE);
+        setBackground(new Color(10, 86, 27));
+        setFont(new Font("Segoe UI", Font.BOLD, 16));
 
-		setFocusPainted(false);
-		setBorderPainted(false);
-		setContentAreaFilled(false);
-		setOpaque(false);
-	}
+        setFocusPainted(false);
+        setBorderPainted(false);
+        setContentAreaFilled(false);
+        setOpaque(false);
+    }
 
-	@Override
-	protected void paintComponent(Graphics g) {
+    @Override
+    protected void paintComponent(Graphics g) {
 
-		Graphics2D g2 = (Graphics2D) g.create();
+        Graphics2D g2 =
+                (Graphics2D) g.create();
 
-		g2.setRenderingHint(
-				RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON
-		);
+        g2.setRenderingHint(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON
+        );
 
-		g2.setColor(new Color(10, 86, 27));
+        g2.setColor(
+                new Color(10, 86, 27)
+        );
 
-		g2.fillRoundRect(
-				0,
-				0,
-				getWidth(),
-				getHeight(),
-				20,
-				20
-		);
+        g2.fillRoundRect(
+                0,
+                0,
+                getWidth(),
+                getHeight(),
+                20,
+                20
+        );
 
-		g2.dispose();
+        g2.dispose();
 
-		super.paintComponent(g);
-	}
+        super.paintComponent(g);
+    }
 }
 
 
 // Cadastro de autor
 public class Cadastro_Autor extends JFrame {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private JPanel contentPane;
+    private JPanel contentPane;
 
-	private JTextField txtNome;
+    private JTextField txtNome;
 
-	private JComboBox<String> comboBox;
+    private JComboBox<String> comboBox;
 
-	private JButton botaoCadastrar;
+    private JButton botaoCadastrar;
 
+    // Tela de livros que abriu o cadastro
+    private Cadastro_Livro cadastroLivro;
 
-	public static void main(String[] args) {
 
-		EventQueue.invokeLater(new Runnable() {
+    public static void main(String[] args) {
 
-			public void run() {
+        EventQueue.invokeLater(
+                new Runnable() {
 
-				try {
+                    public void run() {
 
-					Cadastro_Autor frame = new Cadastro_Autor();
+                        try {
 
-					frame.setVisible(true);
+                            Cadastro_Autor frame =
+                                    new Cadastro_Autor();
 
-				} catch (Exception e) {
+                            frame.setVisible(true);
 
-					e.printStackTrace();
+                        } catch (Exception e) {
 
-				}
-			}
-		});
-	}
+                            e.printStackTrace();
 
+                        }
+                    }
+                }
+        );
+    }
 
-	public Cadastro_Autor() {
 
-		setBackground(new Color(128, 255, 0));
+    // Construtor padrão
+    public Cadastro_Autor() {
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this(null);
+    }
 
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-		setSize(1920, 1080);
+    // Construtor recebendo a tela de livros
+    public Cadastro_Autor(
+            Cadastro_Livro cadastroLivro) {
 
-		setLocationRelativeTo(null);
+        this.cadastroLivro =
+                cadastroLivro;
 
+        setBackground(
+                new Color(128, 255, 0)
+        );
 
-		contentPane = new JPanel();
+        setDefaultCloseOperation(
+                JFrame.DISPOSE_ON_CLOSE
+        );
 
-		contentPane.setBackground(
-				new Color(175, 244, 198)
-		);
+        setExtendedState(
+                JFrame.MAXIMIZED_BOTH
+        );
 
-		contentPane.setBorder(
-				new EmptyBorder(5, 5, 5, 5)
-		);
+        setSize(
+                1920,
+                1080
+        );
 
-		setContentPane(contentPane);
+        setLocationRelativeTo(null);
 
 
-		contentPane.setLayout(
-				new MigLayout(
-						"",
-						"[98.00][86.00][150.00,grow][240.00][118.00]",
-						"[][][][][grow][][][][]"
-				)
-		);
+        contentPane =
+                new JPanel();
 
+        contentPane.setBackground(
+                new Color(175, 244, 198)
+        );
 
-		// Logo
-		JLabel lblNewLabel = new JLabel("");
+        contentPane.setBorder(
+                new EmptyBorder(
+                        5,
+                        5,
+                        5,
+                        5
+                )
+        );
 
-		ImageIcon logoOriginal = new ImageIcon(
-				Cadastro_Autor.class.getResource(
-						"/imagens/Logo.png"
-				)
-		);
+        setContentPane(
+                contentPane
+        );
 
-		Image logoRedimensionada =
-				logoOriginal.getImage().getScaledInstance(
-						300,
-						150,
-						Image.SCALE_SMOOTH
-				);
 
-		lblNewLabel.setIcon(
-				new ImageIcon(logoRedimensionada)
-		);
+        contentPane.setLayout(
+                new MigLayout(
+                        "",
+                        "[98.00][86.00][150.00,grow][240.00][118.00]",
+                        "[][][][][grow][][][][]"
+                )
+        );
+
+
+        // =====================================================
+        // LOGO
+        // =====================================================
+
+        JLabel lblNewLabel =
+                new JLabel("");
+
+        ImageIcon logoOriginal =
+                new ImageIcon(
+                        Cadastro_Autor.class.getResource(
+                                "/imagens/Logo.png"
+                        )
+                );
+
+        Image logoRedimensionada =
+                logoOriginal.getImage()
+                        .getScaledInstance(
+                                300,
+                                150,
+                                Image.SCALE_SMOOTH
+                        );
+
+        lblNewLabel.setIcon(
+                new ImageIcon(
+                        logoRedimensionada
+                )
+        );
+
+        contentPane.add(
+                lblNewLabel,
+                "cell 0 0 1 2"
+        );
+
+
+        // =====================================================
+        // TÍTULO
+        // =====================================================
+
+        JLabel lblNewLabel_2 =
+                new JLabel(
+                        "Cadastro de Autores"
+                );
+
+        lblNewLabel_2.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblNewLabel_2.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        48
+                )
+        );
+
+        contentPane.add(
+                lblNewLabel_2,
+                "cell 2 1,alignx center,aligny bottom"
+        );
+
+
+        // =====================================================
+        // PAINEL PRINCIPAL
+        // =====================================================
+
+        JPanel panel =
+                new ImagePanel();
+
+        panel.setForeground(
+                Color.WHITE
+        );
+
+        panel.setBackground(
+                new Color(10, 86, 27)
+        );
+
+        panel.setOpaque(false);
+
+        contentPane.add(
+                panel,
+                "cell 2 4,grow"
+        );
+
+
+        panel.setLayout(
+                new MigLayout(
+                        "",
+                        "[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]",
+                        "[73.00][][][28.00][][][][24.00][][][][grow][][27.00][][][][31.00][35.00][][31.00][][][][][][grow]"
+                )
+        );
+
+
+        // =====================================================
+        // NOME
+        // =====================================================
+
+        JLabel lblTitulo =
+                new JLabel(
+                        "NOME COMPLETO DO AUTOR:"
+                );
+
+        lblTitulo.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblTitulo.setHorizontalAlignment(
+                SwingConstants.CENTER
+        );
+
+        lblTitulo.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        30
+                )
+        );
+
+        panel.add(
+                lblTitulo,
+                "cell 0 1 6 1,alignx center"
+        );
+
+
+        txtNome =
+                new JTextField();
+
+        txtNome.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        16
+                )
+        );
+
+        txtNome.setColumns(10);
+
+        txtNome.setBorder(
+                BorderFactory.createLineBorder(
+                        new Color(10, 86, 27),
+                        2
+                )
+        );
 
-		contentPane.add(
-				lblNewLabel,
-				"cell 0 0 1 2"
-		);
+        panel.add(
+                txtNome,
+                "cell 2 2,growx,h 42!"
+        );
 
 
-		// Título
-		JLabel lblNewLabel_2 =
-				new JLabel("Cadastro de Autores");
+        // =====================================================
+        // NACIONALIDADE
+        // =====================================================
 
-		lblNewLabel_2.setForeground(
-				new Color(10, 86, 27)
-		);
+        JLabel lblNacionalidade =
+                new JLabel(
+                        "NACIONALIDADE:"
+                );
+
+        lblNacionalidade.setForeground(
+                new Color(10, 86, 27)
+        );
+
+        lblNacionalidade.setHorizontalAlignment(
+                SwingConstants.CENTER
+        );
+
+        lblNacionalidade.setFont(
+                new Font(
+                        "Tahoma",
+                        Font.BOLD,
+                        30
+                )
+        );
 
-		lblNewLabel_2.setFont(
-				new Font("Tahoma", Font.BOLD, 48)
-		);
+        panel.add(
+                lblNacionalidade,
+                "cell 0 4 6 1,growx"
+        );
 
-		contentPane.add(
-				lblNewLabel_2,
-				"cell 2 1,alignx center,aligny bottom"
-		);
 
+        // =====================================================
+        // COMBOBOX DE PAÍSES
+        // =====================================================
 
-		// Painel principal
-		JPanel panel = new ImagePanel();
+        comboBox =
+                new JComboBox<String>();
 
-		panel.setForeground(
-				new Color(255, 255, 255)
-		);
+        String[] codigosPaises =
+                Locale.getISOCountries();
 
-		panel.setBackground(
-				new Color(10, 86, 27)
-		);
+        ArrayList<String> paises =
+                new ArrayList<>();
 
-		panel.setOpaque(false);
 
-		contentPane.add(
-				panel,
-				"cell 2 4,grow"
-		);
+        for (String codigo :
+                codigosPaises) {
 
+            Locale pais =
+                    new Locale(
+                            "",
+                            codigo
+                    );
 
-		panel.setLayout(
-				new MigLayout(
-						"",
-						"[234.00][10.00,grow][733.00,grow,center][grow][83.00][165.00]",
-						"[73.00][][][28.00][][][][24.00][][][][grow][][27.00][][][][31.00][35.00][][31.00][][][][][][grow]"
-				)
-		);
+            String nomePais =
+                    pais.getDisplayCountry(
+                            new Locale(
+                                    "pt",
+                                    "BR"
+                            )
+                    );
 
+            paises.add(
+                    nomePais
+            );
+        }
 
-		// Nome do autor
-		JLabel lblTitulo =
-				new JLabel("NOME COMPLETO DO AUTOR:");
 
-		lblTitulo.setForeground(
-				new Color(10, 86, 27)
-		);
+        Collections.sort(
+                paises
+        );
 
-		lblTitulo.setHorizontalAlignment(
-				SwingConstants.CENTER
-		);
 
-		lblTitulo.setFont(
-				new Font("Tahoma", Font.BOLD, 30)
-		);
+        for (String pais :
+                paises) {
 
-		panel.add(
-				lblTitulo,
-				"cell 0 1 6 1,alignx center"
-		);
+            comboBox.addItem(
+                    pais
+            );
+        }
 
 
-		txtNome = new JTextField();
+        panel.add(
+                comboBox,
+                "cell 2 5,growx,h 42!"
+        );
 
-		txtNome.setFont(
-				new Font("Segoe UI", Font.PLAIN, 16)
-		);
 
-		txtNome.setColumns(10);
+        // =====================================================
+        // BOTÃO CADASTRAR
+        // =====================================================
 
-		txtNome.setBorder(
-				BorderFactory.createLineBorder(
-						new Color(10, 86, 27),
-						2
-				)
-		);
+        botaoCadastrar =
+                new JButton("");
 
-		panel.add(
-				txtNome,
-				"cell 2 2,growx,h 42!"
-		);
+        botaoCadastrar.setContentAreaFilled(
+                false
+        );
 
+        botaoCadastrar.setBorderPainted(
+                false
+        );
 
-		// Nacionalidade
-		JLabel lblNacionalidade =
-				new JLabel("NACIONALIDADE:");
+        botaoCadastrar.setIcon(
+                new ImageIcon(
+                        Cadastro_Autor.class.getResource(
+                                "/imagens/BotaoCerto.png"
+                        )
+                )
+        );
 
-		lblNacionalidade.setForeground(
-				new Color(10, 86, 27)
-		);
+        panel.add(
+                botaoCadastrar,
+                "cell 2 12"
+        );
 
-		lblNacionalidade.setHorizontalAlignment(
-				SwingConstants.CENTER
-		);
 
-		lblNacionalidade.setFont(
-				new Font("Tahoma", Font.BOLD, 30)
-		);
+        // Evento do botão
+        botaoCadastrar.addActionListener(
+                e -> cadastrarAutor()
+        );
 
-		panel.add(
-				lblNacionalidade,
-				"cell 0 4 6 1,growx"
-		);
 
-		// ComboBox dos países
-		comboBox = new JComboBox<String>();
+        // =====================================================
+        // PAINÉIS OCULTOS
+        // =====================================================
 
-		String[] codigosPaises = Locale.getISOCountries();
+        JPanel panel_1 =
+                new JPanel();
 
-		ArrayList<String> paises = new ArrayList<>();
+        panel_1.setVisible(false);
 
-		for (String codigo : codigosPaises) {
+        panel.add(
+                panel_1,
+                "cell 1 26,grow"
+        );
 
-		    Locale pais = new Locale("", codigo);
 
-		    String nomePais = pais.getDisplayCountry(
-		            new Locale("pt", "BR")
-		    );
+        JPanel panel_2 =
+                new JPanel();
 
-		    paises.add(nomePais);
-		}
+        panel_2.setVisible(false);
 
-		// Coloca os países em ordem alfabética
-		Collections.sort(paises);
+        panel.add(
+                panel_2,
+                "cell 2 26"
+        );
 
-		for (String pais : paises) {
 
-		    comboBox.addItem(pais);
-		}
+        JPanel panel_3 =
+                new JPanel();
 
-		panel.add(
-		        comboBox,
-		        "cell 2 5,growx,h 42!"
-		);
+        panel_3.setVisible(false);
 
+        panel.add(
+                panel_3,
+                "cell 3 26,grow"
+        );
+    }
 
 
-		// Botão cadastrar
-		botaoCadastrar =
-				new JButton("");
+    // =========================================================
+    // CADASTRAR AUTOR
+    // =========================================================
 
-		botaoCadastrar.setContentAreaFilled(
-				false
-		);
+    private void cadastrarAutor() {
 
-		botaoCadastrar.setBorderPainted(
-				false
-		);
+        String nome =
+                txtNome.getText().trim();
 
-		botaoCadastrar.setIcon(
-				new ImageIcon(
-						Cadastro_Autor.class.getResource(
-								"/imagens/BotaoCerto.png"
-						)
-				)
-		);
 
-		panel.add(
-				botaoCadastrar,
-				"cell 2 12"
-		);
+        String nacionalidade = "";
 
+        if (comboBox.getSelectedItem() != null) {
 
-		// Painéis ocultos
-		JPanel panel_1 =
-				new JPanel();
+            nacionalidade =
+                    comboBox.getSelectedItem()
+                            .toString()
+                            .trim();
+        }
 
-		panel_1.setVisible(false);
 
-		panel.add(
-				panel_1,
-				"cell 1 26,grow"
-		);
+        // Validação do nome
+        if (nome.isEmpty()) {
 
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Digite o nome do autor."
+            );
 
-		JPanel panel_2 =
-				new JPanel();
+            txtNome.requestFocus();
 
-		panel_2.setVisible(false);
+            return;
+        }
 
-		panel.add(
-				panel_2,
-				"cell 2 26"
-		);
 
+        // Validação da nacionalidade
+        if (nacionalidade.isEmpty()) {
 
-		JPanel panel_3 =
-				new JPanel();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Selecione a nacionalidade."
+            );
 
-		panel_3.setVisible(false);
+            return;
+        }
 
-		panel.add(
-				panel_3,
-				"cell 3 26,grow"
-		);
-	}
 
+        try {
 
-	// Pega o nome
-	public JTextField getTxtNome() {
+            // Cria o objeto Autor
+            Autor autor =
+                    new Autor(
+                            0,
+                            nome,
+                            nacionalidade
+                    );
 
-		return txtNome;
-	}
 
+            // Cria o DAO
+            AutorDAO autorDAO =
+                    new AutorDAO(
+                            ConnectionFactory.getConnection()
+                    );
 
-	// Altera o nome
-	public void setTxtNome(JTextField txtNome) {
 
-		this.txtNome = txtNome;
-	}
+            // Salva no banco
+            autorDAO.cadastrar(
+                    autor
+            );
 
 
-	// Pega a nacionalidade selecionada
-	public JComboBox<String> getComboBox() {
+            // =================================================
+            // ATUALIZA A LISTA DA TELA DE LIVROS
+            // =================================================
 
-		return comboBox;
-	}
+            if (cadastroLivro != null) {
 
+                cadastroLivro.carregarAutores(
+                        autorDAO.listarAutores()
+                );
+            }
 
-	// Altera o ComboBox
-	public void setComboBox(
-			JComboBox<String> comboBox) {
 
-		this.comboBox = comboBox;
-	}
+            // Mensagem
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Autor cadastrado com sucesso!"
+            );
 
 
-	// Pega o botão cadastrar
-	public JButton getBtnAdicionar() {
+            // Limpa o campo
+            txtNome.setText("");
 
-		return botaoCadastrar;
-	}
+
+            // Fecha a janela
+            dispose();
+
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro ao cadastrar o autor:\n"
+                            + ex.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+
+    // =========================================================
+    // GETTERS E SETTERS
+    // =========================================================
+
+    public JTextField getTxtNome() {
+
+        return txtNome;
+    }
+
+
+    public void setTxtNome(
+            JTextField txtNome) {
+
+        this.txtNome =
+                txtNome;
+    }
+
+
+    public JComboBox<String> getComboBox() {
+
+        return comboBox;
+    }
+
+
+    public void setComboBox(
+            JComboBox<String> comboBox) {
+
+        this.comboBox =
+                comboBox;
+    }
+
+
+    public JButton getBtnAdicionar() {
+
+        return botaoCadastrar;
+    }
+
+
+    public void setCadastroLivro(
+            Cadastro_Livro cadastroLivro) {
+
+        this.cadastroLivro =
+                cadastroLivro;
+    }
+
+
+    public Cadastro_Livro getCadastroLivro() {
+
+        return cadastroLivro;
+    }
 }

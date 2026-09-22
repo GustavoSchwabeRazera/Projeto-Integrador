@@ -6,157 +6,295 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LivroDAO {
 
-    private Connection connection;
+    private final Connection connection;
+
 
     public LivroDAO(Connection connection) {
         this.connection = connection;
     }
 
-    // CREATE - Inserir livro
-    public void inserir(Livro livro) throws SQLException {
 
-        String sql = "INSERT INTO livro " +
-                     "(nome, editora, ano_lancamento, autor, genero) " +
-                     "VALUES (?, ?, ?, ?, ?)";
+    // =========================================================
+    // CREATE - INSERIR LIVRO
+    // =========================================================
 
-        PreparedStatement stmt = connection.prepareStatement(sql);
+    public void inserir(Livro livro)
+            throws SQLException {
 
-        stmt.setString(1, livro.getNome());
-        stmt.setString(2, livro.getEditora());
-        stmt.setInt(3, livro.getAnoLancamento());
-        stmt.setString(5, livro.getGenero());
+        String sql =
+                "INSERT INTO livro "
+                + "(nome, editora, ano_lancamento, autor, genero) "
+                + "VALUES (?, ?, ?, ?, ?)";
 
-        stmt.executeUpdate();
 
-    }
+        try (
+                PreparedStatement stmt =
+                        connection.prepareStatement(sql)
+        ) {
 
-    // READ - Listar todos os livros
-    public List<Livro> listar() throws SQLException {
-
-        List<Livro> livros = new ArrayList<>();
-
-        String sql = "SELECT * FROM livro";
-
-        PreparedStatement stmt = connection.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery();
-
-        while (rs.next()) {
-
-            Livro livro = new Livro(
-                rs.getString("nome"),
-                rs.getString("editora"),
-                rs.getInt("ano_lancamento"),
-                rs.getString("genero")
+            stmt.setString(
+                    1,
+                    livro.getNome()
             );
 
-            livros.add(livro);
+            stmt.setString(
+                    2,
+                    livro.getEditora()
+            );
+
+            stmt.setInt(
+                    3,
+                    livro.getAnoLancamento()
+            );
+
+            /*
+             * Atualmente o Livro não está recebendo
+             * um autor diretamente.
+             *
+             * Por isso o campo fica NULL.
+             *
+             * Quando você me mandar o relacionamento
+             * Livro <-> Autor, podemos corrigir essa
+             * parte para salvar os autores selecionados.
+             */
+            stmt.setNull(
+                    4,
+                    Types.INTEGER
+            );
+
+            stmt.setString(
+                    5,
+                    livro.getGenero()
+            );
+
+            stmt.executeUpdate();
+        }
+    }
+
+
+    // =========================================================
+    // READ - LISTAR TODOS
+    // =========================================================
+
+    public List<Livro> listar()
+            throws SQLException {
+
+        List<Livro> livros =
+                new ArrayList<>();
+
+
+        String sql =
+                "SELECT * FROM livro";
+
+
+        try (
+                PreparedStatement stmt =
+                        connection.prepareStatement(sql);
+
+                ResultSet rs =
+                        stmt.executeQuery()
+        ) {
+
+            while (rs.next()) {
+
+                Livro livro =
+                        new Livro(
+                                rs.getString("nome"),
+                                rs.getString("editora"),
+                                rs.getInt("ano_lancamento"),
+                                rs.getString("genero")
+                        );
+
+                livros.add(livro);
+            }
         }
 
-        rs.close();
-        stmt.close();
 
         return livros;
     }
 
-    // READ - Buscar livro pelo nome
-    public Livro buscarPorNome(String nome) throws SQLException {
 
-        String sql = "SELECT * FROM livro WHERE nome = ?";
+    // =========================================================
+    // READ - BUSCAR POR NOME
+    // =========================================================
 
-        PreparedStatement stmt = connection.prepareStatement(sql);
+    public Livro buscarPorNome(
+            String nome)
+            throws SQLException {
 
-        stmt.setString(1, nome);
+        String sql =
+                "SELECT * "
+                + "FROM livro "
+                + "WHERE nome = ?";
 
-        ResultSet rs = stmt.executeQuery();
 
-        if (rs.next()) {
+        try (
+                PreparedStatement stmt =
+                        connection.prepareStatement(sql)
+        ) {
 
-            Livro livro = new Livro(
-                rs.getString("nome"),
-                rs.getString("editora"),
-                rs.getInt("ano_lancamento"),
-                rs.getString("genero")
+            stmt.setString(
+                    1,
+                    nome
             );
 
-            rs.close();
-        
-            return livro;
+
+            try (
+                    ResultSet rs =
+                            stmt.executeQuery()
+            ) {
+
+                if (rs.next()) {
+
+                    return new Livro(
+                            rs.getString("nome"),
+                            rs.getString("editora"),
+                            rs.getInt("ano_lancamento"),
+                            rs.getString("genero")
+                    );
+                }
+            }
         }
 
-        rs.close();
-    
 
         return null;
     }
 
-    // UPDATE - Atualizar livro
-    public void atualizar(Livro livro) throws SQLException {
 
-        String sql = "UPDATE livro SET " +
-                     "editora = ?, " +
-                     "ano_lancamento = ?, " +
-                     "autor = ?, " +
-                     "genero = ? " +
-                     "WHERE id = ?";
+    // =========================================================
+    // UPDATE - ATUALIZAR LIVRO
+    // =========================================================
 
-        PreparedStatement stmt = connection.prepareStatement(sql);
+    public void atualizar(Livro livro)
+            throws SQLException {
 
-        stmt.setString(1, livro.getEditora());
-        stmt.setInt(2, livro.getAnoLancamento());
-        stmt.setString(4, livro.getGenero());
-        stmt.setString(5, livro.getNome());
+        /*
+         * Aqui estou usando o nome para localizar
+         * o livro, porque seu objeto Livro atualmente
+         * não mostrou um getId().
+         */
 
-        stmt.executeUpdate();
+        String sql =
+                "UPDATE livro SET "
+                + "editora = ?, "
+                + "ano_lancamento = ?, "
+                + "genero = ? "
+                + "WHERE nome = ?";
 
-        
+
+        try (
+                PreparedStatement stmt =
+                        connection.prepareStatement(sql)
+        ) {
+
+            stmt.setString(
+                    1,
+                    livro.getEditora()
+            );
+
+            stmt.setInt(
+                    2,
+                    livro.getAnoLancamento()
+            );
+
+            stmt.setString(
+                    3,
+                    livro.getGenero()
+            );
+
+            stmt.setString(
+                    4,
+                    livro.getNome()
+            );
+
+            stmt.executeUpdate();
+        }
     }
 
-    // DELETE - Excluir livro
-    public void excluir(String nome) throws SQLException {
 
-        String sql = "DELETE FROM livro WHERE nome = ?";
+    // =========================================================
+    // DELETE - EXCLUIR LIVRO
+    // =========================================================
 
-        PreparedStatement stmt = connection.prepareStatement(sql);
+    public void excluir(String nome)
+            throws SQLException {
 
-        stmt.setString(1, nome);
+        String sql =
+                "DELETE FROM livro "
+                + "WHERE nome = ?";
 
-        stmt.executeUpdate();
 
-       
+        try (
+                PreparedStatement stmt =
+                        connection.prepareStatement(sql)
+        ) {
+
+            stmt.setString(
+                    1,
+                    nome
+            );
+
+            stmt.executeUpdate();
+        }
     }
 
-	public List<Livro> buscarLivrosPorNome(String texto) throws SQLException {
-		   List<Livro> livros = new ArrayList<>();
 
-	        String sql = "SELECT * FROM livro where nome like '%?%'";
+    // =========================================================
+    // BUSCAR LIVROS POR NOME
+    // =========================================================
 
-	        PreparedStatement stmt = connection.prepareStatement(sql);
-	        stmt.setString(1, texto);
-	        ResultSet rs = stmt.executeQuery();
+    public List<Livro> buscarLivrosPorNome(
+            String texto)
+            throws SQLException {
 
-	        while (rs.next()) {
+        List<Livro> livros =
+                new ArrayList<>();
 
-	            Livro livro = new Livro(
-	                rs.getString("nome"),
-	                rs.getString("editora"),
-	                rs.getInt("ano_lancamento"),
-	                rs.getString("genero")
-	            );
 
-	            livros.add(livro);
-	        }
+        String sql =
+                "SELECT * "
+                + "FROM livro "
+                + "WHERE nome LIKE ?";
 
-	        rs.close();
-	       
 
-	        return livros;
-	}
-    
-    
-    
+        try (
+                PreparedStatement stmt =
+                        connection.prepareStatement(sql)
+        ) {
+
+            stmt.setString(
+                    1,
+                    "%" + texto + "%"
+            );
+
+
+            try (
+                    ResultSet rs =
+                            stmt.executeQuery()
+            ) {
+
+                while (rs.next()) {
+
+                    Livro livro =
+                            new Livro(
+                                    rs.getString("nome"),
+                                    rs.getString("editora"),
+                                    rs.getInt("ano_lancamento"),
+                                    rs.getString("genero")
+                            );
+
+                    livros.add(livro);
+                }
+            }
+        }
+
+
+        return livros;
+    }
 }
