@@ -26,7 +26,6 @@ public class TelaMeusLivros extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JButton btnHome;
-	private JButton btnPerfil;
 	private JButton btnMostrarMais;
 
 	// =====================================================
@@ -132,23 +131,9 @@ public class TelaMeusLivros extends JFrame {
 
 		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
-		// =====================================================
-		// PERFIL
-		// =====================================================
-
-		btnPerfil = new JButton();
-
 		ImageIcon perfil = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
 
 		Image imgPerfil = perfil.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-
-		btnPerfil.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/FotoPerfil.png")));
-
-		btnPerfil.setBorderPainted(false);
-		btnPerfil.setContentAreaFilled(false);
-		btnPerfil.setFocusPainted(false);
-
-		contentPane.add(btnPerfil, "cell 4 0,alignx right,aligny top");
 
 		// =====================================================
 		// TÍTULO
@@ -269,9 +254,7 @@ public class TelaMeusLivros extends JFrame {
 		return btnHome;
 	}
 
-	public JButton getBtnPerfil() {
-		return btnPerfil;
-	}
+	
 
 	public JButton getBtnMostrarMais() {
 		return btnMostrarMais;

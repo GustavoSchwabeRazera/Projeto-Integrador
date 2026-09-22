@@ -26,7 +26,6 @@ public class TelaSolicitacoes extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JButton btnHome;
-	private JButton btnPerfil;
 	private JButton btnExcluir;
 	private JButton btnAceitar;
 
@@ -206,13 +205,6 @@ public class TelaSolicitacoes extends JFrame {
             "cell 0 2 5 1,alignx center"
         );
 
-
-        // =====================================================
-        // PERFIL
-        // =====================================================
-
-        btnPerfil = new JButton();
-
         ImageIcon perfil = new ImageIcon(
             TelaSolicitacoes.class.getResource("/imagens/perfil3.png")
         );
@@ -221,16 +213,6 @@ public class TelaSolicitacoes extends JFrame {
             70,
             70,
             Image.SCALE_SMOOTH
-        );
-
-        btnPerfil.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/FotoPerfil.png")));
-        btnPerfil.setBorderPainted(false);
-        btnPerfil.setContentAreaFilled(false);
-        btnPerfil.setFocusPainted(false);
-
-        contentPane.add(
-            btnPerfil,
-            "cell 4 0,alignx right,aligny top"
         );
 
 
@@ -412,9 +394,7 @@ public class TelaSolicitacoes extends JFrame {
         return btnHome;
     }
 
-    public JButton getBtnPerfil() {
-        return btnPerfil;
-    }
+  
 
     public JButton getBtnExcluir() {
         return btnExcluir;

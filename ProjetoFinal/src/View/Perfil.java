@@ -38,6 +38,7 @@ public class Perfil extends JFrame {
 	private CircularImageLabel lblFoto;
 	private byte[] fotoSelecionada;
 	private String cpfUsuario;
+	private JButton btnNewButton;
 
 
 	/**
@@ -285,6 +286,11 @@ public class Perfil extends JFrame {
 		btnHome.setFocusPainted(false);
 		btnHome.setOpaque(false);
 		contentPane.add(btnHome, "cell 1 1, alignx left, aligny center");
+		
+		btnNewButton = new JButton("");
+		btnNewButton.setContentAreaFilled(false);
+		btnNewButton.setIcon(new ImageIcon(Perfil.class.getResource("/imagens/sairAjustado.png")));
+		contentPane.add(btnNewButton, "cell 3 1");
 
 		// Título "Informações" - Formatado igual ao "Foto de perfil:"
 		JLabel lblPerfil = new JLabel("Informações:");

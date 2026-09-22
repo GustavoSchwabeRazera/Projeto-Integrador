@@ -26,7 +26,6 @@ public class PesquisarLivro extends JFrame {
     private JTextField textField;
     private JButton btnHome;
     private JButton btnPesquisar;
-    private JButton btnPerfil;
 
     /**
      * Launch the application.
@@ -78,22 +77,6 @@ public class PesquisarLivro extends JFrame {
             .getScaledInstance(350, 190, Image.SCALE_SMOOTH);
 
 
-        // =====================================================
-        // BOTÃO PERFIL
-        // =====================================================
-
-        btnPerfil = new JButton("");
-
-        // TAMANHO DO BOTÃO PERFIL
-        btnPerfil.setPreferredSize(
-            new Dimension(70, 70)
-        );
-
-        btnPerfil.setBorderPainted(false);
-        btnPerfil.setContentAreaFilled(false);
-        btnPerfil.setFocusPainted(false);
-
-
         // TAMANHO DA IMAGEM DO PERFIL
         ImageIcon perfil = new ImageIcon(
             PesquisarLivro.class.getResource(
@@ -107,24 +90,6 @@ public class PesquisarLivro extends JFrame {
                 80,
                 Image.SCALE_SMOOTH
             );
-
-        btnPerfil.setIcon(
-            new ImageIcon(PesquisarLivro.class.getResource("/imagens/FotoPerfil.png"))
-        );
-
-
-        btnPerfil.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-
-                }
-            }
-        );
-
-        contentPane.add(
-            btnPerfil,
-            "cell 5 0,alignx right,aligny center"
-        );
 
 
         // =====================================================
@@ -307,10 +272,7 @@ public class PesquisarLivro extends JFrame {
         return btnPesquisar;
     }
 
-    public JButton getBtnPerfil() {
-        return btnPerfil;
-    }
-
+   
     public String getTextoPesquisa() {
         return textField.getText().trim();
     }

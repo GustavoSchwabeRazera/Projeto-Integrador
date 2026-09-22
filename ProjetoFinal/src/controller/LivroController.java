@@ -94,20 +94,20 @@ public class LivroController {
         telaInicial.getBtnHistorico().addActionListener(e -> abrirHistorico());
 
         // SINO -> abre a tela de notificações
-        telaInicial.getBtnNotificacao().addActionListener(e -> abrirNotificacoes());
+       // telaInicial.getBtnNotificacao().addActionListener(e -> abrirNotificacoes());
 
         // PESQUISA
         pesquisarLivro.getBtnHome().addActionListener(e -> abrirHome());
-        pesquisarLivro.getBtnPerfil().addActionListener(e -> abrirPerfil());
+       
         pesquisarLivro.getBtnPesquisar().addActionListener(e -> pesquisar());
 
         // MEUS LIVROS
         telaMeusLivros.getBtnHome().addActionListener(e -> abrirHome());
-        telaMeusLivros.getBtnPerfil().addActionListener(e -> abrirPerfil());
+ 
 
         // SOLICITAÇÕES
         telaSolicitacoes.getBtnHome().addActionListener(e -> abrirHome());
-        telaSolicitacoes.getBtnPerfil().addActionListener(e -> abrirPerfil());
+      
         telaSolicitacoes.getBtnAceitar().addActionListener(e -> aceitarSolicitacao());
         telaSolicitacoes.getBtnExcluir().addActionListener(e -> excluirSolicitacao());
 
