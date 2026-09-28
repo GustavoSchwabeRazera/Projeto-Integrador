@@ -14,7 +14,7 @@ import View.Calendario;
 import View.Historico;
 import View.Perfil;
 import View.PesquisarLivro;
-import View.TelaAlterarCadastro;
+import View.TelaAlterar;
 import View.TelaCriarConta;
 import View.TelaLogin;
 import View.TelaMeusLivros;
@@ -40,7 +40,7 @@ private final Perfil perfil;
 private final Cadastro_Livro cadastro_livro;
 private final TelaCriarConta CriarConta;
 private final Calendario calendario;
-private final TelaAlterarCadastro alterarCadastro;
+private final TelaAlterar alterarCadastro;
 private final Historico historico;
 
 private String emailUsuarioLogado;
@@ -73,7 +73,7 @@ public LivroController(
     this.telaMeusLivros = new TelaMeusLivros();
     this.perfil = new Perfil();
     this.calendario = new Calendario();
-    this.alterarCadastro = new TelaAlterarCadastro();
+    this.alterarCadastro = new TelaAlterar();
     this.usuarioDAO = new UsuarioDAO();
     this.historico = new Historico();
 
@@ -201,6 +201,15 @@ private void configurarEventos() {
                     );
                 }
             });
+ // Alterar Cadastro //
+    alterarCadastro.getBtnVoltar().addActionListener(e -> VoltarDoCadastro());
+}
+	
+	
+
+public void VoltarDoCadastro() {
+	esconderTodas();
+	perfil.setVisible(true);
 }
 
 public void iniciar() {
