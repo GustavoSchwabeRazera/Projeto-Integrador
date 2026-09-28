@@ -674,7 +674,7 @@ private void limparCadastro() {
             .setText("");
 
     cadastro_livro.getTxtAno()
-            .setValue(null);
+            .setText("");
 }
 
 private void pesquisar() {
