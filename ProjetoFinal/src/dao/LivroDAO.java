@@ -1,85 +1,153 @@
 package dao;
 
-import model.Livro;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.Autor;
+import model.Livro;
 
 public class LivroDAO {
 
     private final Connection connection;
 
-
     public LivroDAO(Connection connection) {
         this.connection = connection;
     }
 
-
     // =========================================================
-    // CREATE - INSERIR LIVRO
+    // CADASTRAR LIVRO + AUTORES
     // =========================================================
 
-    public void inserir(Livro livro)
-            throws SQLException {
+    public void inserir(
+            Livro livro,
+            List<Autor> autores) throws SQLException {
 
-        String sql =
-                "INSERT INTO livro "
-                + "(nome, editora, ano_lancamento, autor, genero) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        String sqlLivro =
+                "INSERT INTO Livros "
+                + "(ISBN, fotoContraCapa, fotoCapa, status, "
+                + "CPF_dono, titulo, data_lancamento, editora, generos) "
+                + "VALUES (?, NULL, NULL, ?, ?, ?, ?, ?, ?)";
 
+        String sqlPertence =
+                "INSERT INTO Pertence (ISBN, id_autor) "
+                + "VALUES (?, ?)";
 
-        try (
-                PreparedStatement stmt =
-                        connection.prepareStatement(sql)
-        ) {
+        boolean autoCommitAnterior =
+                connection.getAutoCommit();
 
-            stmt.setString(
-                    1,
-                    livro.getNome()
+        try {
+
+            connection.setAutoCommit(false);
+
+            // =================================================
+            // INSERIR LIVRO
+            // =================================================
+
+            try (PreparedStatement stmt =
+                    connection.prepareStatement(sqlLivro)) {
+
+                // ISBN
+                stmt.setString(
+                        1,
+                        livro.getIsbn()
+                );
+
+                // STATUS
+                stmt.setBoolean(
+                        2,
+                        true
+                );
+
+                // CPF DO DONO
+                // Temporário até integrar com o login
+                stmt.setString(
+                        3,
+                        "12345678911"
+                );
+
+                // TÍTULO
+                stmt.setString(
+                        4,
+                        livro.getNome()
+                );
+
+                // DATA DE LANÇAMENTO
+                stmt.setDate(
+                        5,
+                        java.sql.Date.valueOf(
+                                livro.getAnoLancamento()
+                                        + "-01-01"
+                        )
+                );
+
+                // EDITORA
+                stmt.setString(
+                        6,
+                        livro.getEditora()
+                );
+
+                // GÊNERO
+                stmt.setString(
+                        7,
+                        livro.getGenero()
+                );
+
+                stmt.executeUpdate();
+            }
+
+            // =================================================
+            // INSERIR AUTORES
+            // =================================================
+
+            if (autores != null
+                    && !autores.isEmpty()) {
+
+                try (PreparedStatement stmt =
+                        connection.prepareStatement(sqlPertence)) {
+
+                    for (Autor autor : autores) {
+
+                        stmt.setString(
+                                1,
+                                livro.getIsbn()
+                        );
+
+                        stmt.setInt(
+                                2,
+                                autor.getId_autor()
+                        );
+
+                        stmt.executeUpdate();
+                    }
+                }
+            }
+
+            // =================================================
+            // CONFIRMAR
+            // =================================================
+
+            connection.commit();
+
+        } catch (SQLException e) {
+
+            connection.rollback();
+
+            throw e;
+
+        } finally {
+
+            connection.setAutoCommit(
+                    autoCommitAnterior
             );
-
-            stmt.setString(
-                    2,
-                    livro.getEditora()
-            );
-
-            stmt.setInt(
-                    3,
-                    livro.getAnoLancamento()
-            );
-
-            /*
-             * Atualmente o Livro não está recebendo
-             * um autor diretamente.
-             *
-             * Por isso o campo fica NULL.
-             *
-             * Quando você me mandar o relacionamento
-             * Livro <-> Autor, podemos corrigir essa
-             * parte para salvar os autores selecionados.
-             */
-            stmt.setNull(
-                    4,
-                    Types.INTEGER
-            );
-
-            stmt.setString(
-                    5,
-                    livro.getGenero()
-            );
-
-            stmt.executeUpdate();
         }
     }
 
-
     // =========================================================
-    // READ - LISTAR TODOS
+    // LISTAR LIVROS
     // =========================================================
 
     public List<Livro> listar()
@@ -88,10 +156,11 @@ public class LivroDAO {
         List<Livro> livros =
                 new ArrayList<>();
 
-
         String sql =
-                "SELECT * FROM livro";
-
+                "SELECT ISBN, titulo, editora, "
+                + "data_lancamento, generos "
+                + "FROM Livros "
+                + "ORDER BY titulo";
 
         try (
                 PreparedStatement stmt =
@@ -103,36 +172,48 @@ public class LivroDAO {
 
             while (rs.next()) {
 
+                java.sql.Date data =
+                        rs.getDate(
+                                "data_lancamento"
+                        );
+
+                int ano = 0;
+
+                if (data != null) {
+
+                    ano =
+                            data.toLocalDate()
+                                    .getYear();
+                }
+
                 Livro livro =
                         new Livro(
-                                rs.getString("nome"),
+                                rs.getString("ISBN"),
+                                rs.getString("titulo"),
                                 rs.getString("editora"),
-                                rs.getInt("ano_lancamento"),
-                                rs.getString("genero")
+                                ano,
+                                rs.getString("generos")
                         );
 
                 livros.add(livro);
             }
         }
 
-
         return livros;
     }
 
-
     // =========================================================
-    // READ - BUSCAR POR NOME
+    // BUSCAR POR ISBN
     // =========================================================
 
-    public Livro buscarPorNome(
-            String nome)
-            throws SQLException {
+    public Livro buscarPorISBN(
+            String isbn) throws SQLException {
 
         String sql =
-                "SELECT * "
-                + "FROM livro "
-                + "WHERE nome = ?";
-
+                "SELECT ISBN, titulo, editora, "
+                + "data_lancamento, generos "
+                + "FROM Livros "
+                + "WHERE ISBN = ?";
 
         try (
                 PreparedStatement stmt =
@@ -141,9 +222,8 @@ public class LivroDAO {
 
             stmt.setString(
                     1,
-                    nome
+                    isbn
             );
-
 
             try (
                     ResultSet rs =
@@ -152,149 +232,77 @@ public class LivroDAO {
 
                 if (rs.next()) {
 
+                    java.sql.Date data =
+                            rs.getDate(
+                                    "data_lancamento"
+                            );
+
+                    int ano = 0;
+
+                    if (data != null) {
+
+                        ano =
+                                data.toLocalDate()
+                                        .getYear();
+                    }
+
                     return new Livro(
-                            rs.getString("nome"),
+                            rs.getString("ISBN"),
+                            rs.getString("titulo"),
                             rs.getString("editora"),
-                            rs.getInt("ano_lancamento"),
-                            rs.getString("genero")
+                            ano,
+                            rs.getString("generos")
                     );
                 }
             }
         }
 
-
         return null;
     }
 
-
     // =========================================================
-    // UPDATE - ATUALIZAR LIVRO
+    // EXCLUIR LIVRO
     // =========================================================
 
-    public void atualizar(Livro livro)
-            throws SQLException {
+    public void excluir(
+            String isbn) throws SQLException {
 
-        /*
-         * Aqui estou usando o nome para localizar
-         * o livro, porque seu objeto Livro atualmente
-         * não mostrou um getId().
-         */
-
-        String sql =
-                "UPDATE livro SET "
-                + "editora = ?, "
-                + "ano_lancamento = ?, "
-                + "genero = ? "
-                + "WHERE nome = ?";
-
+        String sqlPertence =
+                "DELETE FROM Pertence "
+                + "WHERE ISBN = ?";
 
         try (
                 PreparedStatement stmt =
-                        connection.prepareStatement(sql)
+                        connection.prepareStatement(
+                                sqlPertence
+                        )
         ) {
 
             stmt.setString(
                     1,
-                    livro.getEditora()
-            );
-
-            stmt.setInt(
-                    2,
-                    livro.getAnoLancamento()
-            );
-
-            stmt.setString(
-                    3,
-                    livro.getGenero()
-            );
-
-            stmt.setString(
-                    4,
-                    livro.getNome()
+                    isbn
             );
 
             stmt.executeUpdate();
         }
-    }
 
-
-    // =========================================================
-    // DELETE - EXCLUIR LIVRO
-    // =========================================================
-
-    public void excluir(String nome)
-            throws SQLException {
-
-        String sql =
-                "DELETE FROM livro "
-                + "WHERE nome = ?";
-
+        String sqlLivro =
+                "DELETE FROM Livros "
+                + "WHERE ISBN = ?";
 
         try (
                 PreparedStatement stmt =
-                        connection.prepareStatement(sql)
+                        connection.prepareStatement(
+                                sqlLivro
+                        )
         ) {
 
             stmt.setString(
                     1,
-                    nome
+                    isbn
             );
 
             stmt.executeUpdate();
         }
-    }
-
-
-    // =========================================================
-    // BUSCAR LIVROS POR NOME
-    // =========================================================
-
-    public List<Livro> buscarLivrosPorNome(
-            String texto)
-            throws SQLException {
-
-        List<Livro> livros =
-                new ArrayList<>();
-
-
-        String sql =
-                "SELECT * "
-                + "FROM livro "
-                + "WHERE nome LIKE ?";
-
-
-        try (
-                PreparedStatement stmt =
-                        connection.prepareStatement(sql)
-        ) {
-
-            stmt.setString(
-                    1,
-                    "%" + texto + "%"
-            );
-
-
-            try (
-                    ResultSet rs =
-                            stmt.executeQuery()
-            ) {
-
-                while (rs.next()) {
-
-                    Livro livro =
-                            new Livro(
-                                    rs.getString("nome"),
-                                    rs.getString("editora"),
-                                    rs.getInt("ano_lancamento"),
-                                    rs.getString("genero")
-                            );
-
-                    livros.add(livro);
-                }
-            }
-        }
-
-
-        return livros;
     }
 }
