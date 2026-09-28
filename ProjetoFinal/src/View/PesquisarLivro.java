@@ -136,6 +136,7 @@ public class PesquisarLivro extends JFrame {
         JLabel lblNewLabel = new JLabel(
             "Pesquisar Livros"
         );
+        lblNewLabel.setForeground(new Color(10, 86, 27));
 
         lblNewLabel.setHorizontalAlignment(
             SwingConstants.CENTER
@@ -151,7 +152,7 @@ public class PesquisarLivro extends JFrame {
 
         contentPane.add(
             lblNewLabel,
-            "cell 2 1 6 1,alignx center"
+            "cell 0 1 8 1,alignx center"
         );
 
 
@@ -176,107 +177,26 @@ public class PesquisarLivro extends JFrame {
         // =====================================================
 
         btnHome = new JButton("");
+		btnHome.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 
-        btnHome.setPreferredSize(
-            new Dimension(
-                80,
-                80
-            )
-        );
+		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
 
-        btnHome.setBorderPainted(false);
+		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
 
-        btnHome.setContentAreaFilled(false);
+		btnHome.setForeground(new Color(10, 86, 27));
 
-        btnHome.setFocusPainted(false);
+		btnHome.setBorderPainted(false);
+		btnHome.setContentAreaFilled(false);
+		btnHome.setFocusPainted(false);
 
+		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
-        // =====================================================
-        // IMAGEM DO BOTÃO HOME
-        // =====================================================
+		ImageIcon perfil1 = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
 
-        ImageIcon casa = new ImageIcon(
-            PesquisarLivro.class.getResource(
-                "/imagens/LogoCasa.png"
-            )
-        );
-
-        Image imagemCasaRedimensionada = casa.getImage()
-            .getScaledInstance(
-                70,
-                70,
-                Image.SCALE_SMOOTH
-            );
-
-        btnHome.setIcon(
-            new ImageIcon(
-                imagemCasaRedimensionada
-            )
-        );
-
-
-        btnHome.addActionListener(
-            new ActionListener() {
-
-                public void actionPerformed(
-                    ActionEvent e
-                ) {
-
-                    // Ação do botão Home
-
-                }
-            }
-        );
-
-
-        contentPane.add(
-            btnHome,
-            "cell 2 0 2 1,aligny top"
-        );
-
-
-        // =====================================================
-        // LOCALIZAÇÃO
-        // =====================================================
-
-        JButton btnNewButton_1 = new JButton(
-            "Gaspar"
-        );
-
-        btnNewButton_1.setFont(
-            new Font(
-                "Tahoma",
-                Font.BOLD,
-                36
-            )
-        );
-
-        btnNewButton_1.setBorderPainted(false);
-
-        btnNewButton_1.setContentAreaFilled(false);
-
-
-        btnNewButton_1.setIcon(
-            new ImageIcon(
-                PesquisarLivro.class.getResource(
-                    "/imagens/LogoLocalizacao.png"
-                )
-            )
-        );
-
-
-        btnNewButton_1.addActionListener(
-            new ActionListener() {
-
-                public void actionPerformed(
-                    ActionEvent e
-                ) {
-
-                    // Ação da localização
-
-                }
-            }
-        );
+		Image imgPerfil = perfil1.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 
 
         // =====================================================
@@ -308,17 +228,7 @@ public class PesquisarLivro extends JFrame {
 
         contentPane.add(
             textField,
-            "cell 2 4 6 1,alignx center,width 600:200:800,height 42!"
-        );
-
-
-        // =====================================================
-        // LOCALIZAÇÃO
-        // =====================================================
-
-        contentPane.add(
-            btnNewButton_1,
-            "cell 2 7 3 1,alignx left,aligny bottom"
+            "cell 0 4 8 1,width 600:200:800,alignx center,height 42!"
         );
 
 
@@ -402,8 +312,61 @@ public class PesquisarLivro extends JFrame {
 
         contentPane.add(
             btnPesquisar,
-            "cell 2 6 6 1,alignx center,width 300:200:500,height 125:80:180"
+            "cell 0 6 8 1,width 300:200:500,alignx center,height 125:80:180"
         );
+        
+                // =====================================================
+                // LOCALIZAÇÃO
+                // =====================================================
+        
+                JButton btnNewButton_1 = new JButton(
+                    "Gaspar"
+                );
+                
+                        btnNewButton_1.setFont(
+                            new Font(
+                                "Tahoma",
+                                Font.BOLD,
+                                36
+                            )
+                        );
+                        
+                                btnNewButton_1.setBorderPainted(false);
+                                
+                                        btnNewButton_1.setContentAreaFilled(false);
+                                        
+                                        
+                                                btnNewButton_1.setIcon(
+                                                    new ImageIcon(
+                                                        PesquisarLivro.class.getResource(
+                                                            "/imagens/LogoLocalizacao.png"
+                                                        )
+                                                    )
+                                                );
+                                                
+                                                
+                                                        btnNewButton_1.addActionListener(
+                                                            new ActionListener() {
+                                                
+                                                                public void actionPerformed(
+                                                                    ActionEvent e
+                                                                ) {
+                                                
+                                                                    // Ação da localização
+                                                
+                                                                }
+                                                            }
+                                                        );
+                                                        
+                                                        
+                                                                // =====================================================
+                                                                // LOCALIZAÇÃO
+                                                                // =====================================================
+                                                        
+                                                                contentPane.add(
+                                                                    btnNewButton_1,
+                                                                    "cell 0 7,alignx left,aligny bottom"
+                                                                );
 
 
         // =====================================================

@@ -158,30 +158,26 @@ public class Calendario extends JFrame {
         // =====================================================
 
         btnHome = new JButton("");
-        btnHome.setPreferredSize(new Dimension(50, 50));
+		btnHome.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 
-        try {
-            ImageIcon iconeHome = new ImageIcon(
-                Calendario.class.getResource("/imagens/casa 1.png")
-            );
-            Image imagemHome = iconeHome.getImage().getScaledInstance(
-                60, 60, Image.SCALE_SMOOTH
-            );
-            btnHome.setIcon(new ImageIcon(imagemHome));
-        } catch (Exception e) {
-            btnHome.setText("Home");
-        }
+		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
 
-        btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-        btnHome.setForeground(VERDE_ESCURO);
-        btnHome.setBorderPainted(false);
-        btnHome.setContentAreaFilled(false);
-        btnHome.setFocusPainted(false);
+		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
 
-        contentPane.add(
-            btnHome,
-            "cell 0 0,alignx left,aligny top"
-        );
+		btnHome.setForeground(new Color(10, 86, 27));
+
+		btnHome.setBorderPainted(false);
+		btnHome.setContentAreaFilled(false);
+		btnHome.setFocusPainted(false);
+
+		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
+
+		ImageIcon perfil = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
+
+		Image imgPerfil = perfil.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 
         // =====================================================
         // LOGO

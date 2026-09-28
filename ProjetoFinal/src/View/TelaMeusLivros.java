@@ -118,6 +118,10 @@ public class TelaMeusLivros extends JFrame {
 		// =====================================================
 
 		btnHome = new JButton("");
+		btnHome.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 
 		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
 
