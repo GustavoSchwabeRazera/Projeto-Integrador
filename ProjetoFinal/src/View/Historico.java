@@ -84,17 +84,17 @@ public class Historico extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		contentPane.add(btnHome, "cell 0 0,alignx left");
+		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 		
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setIcon(new ImageIcon(Historico.class.getResource("/imagens/LogoPequena.png")));
-		contentPane.add(lblNewLabel, "cell 1 0 3 1,alignx center");
+		contentPane.add(lblNewLabel, "cell 2 0,alignx center");
 		
 		JLabel lblNewLabel_1 = new JLabel("   Histórico de Emprésimos");
 		lblNewLabel_1.setForeground(new Color(10, 86, 27));
 		lblNewLabel_1.setBackground(new Color(10, 86, 27));
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 32));
-		contentPane.add(lblNewLabel_1, "cell 1 1 3 1,alignx center,aligny center");
+		contentPane.add(lblNewLabel_1, "cell 2 1,alignx center,aligny center");
 		
 		RoundedPanel panel = new RoundedPanel(new MigLayout(), 30); // 30 = raio das bordas
 		panel.setBackground(new Color(10, 86, 27));

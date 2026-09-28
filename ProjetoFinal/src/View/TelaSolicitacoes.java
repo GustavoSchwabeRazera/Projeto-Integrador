@@ -124,67 +124,26 @@ public class TelaSolicitacoes extends JFrame {
         // =====================================================
 
         btnHome = new JButton("");
+		btnHome.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 
-        // =====================================================
-        // TAMANHO DO BOTÃO
-        // Altere esses valores para aumentar/diminuir
-        // =====================================================
+		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
 
-        btnHome.setPreferredSize(new Dimension(50, 50));
+		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
 
+		btnHome.setForeground(new Color(10, 86, 27));
 
-        // =====================================================
-        // ÍCONE HOME
-        // =====================================================
+		btnHome.setBorderPainted(false);
+		btnHome.setContentAreaFilled(false);
+		btnHome.setFocusPainted(false);
 
-        ImageIcon iconeHome = new ImageIcon(
-            TelaSolicitacoes.class.getResource("/imagens/casa 1.png")
-        );
+		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
-        // =====================================================
-        // TAMANHO DO ÍCONE
-        // Altere esses valores para aumentar/diminuir
-        // =====================================================
+		ImageIcon perfil = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
 
-        Image imagemHome = iconeHome.getImage().getScaledInstance(
-            60,
-            60,
-            Image.SCALE_SMOOTH
-        );
-
-        btnHome.setIcon(new ImageIcon(imagemHome));
-
-
-        // Configurações do botão
-        btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-        btnHome.setForeground(new Color(10, 86, 27));
-        btnHome.setBorderPainted(false);
-        btnHome.setContentAreaFilled(false);
-        btnHome.setFocusPainted(false);
-
-        contentPane.add(
-            btnHome,
-            "cell 0 0,alignx left,aligny top"
-        );
-
-
-        // =====================================================
-        // LOGO
-        // =====================================================
-
-        JLabel lblNewLabel = new JLabel("");
-
-        lblNewLabel.setIcon(
-            new ImageIcon(
-                TelaSolicitacoes.class.getResource("/imagens/Logo.png")
-            )
-        );
-
-        contentPane.add(
-            lblNewLabel,
-            "cell 0 1 5 1,alignx center"
-        );
-
+		Image imgPerfil = perfil.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 
         // =====================================================
         // TÍTULO
@@ -205,11 +164,11 @@ public class TelaSolicitacoes extends JFrame {
             "cell 0 2 5 1,alignx center"
         );
 
-        ImageIcon perfil = new ImageIcon(
+        ImageIcon perfil1 = new ImageIcon(
             TelaSolicitacoes.class.getResource("/imagens/perfil3.png")
         );
 
-        Image imgPerfil = perfil.getImage().getScaledInstance(
+        Image imgPerfil1 = perfil1.getImage().getScaledInstance(
             70,
             70,
             Image.SCALE_SMOOTH
