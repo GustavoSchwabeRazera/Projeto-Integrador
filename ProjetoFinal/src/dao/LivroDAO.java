@@ -23,8 +23,8 @@ public class LivroDAO {
     // =========================================================
 
     public void inserir(
-            Livro livro,
-            List<Autor> autores) throws SQLException {
+            Livro livro
+            ) throws SQLException {
 
         String sqlLivro =
                 "INSERT INTO Livros "
@@ -103,6 +103,7 @@ public class LivroDAO {
             // INSERIR AUTORES
             // =================================================
 
+            List<Autor> autores = livro.getAutores();
             if (autores != null
                     && !autores.isEmpty()) {
 

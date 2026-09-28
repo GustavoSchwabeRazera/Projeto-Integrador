@@ -567,9 +567,9 @@ private void adicionarLivro() {
                 new Livro(
                         nome,
                         editora,
+                        dataTexto,
                         anoLancamento,
-                        genero
-                );
+                        genero);
 
         /*
          * Adiciona no modelo da tabela.
@@ -702,10 +702,10 @@ private void pesquisar() {
 
     try {
 
-        List<Livro> listaLivros =
-                livroDAO.buscarLivrosPorNome(
+        List<Livro> listaLivros = livroDAO.listar();
+               /** livroDAO.buscarLivrosPorNome(
                         texto
-                );
+                );**/
 
         if (listaLivros == null
                 || listaLivros.isEmpty()) {

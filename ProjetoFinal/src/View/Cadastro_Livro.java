@@ -776,7 +776,8 @@ private void cadastrarLivro() {
                     titulo,
                     editora,
                     ano,
-                    genero
+                    genero,
+                    autoresSelecionados
             );
 
     // =====================================================
@@ -791,8 +792,7 @@ private void cadastrarLivro() {
                 );
 
         livroDAO.inserir(
-                livro,
-                autoresSelecionados
+                livro
         );
 
         JOptionPane.showMessageDialog(

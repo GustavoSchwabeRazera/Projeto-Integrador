@@ -1,5 +1,8 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Livro {
 
     private String isbn;
@@ -7,8 +10,14 @@ public class Livro {
     private String editora;
     private int anoLancamento;
     private String genero;
+    private List<Autor> autores;
 
-    public Livro() {
+    public List<Autor> getAutores() {
+		return autores;
+	}
+
+	public Livro() {
+    	autores = new ArrayList<Autor>();
     }
 
     public Livro(
@@ -16,13 +25,14 @@ public class Livro {
             String nome,
             String editora,
             int anoLancamento,
-            String genero) {
+            String genero, List<Autor> autoresSelecionados) {
 
         this.isbn = isbn;
         this.nome = nome;
         this.editora = editora;
         this.anoLancamento = anoLancamento;
         this.genero = genero;
+        autores = autoresSelecionados;
     }
 
     public String getIsbn() {
