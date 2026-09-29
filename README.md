@@ -149,17 +149,6 @@ Este projeto foi desenvolvido com o objetivo de praticar e consolidar conhecimen
 * Eventos e componentes gráficos
 * Desenvolvimento de aplicações desktop
 
-## 👨‍💻 Desenvolvedor
-
-**Gustavo Schwabe Razera**
-
-Estudante de programação e apaixonado por tecnologia.
-
-### 📫 Contato
-
-* 💼 [LinkedIn](https://www.linkedin.com/in/gustavo-schwabe-razera/)
-* 🐙 [GitHub](https://github.com/GustavoSchwabeRazera)
-
 ---
 
 ⭐ Se este projeto foi útil ou interessante, considere deixar uma estrela no repositório!
