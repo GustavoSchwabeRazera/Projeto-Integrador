@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -127,7 +129,7 @@ public Cadastro_Livro() {
                             Image.SCALE_SMOOTH
                     );
     
-    JButton btnHome = new JButton("");
+    AbstractButton btnHome = new JButton("");
 	btnHome.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		}
@@ -148,9 +150,18 @@ public Cadastro_Livro() {
 	ImageIcon perfil = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
 
 	Image imgPerfil = perfil.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-    // =====================================================
-    // TÍTULO
-    // =====================================================
+
+	
+	
+
+	contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
+
+	ImageIcon perfil1 = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
+
+	Image imgPerfil1 = perfil1.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+   
+	// TiTULO
 
     JLabel lblTituloTela =
             new JLabel(
@@ -174,9 +185,7 @@ public Cadastro_Livro() {
             "cell 2 1,alignx center,aligny bottom"
     );
     
-        // =====================================================
         // LOGO
-        // =====================================================
     
         JLabel lblLogo =
                 new JLabel("");
@@ -192,9 +201,7 @@ public Cadastro_Livro() {
                         "cell 4 1,alignx right"
                 );
 
-    // =====================================================
     // PAINEL PRINCIPAL
-    // =====================================================
 
     JPanel panel =
             new ImagePanel();
@@ -220,9 +227,7 @@ public Cadastro_Livro() {
             )
     );
 
-    // =====================================================
     // TÍTULO DO LIVRO
-    // =====================================================
 
     JLabel lblTitulo =
             new JLabel(
@@ -275,9 +280,7 @@ public Cadastro_Livro() {
             "cell 2 2,growx,h 42!"
     );
 
-    // =====================================================
     // EDITORA
-    // =====================================================
 
     JLabel lblEditora =
             new JLabel(
