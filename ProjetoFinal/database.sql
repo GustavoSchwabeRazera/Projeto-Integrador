@@ -24,13 +24,15 @@ status BOOLEAN NOT NULL,
 CPF_dono VARCHAR(11) NOT NULL,
 titulo VARCHAR(50) NOT NULL,
 data_lancamento DATE NOT NULL,
-FOREIGN KEY (CPF_dono) REFERENCES Usuarios(CPF)
+FOREIGN KEY (CPF_dono) REFERENCES Usuarios(CPF),
+editora varchar(50),
+generos varchar (50)
 );
 
 -- Tabela de autores
 CREATE TABLE Autor
 (
-id_autor INT PRIMARY KEY NOT NULL,
+id_autor INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 nome VARCHAR(50) NOT NULL,
 nacionalidade VARCHAR(50) NOT NULL
 );
@@ -80,10 +82,10 @@ VALUES
 INSERT INTO Autor
 (id_autor, nome, nacionalidade)
 VALUES
-(1, 'J. R. R. Tolkien', 'Britânica'),
-(2, 'Machado de Assis', 'Brasileira'),
+(1, 'J. R. R. Tolkien', 'Reino Unido'),
+(2, 'Machado de Assis', 'Reino Unido'),
 (3, 'Clarice Lispector', 'Brasileira'),
-(4, 'George Orwell', 'Britânica');
+(4, 'George Orwell', 'Reino Unido');
 
 
 -- LIVROS E SEUS AUTORES
@@ -100,5 +102,3 @@ INSERT INTO Emprestimos
 VALUES
 (1, '45678912300', '9788535902777', TRUE, '2026-09-15', '2026-09-29'),
 (2, '12345678911', '9788532530788', FALSE, '2026-09-01', '2026-09-15');
-
-

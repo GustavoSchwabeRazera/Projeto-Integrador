@@ -143,6 +143,13 @@ public class LivroController {
                     telaInicial.atualizarFotoPerfil(foto);
                     mostrarMensagem("Foto atualizada com sucesso!");
                 }
+            });
+ // Alterar Cadastro //
+    alterarCadastro.getBtnVoltar().addActionListener(e -> VoltarDoCadastro());
+    alterarCadastro.getBotaoCadastrar().addActionListener(e -> atualizarCadastro());
+}
+	
+	
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 mostrarMensagem("Erro ao salvar a foto.");
@@ -258,6 +265,171 @@ public class LivroController {
         alterarCadastro.setVisible(true);
     }
 
+    esconderTodas();
+
+    perfil.setVisible(true);
+}
+
+private void abrirCadastroLivro() {
+
+    esconderTodas();
+
+    cadastro_livro.setVisible(true);
+}
+
+private void abrirCriarConta() {
+
+    esconderTodas();
+
+    CriarConta.setVisible(true);
+}
+
+private void abrirCalendario() {
+
+    esconderTodas();
+
+    calendario.setVisible(true);
+}
+
+private void abrirAlterarCadastro() {
+
+    try {
+
+        String[] dados =
+                usuarioDAO.buscarDadosParaAlteracao(
+                        cpfUsuarioLogado
+                );
+
+        if (dados != null) {
+
+            // CPF
+            alterarCadastro.getTxtCpf()
+                    .setText(dados[0]);
+
+            // Nome
+            alterarCadastro.getTxtNome()
+                    .setText(dados[1]);
+
+            // E-mail
+            alterarCadastro.getTxtEmail()
+                    .setText(dados[2]);
+
+            // Telefone
+            alterarCadastro.getTxtTelefone()
+                    .setText(dados[3]);
+
+            // Data de nascimento
+            alterarCadastro.getTxtDataNascimento()
+                    .setText(dados[4]);
+
+            // Senha
+            alterarCadastro.getTxtSenha()
+                    .setText(dados[5]);
+
+            // Confirmar senha
+            alterarCadastro.getTxtConfirmarSenha()
+                    .setText(dados[5]);
+
+        } else {
+
+            mostrarMensagem(
+                    "Não foi possível encontrar os dados do usuário."
+            );
+
+            return;
+        }
+
+    } catch (SQLException e) {
+
+        e.printStackTrace();
+
+        mostrarMensagem(
+                "Erro ao carregar os dados do cadastro."
+        );
+
+        return;
+    }
+
+    esconderTodas();
+
+    alterarCadastro.setVisible(true);
+}
+
+private void abrirHistorico() {
+
+    esconderTodas();
+
+    historico.setVisible(true);
+}
+
+private void esconderTodas() {
+
+    telaLogin.setVisible(false);
+    telaInicial.setVisible(false);
+    pesquisarLivro.setVisible(false);
+    telaSolicitacoes.setVisible(false);
+    telaNotificacoes.setVisible(false);
+    telaMeusLivros.setVisible(false);
+    perfil.setVisible(false);
+    cadastro_livro.setVisible(false);
+    CriarConta.setVisible(false);
+    calendario.setVisible(false);
+    alterarCadastro.setVisible(false);
+    historico.setVisible(false);
+}
+
+private void cadastrarUsuario() {
+
+    String nome =
+            CriarConta.getTxtNome()
+                    .getText()
+                    .trim();
+
+    String email =
+            CriarConta.getTxtEmail()
+                    .getText()
+                    .trim();
+
+    String telefone =
+            CriarConta.getTxtTelefone()
+                    .getText()
+                    .trim();
+
+    String cpf =
+            CriarConta.getTxtCpf()
+                    .getText()
+                    .trim();
+
+    String dataNascimento =
+            CriarConta.getTxtDataNascimento()
+                    .getText()
+                    .trim();
+
+    String senha =
+            new String(
+                    CriarConta.getTxtSenha()
+                            .getPassword()
+            );
+
+    String confirmarSenha =
+            new String(
+                    CriarConta.getTxtConfirmarSenha()
+                            .getPassword()
+            );
+
+    if (nome.isEmpty()
+            || email.isEmpty()
+            || telefone.isEmpty()
+            || cpf.isEmpty()
+            || dataNascimento.contains("_")
+            || senha.isEmpty()
+            || confirmarSenha.isEmpty()) {
+
+        mostrarMensagem(
+                "Preencha todos os campos."
+        );
+
+        return;
     private void abrirHistorico() {
         esconderTodas();
         historico.setVisible(true);
@@ -452,4 +624,222 @@ public class LivroController {
     public TelaMeusLivros getTelaMeusLivros() { return telaMeusLivros; }
     public Perfil getPerfil() { return perfil; }
     public Cadastro_Livro getCadastro() { return cadastroLivro; }
+}
+
+private void excluirSolicitacao() {
+
+    mostrarMensagem(
+            "Solicitação excluída."
+    );
+}
+
+// =========================================================
+// UTILITÁRIO
+// =========================================================
+
+private void mostrarMensagem(String mensagem) {
+
+    UIManager.put(
+            "OptionPane.background",
+            new Color(175, 244, 198)
+    );
+
+    UIManager.put(
+            "Panel.background",
+            new Color(175, 244, 198)
+    );
+
+    JOptionPane.showMessageDialog(
+            null,
+            mensagem
+    );
+
+    UIManager.put(
+            "OptionPane.background",
+            null
+    );
+
+    UIManager.put(
+            "Panel.background",
+            null
+    );
+}
+private void atualizarCadastro() {
+
+    String cpfAtual = cpfUsuarioLogado;
+
+    String cpfNovo = alterarCadastro.getTxtCpf().getText().trim();
+    String nome = alterarCadastro.getTxtNome().getText().trim();
+    String telefone = alterarCadastro.getTxtTelefone().getText().trim();
+    String email = alterarCadastro.getTxtEmail().getText().trim();
+    String dataNascimento =
+            alterarCadastro.getTxtDataNascimento().getText().trim();
+
+    String senha =
+            new String(
+                    alterarCadastro.getTxtSenha().getPassword()
+            );
+
+    String confirmarSenha =
+            new String(
+                    alterarCadastro.getTxtConfirmarSenha().getPassword()
+            );
+
+    // ==============================
+    // VALIDA CAMPOS
+    // ==============================
+
+    if (cpfNovo.isEmpty()
+            || nome.isEmpty()
+            || telefone.isEmpty()
+            || email.isEmpty()
+            || dataNascimento.isEmpty()
+            || senha.isEmpty()
+            || confirmarSenha.isEmpty()) {
+
+        mostrarMensagem(
+                "Preencha todos os campos."
+        );
+
+        return;
+    }
+
+    // ==============================
+    // VALIDA SENHA
+    // ==============================
+
+    if (senha.length() > 20) {
+
+        mostrarMensagem(
+                "A senha deve ter no máximo 20 caracteres."
+        );
+
+        return;
+    }
+
+    if (!senha.equals(confirmarSenha)) {
+
+        mostrarMensagem(
+                "As senhas não são iguais."
+        );
+
+        return;
+    }
+
+    // ==============================
+    // VALIDA CPF
+    // ==============================
+
+    String cpfLimpo =
+            cpfNovo.replaceAll("\\D", "");
+
+    if (cpfLimpo.length() != 11) {
+
+        mostrarMensagem(
+                "CPF deve possuir 11 números."
+        );
+
+        return;
+    }
+
+    try {
+
+        // ==============================
+        // ATUALIZA NO BANCO
+        // ==============================
+
+        usuarioDAO.atualizarCadastro(
+                cpfAtual,
+                cpfLimpo,
+                nome,
+                telefone,
+                email,
+                senha,
+                dataNascimento
+        );
+
+        // ==============================
+        // ATUALIZA SESSÃO
+        // ==============================
+
+        cpfUsuarioLogado = cpfLimpo;
+        emailUsuarioLogado = email;
+
+        // ==============================
+        // BUSCA NOVAMENTE NO BANCO
+        // ==============================
+
+        String[] dadosAtualizados =
+                usuarioDAO.buscarUsuarioPorEmail(
+                        emailUsuarioLogado
+                );
+
+        if (dadosAtualizados != null) {
+
+            perfil.atualizarDados(
+                    dadosAtualizados[0], // nome
+                    dadosAtualizados[1], // email
+                    dadosAtualizados[2], // telefone
+                    dadosAtualizados[3]  // data nascimento
+            );
+        }
+
+        // ==============================
+        // VOLTA PARA O PERFIL
+        // ==============================
+
+        esconderTodas();
+
+        perfil.setVisible(true);
+
+        mostrarMensagem(
+                "Cadastro atualizado com sucesso!"
+        );
+
+    } catch (SQLException e) {
+
+        e.printStackTrace();
+
+        mostrarMensagem(
+                "Erro ao atualizar cadastro:\n"
+                + e.getMessage()
+        );
+    }
+}
+
+public LivroTableModel getLivroModel() {
+    return livroModel;
+}
+
+public TelaLogin getTelaLogin() {
+    return telaLogin;
+}
+
+public tela_inicial getTelaInicial() {
+    return telaInicial;
+}
+
+public PesquisarLivro getPesquisarLivro() {
+    return pesquisarLivro;
+}
+
+public TelaSolicitacoes getTelaSolicitacoes() {
+    return telaSolicitacoes;
+}
+
+public TelaNotificacoes getTelaNotificacoes() {
+    return telaNotificacoes;
+}
+
+public TelaMeusLivros getTelaMeusLivros() {
+    return telaMeusLivros;
+}
+
+public Perfil getPerfil() {
+    return perfil;
+}
+
+public Cadastro_Livro getCadastro() {
+    return cadastro_livro;
+}
 }

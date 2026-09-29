@@ -228,6 +228,7 @@ public class TelaAlterar extends JFrame {
 
         txtCpf = new JTextField();
         txtCpf.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        txtCpf.setEditable(false);
         panelCadastro.add(txtCpf, "cell 0 10,growx,h 40!");
 
         // ======================================
@@ -323,4 +324,8 @@ public class TelaAlterar extends JFrame {
 
         panelCadastro.add(botaoCadastrar, "cell 0 18,growx,height 50!");
     }
+
+	public void setBotaoCadastrar(JButton botaoCadastrar) {
+		this.botaoCadastrar = botaoCadastrar;
+	}
 }
