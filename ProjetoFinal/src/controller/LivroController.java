@@ -569,7 +569,8 @@ private void adicionarLivro() {
                         editora,
                         dataTexto,
                         anoLancamento,
-                        genero);
+                        genero, null
+                        );
 
         /*
          * Adiciona no modelo da tabela.

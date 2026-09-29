@@ -193,8 +193,8 @@ public class LivroDAO {
                                 rs.getString("titulo"),
                                 rs.getString("editora"),
                                 ano,
-                                rs.getString("generos")
-                        );
+                                rs.getString("generos"), 
+                                null);
 
                 livros.add(livro);
             }
@@ -252,8 +252,8 @@ public class LivroDAO {
                             rs.getString("titulo"),
                             rs.getString("editora"),
                             ano,
-                            rs.getString("generos")
-                    );
+                            rs.getString("generos"),
+                            null);
                 }
             }
         }
