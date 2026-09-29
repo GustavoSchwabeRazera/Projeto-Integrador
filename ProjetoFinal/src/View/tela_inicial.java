@@ -58,7 +58,7 @@ public class tela_inicial extends JFrame {
         contentPane.setBorder(new EmptyBorder(5, 0, 5, 5));
         setContentPane(contentPane);
 
-        contentPane.setLayout(new MigLayout("", "[][][197.00][172.00,grow][449.00][480,grow][480,grow][261.00,grow][153.00,grow]", "[113.00,grow][][][grow][grow][grow][grow][][grow][71.00,grow][54.00,grow][grow]"));
+        contentPane.setLayout(new MigLayout("", "[][][197.00][172.00,grow][449.00][480,grow][480,grow][261.00,grow][153.00,grow]", "[113.00,grow][][][grow][grow][grow][grow][][][][grow][71.00,grow][][][54.00,grow][grow]"));
 
         // =========================================================
         // LOGO
@@ -153,7 +153,7 @@ public class tela_inicial extends JFrame {
                                 btnPesquisar.setContentAreaFilled(false);
                                 btnPesquisar.setFocusPainted(false);
                                 btnPesquisar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                                contentPane.add(btnPesquisar, "cell 4 8,alignx center");
+                                contentPane.add(btnPesquisar, "cell 5 8,alignx center");
                 
                         btnMeusLivros = new JButton();
                         btnMeusLivros.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -162,7 +162,7 @@ public class tela_inicial extends JFrame {
                         btnMeusLivros.setContentAreaFilled(false);
                         btnMeusLivros.setFocusPainted(false);
                         btnMeusLivros.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                        contentPane.add(btnMeusLivros, "cell 5 8,alignx center");
+                        contentPane.add(btnMeusLivros, "cell 5 10,alignx center");
                 
                         btnSolicitacoes = new JButton();
                         btnSolicitacoes.setIcon(new ImageIcon(imgSolicitacoes));
@@ -170,7 +170,7 @@ public class tela_inicial extends JFrame {
                         btnSolicitacoes.setContentAreaFilled(false);
                         btnSolicitacoes.setFocusPainted(false);
                         btnSolicitacoes.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                        contentPane.add(btnSolicitacoes, "cell 6 8,alignx center");
+                        contentPane.add(btnSolicitacoes, "cell 5 11,alignx center");
         
                 btnCalendario = new JButton("");
                 btnCalendario.setContentAreaFilled(false);
@@ -178,7 +178,7 @@ public class tela_inicial extends JFrame {
                 btnCalendario.setFocusPainted(false);
                 btnCalendario.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 btnCalendario.setIcon(new ImageIcon(imgCalendario));
-                contentPane.add(btnCalendario, "cell 8 10,alignx center");
+                contentPane.add(btnCalendario, "cell 8 14,alignx center");
 
         btnNotificacao = new JButton("");
         btnNotificacao.setContentAreaFilled(false);
@@ -188,7 +188,7 @@ public class tela_inicial extends JFrame {
         btnNotificacao.setToolTipText("Notificações");
         btnNotificacao.setIcon(new ImageIcon(imgNotificacao));
         // Sem ActionListener aqui: o LivroController é quem registra a ação.
-        contentPane.add(btnNotificacao, "cell 8 11,alignx center");
+        contentPane.add(btnNotificacao, "cell 8 15,alignx center");
         
                 btnHistorico = new JButton("");
                 btnHistorico.setBorderPainted(false);
@@ -197,7 +197,7 @@ public class tela_inicial extends JFrame {
                 btnHistorico.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 btnHistorico.setIcon(new ImageIcon(imgHistorico));
                 // O dispose() que estava aqui foi REMOVIDO: quem controla a navegação é o Controller.
-                contentPane.add(btnHistorico, "cell 2 11,alignx left,aligny center");
+                contentPane.add(btnHistorico, "cell 2 15,alignx left,aligny center");
     }
     
     public void atualizarFotoPerfil(byte[] foto) {

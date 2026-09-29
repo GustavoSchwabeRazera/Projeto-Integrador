@@ -1,14 +1,15 @@
 package controller;
 
-
+import java.awt.Color;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import java.awt.Color;
+
 import View.Cadastro_Livro;
 import View.Calendario;
 import View.Historico;
@@ -21,821 +22,434 @@ import View.TelaMeusLivros;
 import View.TelaNotificacoes;
 import View.TelaSolicitacoes;
 import View.tela_inicial;
+
 import dao.LivroDAO;
 import dao.UsuarioDAO;
+
 import model.Livro;
 import model.LivroTableModel;
 
 public class LivroController {
 
-private final LivroTableModel livroModel;
-private final UsuarioDAO usuarioDAO;
-private final TelaLogin telaLogin;
-private final tela_inicial telaInicial;
-private final PesquisarLivro pesquisarLivro;
-private final TelaSolicitacoes telaSolicitacoes;
-private final TelaNotificacoes telaNotificacoes;
-private final TelaMeusLivros telaMeusLivros;
-private final Perfil perfil;
-private final Cadastro_Livro cadastro_livro;
-private final TelaCriarConta CriarConta;
-private final Calendario calendario;
-private final TelaAlterar alterarCadastro;
-private final Historico historico;
+    private final LivroTableModel livroModel;
+    private final UsuarioDAO usuarioDAO;
+    private final LivroDAO livroDAO;
 
-private String emailUsuarioLogado;
-private String cpfUsuarioLogado;
+    private final TelaLogin telaLogin;
+    private final tela_inicial telaInicial;
+    private final PesquisarLivro pesquisarLivro;
+    private final TelaSolicitacoes telaSolicitacoes;
+    private final TelaNotificacoes telaNotificacoes;
+    private final TelaMeusLivros telaMeusLivros;
+    private final Perfil perfil;
+    private final Cadastro_Livro cadastroLivro;
+    private final TelaCriarConta criarConta;
+    private final Calendario calendario;
+    private final TelaAlterar alterarCadastro;
+    private final Historico historico;
 
-private LivroDAO livroDAO;
+    private String emailUsuarioLogado;
+    private String cpfUsuarioLogado;
 
-// Formato utilizado pelo campo txtAno
-private static final DateTimeFormatter FORMATO_DATA =
-        DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter FORMATO_DATA =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-/*
- * Construtor principal
- */
-public LivroController(
-        LivroDAO livroDAO,
-        LivroTableModel modelo,
-        Cadastro_Livro view) {
+    // =========================================================
+    // CONSTRUTORES
+    // =========================================================
 
-    this.livroModel = modelo;
-    this.livroDAO = livroDAO;
-    this.cadastro_livro = view;
+    public LivroController(LivroDAO livroDAO, LivroTableModel modelo, Cadastro_Livro view) {
+        this.livroModel = modelo;
+        this.livroDAO = livroDAO;
+        this.cadastroLivro = (view != null) ? view : new Cadastro_Livro();
 
-    this.CriarConta = new TelaCriarConta();
-    this.telaLogin = new TelaLogin();
-    this.telaInicial = new tela_inicial();
-    this.pesquisarLivro = new PesquisarLivro();
-    this.telaSolicitacoes = new TelaSolicitacoes();
-    this.telaNotificacoes = new TelaNotificacoes();
-    this.telaMeusLivros = new TelaMeusLivros();
-    this.perfil = new Perfil();
-    this.calendario = new Calendario();
-    this.alterarCadastro = new TelaAlterar();
-    this.usuarioDAO = new UsuarioDAO();
-    this.historico = new Historico();
+        this.criarConta = new TelaCriarConta();
+        this.telaLogin = new TelaLogin();
+        this.telaInicial = new tela_inicial();
+        this.pesquisarLivro = new PesquisarLivro();
+        this.telaSolicitacoes = new TelaSolicitacoes();
+        this.telaNotificacoes = new TelaNotificacoes();
+        this.telaMeusLivros = new TelaMeusLivros();
+        this.perfil = new Perfil();
+        this.calendario = new Calendario();
+        this.alterarCadastro = new TelaAlterar();
+        this.usuarioDAO = new UsuarioDAO();
+        this.historico = new Historico();
 
-    configurarEventos();
-}
+        configurarEventos();
+    }
 
-public LivroController(
-        LivroDAO livroDAO,
-        LivroTableModel modelo) {
+    public LivroController(LivroDAO livroDAO, LivroTableModel modelo) {
+        this(livroDAO, modelo, new Cadastro_Livro());
+    }
 
-    this(
-        livroDAO,
-        modelo,
-        new Cadastro_Livro()
-    );
-}
+    // =========================================================
+    // CONFIGURAÇÃO DOS EVENTOS
+    // =========================================================
 
-private void configurarEventos() {
+    private void configurarEventos() {
 
-    // LOGIN
-    telaLogin.getBotaoEntrar()
-            .addActionListener(e -> validarLogin());
+        // --- LOGIN ---
+        telaLogin.getBotaoEntrar().addActionListener(e -> validarLogin());
+        telaLogin.getLblCadastro().addActionListener(e -> abrirCriarConta());
+        telaLogin.getTxtSenha().addActionListener(e -> validarLogin());
 
-    telaLogin.getLblCadastro()
-            .addActionListener(e -> abrirCriarConta());
+        // --- CRIAR CONTA ---
+        criarConta.getBotaoCadastrar().addActionListener(e -> cadastrarUsuario());
+        criarConta.getBotaoEntrar().addActionListener(e -> iniciar());
 
-    telaLogin.getTxtSenha()
-            .addActionListener(e -> validarLogin());
+        // --- TELA INICIAL / HOME ---
+        telaInicial.getBtnPesquisar().addActionListener(e -> abrirPesquisa());
+        telaInicial.getBtnMeusLivros().addActionListener(e -> abrirMeusLivros());
+        telaInicial.getBtnSolicitacoes().addActionListener(e -> abrirSolicitacoes());
+        telaInicial.getBtnPerfil().addActionListener(e -> abrirPerfil());
+        telaInicial.getBtnCalendario().addActionListener(e -> abrirCalendario());
+        telaInicial.getBtnHistorico().addActionListener(e -> abrirHistorico());
 
-    // CRIAR CONTA
-    CriarConta.getBotaoCadastrar()
-            .addActionListener(e -> cadastrarUsuario());
+        // --- PESQUISA ---
+        pesquisarLivro.getBtnHome().addActionListener(e -> abrirHome());
+        pesquisarLivro.getBtnPesquisar().addActionListener(e -> pesquisar());
 
-    CriarConta.getBotaoEntrar()
-            .addActionListener(e -> iniciar());
+        // --- MEUS LIVROS ---
+        telaMeusLivros.getBtnHome().addActionListener(e -> abrirHome());
+        telaMeusLivros.getBtnNewButton().addActionListener(e -> abrirCadastroLivro());
 
-    // HOME
-    telaInicial.getBtnPesquisar()
-            .addActionListener(e -> abrirPesquisa());
+        // --- SOLICITAÇÕES ---
+        telaSolicitacoes.getBtnHome().addActionListener(e -> abrirHome());
+        telaSolicitacoes.getBtnAceitar().addActionListener(e -> aceitarSolicitacao());
+        telaSolicitacoes.getBtnExcluir().addActionListener(e -> excluirSolicitacao());
 
-    telaInicial.getBtnMeusLivros()
-            .addActionListener(e -> abrirMeusLivros());
+        // --- CADASTRO DE LIVROS ---
+        cadastroLivro.getBtnVoltar().addActionListener(e -> abrirMeusLivros());
+        cadastroLivro.getBtnAdicionar().addActionListener(e -> adicionarLivro());
 
-    telaInicial.getBtnSolicitacoes()
-            .addActionListener(e -> abrirSolicitacoes());
+        // --- CALENDÁRIO ---
+        calendario.getBtnHome().addActionListener(e -> abrirHome());
 
-    telaInicial.getBtnPerfil()
-            .addActionListener(e -> abrirPerfil());
+        // --- HISTÓRICO ---
+        historico.getBtnHome().addActionListener(e -> abrirHome());
 
-    telaInicial.getBtnCalendario()
-            .addActionListener(e -> abrirCalendario());
+        // --- PERFIL ---
+        perfil.getBtnHome().addActionListener(e -> abrirHome());
+        perfil.getBtnSair().addActionListener(e -> logoff());
+        perfil.getBtnAlterarCadastro().addActionListener(e -> abrirAlterarCadastro());
 
-    telaInicial.getBtnHistorico()
-            .addActionListener(e -> abrirHistorico());
-
-    // PESQUISA
-    pesquisarLivro.getBtnHome()
-            .addActionListener(e -> abrirHome());
-
-    pesquisarLivro.getBtnPesquisar()
-            .addActionListener(e -> pesquisar());
-
-    // MEUS LIVROS
-    telaMeusLivros.getBtnHome()
-            .addActionListener(e -> abrirHome());
-
-    // SOLICITAÇÕES
-    telaSolicitacoes.getBtnHome()
-            .addActionListener(e -> abrirHome());
-
-    telaSolicitacoes.getBtnAceitar()
-            .addActionListener(e -> aceitarSolicitacao());
-
-    telaSolicitacoes.getBtnExcluir()
-            .addActionListener(e -> excluirSolicitacao());
-
-    // CADASTRO DE LIVROS
-    cadastro_livro.getBtnAdicionar()
-            .addActionListener(e -> adicionarLivro());
-
-    // CALENDÁRIO
-    calendario.getBtnHome()
-            .addActionListener(e -> abrirHome());
-
-    // HISTÓRICO
-    historico.getBtnHome()
-            .addActionListener(e -> abrirHome());
-
-    // PERFIL
-    perfil.getBtnHome()
-            .addActionListener(e -> abrirHome());
-   perfil.getBtnSair().addActionListener(e -> logoff());
-
-    perfil.getBtnAlterarCadastro()
-            .addActionListener(e -> abrirAlterarCadastro());
-
-    perfil.getBtnAlterarFoto()
-            .addActionListener(e -> {
-
-                try {
-
-                    perfil.selecionarEAtualizarFoto();
-
-                    byte[] foto = perfil.getFotoSelecionada();
-
-                    if (foto != null && foto.length > 0) {
-
-                        usuarioDAO.atualizarFoto(
-                                cpfUsuarioLogado,
-                                foto
-                        );
-
-                        telaInicial.atualizarFotoPerfil(foto);
-
-                        mostrarMensagem(
-                                "Foto atualizada com sucesso!"
-                        );
-                    }
-
-                } catch (SQLException ex) {
-
-                    ex.printStackTrace();
-
-                    mostrarMensagem(
-                            "Erro ao salvar a foto."
-                    );
+        perfil.getBtnAlterarFoto().addActionListener(e -> {
+            try {
+                perfil.selecionarEAtualizarFoto();
+                byte[] foto = perfil.getFotoSelecionada();
+                if (foto != null && foto.length > 0) {
+                    usuarioDAO.atualizarFoto(cpfUsuarioLogado, foto);
+                    telaInicial.atualizarFotoPerfil(foto);
+                    mostrarMensagem("Foto atualizada com sucesso!");
                 }
-            });
- // Alterar Cadastro //
-    alterarCadastro.getBtnVoltar().addActionListener(e -> VoltarDoCadastro());
-}
-	
-	
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                mostrarMensagem("Erro ao salvar a foto.");
+            }
+        });
 
-public void VoltarDoCadastro() {
-	esconderTodas();
-	perfil.setVisible(true);
-}
+        // --- ALTERAR CADASTRO ---
+        alterarCadastro.getBtnVoltar().addActionListener(e -> voltarDoCadastro());
+    }
 
-public void iniciar() {
+    // =========================================================
+    // ROTAS DE NAVEGAÇÃO
+    // =========================================================
 
-    esconderTodas();
+    public void voltarDoCadastro() {
+        esconderTodas();
+        perfil.setVisible(true);
+    }
 
-    telaLogin.setVisible(true);
-}
-public void logoff() {
+    public void iniciar() {
+        esconderTodas();
+        telaLogin.setVisible(true);
+    }
 
-    // Limpa os dados do usuário logado
-    emailUsuarioLogado = null;
-    cpfUsuarioLogado = null;
+    public void logoff() {
+        emailUsuarioLogado = null;
+        cpfUsuarioLogado = null;
 
-    // Volta as fotos para a imagem padrão
-    telaInicial.atualizarFotoPerfil(null);
-    perfil.carregarFoto(null);
+        telaInicial.atualizarFotoPerfil(null);
+        perfil.carregarFoto(null);
 
-    // Esconde todas as telas
-    esconderTodas();
+        esconderTodas();
+        telaLogin.getTxtNome().setText("");
+        telaLogin.getTxtSenha().setText("");
+        telaLogin.setVisible(true);
+    }
 
-    // Limpa os campos da tela de login
-    telaLogin.getTxtNome().setText("");
-    telaLogin.getTxtSenha().setText("");
+    private void abrirHome() {
+        try {
+            byte[] foto = usuarioDAO.buscarFoto(cpfUsuarioLogado);
+            if (foto != null && foto.length > 0) {
+                telaInicial.atualizarFotoPerfil(foto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        esconderTodas();
+        telaInicial.setVisible(true);
+    }
 
-    // Volta para a tela de login
-    telaLogin.setVisible(true);
-}
+    private void abrirPesquisa() {
+        esconderTodas();
+        pesquisarLivro.setVisible(true);
+    }
 
+    private void abrirMeusLivros() {
+        esconderTodas();
+        telaMeusLivros.setVisible(true);
+    }
 
-private void abrirHome() {
+    private void abrirSolicitacoes() {
+        esconderTodas();
+        telaSolicitacoes.setVisible(true);
+        telaSolicitacoes.toFront();
+        telaSolicitacoes.requestFocus();
+    }
 
-    try {
+    public void abrirNotificacoes() {
+        esconderTodas();
+        telaNotificacoes.setVisible(true);
+        telaNotificacoes.toFront();
+        telaNotificacoes.requestFocus();
+    }
 
-        byte[] foto =
-                usuarioDAO.buscarFoto(
-                        cpfUsuarioLogado
-                );
+    private void abrirPerfil() {
+        try {
+            perfil.setCpfUsuario(cpfUsuarioLogado);
+            String[] dados = usuarioDAO.buscarUsuarioPorEmail(emailUsuarioLogado);
+            if (dados != null) {
+                perfil.atualizarDados(dados[0], dados[1], dados[2], dados[3]);
+            }
 
-        if (foto != null && foto.length > 0) {
-
-            telaInicial.atualizarFotoPerfil(foto);
+            byte[] foto = usuarioDAO.buscarFoto(cpfUsuarioLogado);
+            if (foto != null && foto.length > 0) {
+                perfil.carregarFoto(foto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            mostrarMensagem("Erro ao carregar os dados do perfil.");
         }
 
-    } catch (SQLException e) {
-
-        e.printStackTrace();
+        esconderTodas();
+        perfil.setVisible(true);
     }
 
-    esconderTodas();
-
-    telaInicial.setVisible(true);
-}
-
-private void abrirPesquisa() {
-
-    esconderTodas();
-
-    pesquisarLivro.setVisible(true);
-}
-
-private void abrirMeusLivros() {
-
-    esconderTodas();
-
-    telaMeusLivros.setVisible(true);
-}
-
-private void abrirSolicitacoes() {
-
-    esconderTodas();
-
-    telaSolicitacoes.setVisible(true);
-    telaSolicitacoes.toFront();
-    telaSolicitacoes.requestFocus();
-}
-
-public void abrirNotificacoes() {
-
-    esconderTodas();
-
-    telaNotificacoes.setVisible(true);
-    telaNotificacoes.toFront();
-    telaNotificacoes.requestFocus();
-}
-
-private void abrirPerfil() {
-
-    try {
-
-        perfil.setCpfUsuario(
-                cpfUsuarioLogado
-        );
-
-        String[] dados =
-                usuarioDAO.buscarUsuarioPorEmail(
-                        emailUsuarioLogado
-                );
-
-        if (dados != null) {
-
-            perfil.atualizarDados(
-                    dados[0],
-                    dados[1],
-                    dados[2],
-                    dados[3]
-            );
-        }
-
-        byte[] foto =
-                usuarioDAO.buscarFoto(
-                        cpfUsuarioLogado
-                );
-
-        if (foto != null && foto.length > 0) {
-
-            perfil.carregarFoto(foto);
-        }
-
-    } catch (SQLException e) {
-
-        e.printStackTrace();
-
-        mostrarMensagem(
-                "Erro ao carregar os dados do perfil."
-        );
+    public void abrirCadastroLivro() {
+        esconderTodas();
+        cadastroLivro.setVisible(true);
     }
 
-    esconderTodas();
-
-    perfil.setVisible(true);
-}
-
-private void abrirCadastroLivro() {
-
-    esconderTodas();
-
-    cadastro_livro.setVisible(true);
-}
-
-private void abrirCriarConta() {
-
-    esconderTodas();
-
-    CriarConta.setVisible(true);
-}
-
-private void abrirCalendario() {
-
-    esconderTodas();
-
-    calendario.setVisible(true);
-}
-
-private void abrirAlterarCadastro() {
-
-    esconderTodas();
-
-    alterarCadastro.setVisible(true);
-}
-
-private void abrirHistorico() {
-
-    esconderTodas();
-
-    historico.setVisible(true);
-}
-
-private void esconderTodas() {
-
-    telaLogin.setVisible(false);
-    telaInicial.setVisible(false);
-    pesquisarLivro.setVisible(false);
-    telaSolicitacoes.setVisible(false);
-    telaNotificacoes.setVisible(false);
-    telaMeusLivros.setVisible(false);
-    perfil.setVisible(false);
-    cadastro_livro.setVisible(false);
-    CriarConta.setVisible(false);
-    calendario.setVisible(false);
-    alterarCadastro.setVisible(false);
-    historico.setVisible(false);
-}
-
-private void cadastrarUsuario() {
-
-    String nome =
-            CriarConta.getTxtNome()
-                    .getText()
-                    .trim();
-
-    String email =
-            CriarConta.getTxtEmail()
-                    .getText()
-                    .trim();
-
-    String telefone =
-            CriarConta.getTxtTelefone()
-                    .getText()
-                    .trim();
-
-    String cpf =
-            CriarConta.getTxtCpf()
-                    .getText()
-                    .trim();
-
-    String dataNascimento =
-            CriarConta.getTxtDataNascimento()
-                    .getText()
-                    .trim();
-
-    String senha =
-            new String(
-                    CriarConta.getTxtSenha()
-                            .getPassword()
-            );
-
-    String confirmarSenha =
-            new String(
-                    CriarConta.getTxtConfirmarSenha()
-                            .getPassword()
-            );
-
-    if (nome.isEmpty()
-            || email.isEmpty()
-            || telefone.isEmpty()
-            || cpf.isEmpty()
-            || dataNascimento.contains("_")
-            || senha.isEmpty()
-            || confirmarSenha.isEmpty()) {
-
-        mostrarMensagem(
-                "Preencha todos os campos."
-        );
-
-        return;
+    private void abrirCriarConta() {
+        esconderTodas();
+        criarConta.setVisible(true);
     }
 
-    if (senha.length() > 20) {
-
-        mostrarMensagem(
-                "A senha deve ter no máximo 20 caracteres."
-        );
-
-        return;
+    private void abrirCalendario() {
+        esconderTodas();
+        calendario.setVisible(true);
     }
 
-    if (!senha.equals(confirmarSenha)) {
-
-        mostrarMensagem(
-                "As senhas não são iguais."
-        );
-
-        return;
+    private void abrirAlterarCadastro() {
+        esconderTodas();
+        alterarCadastro.setVisible(true);
     }
 
-    cpf = cpf.replaceAll("\\D", "");
-
-    if (cpf.length() != 11) {
-
-        mostrarMensagem(
-                "CPF deve possuir 11 números."
-        );
-
-        return;
+    private void abrirHistorico() {
+        esconderTodas();
+        historico.setVisible(true);
     }
 
-    try {
-
-        usuarioDAO.cadastrar(
-                cpf,
-                nome,
-                telefone,
-                email,
-                senha,
-                dataNascimento
-        );
-
-        mostrarMensagem(
-                "Cadastro realizado com sucesso!"
-        );
-
-        iniciar();
-
-    } catch (SQLException e) {
-
-        e.printStackTrace();
-
-        if (e.getMessage() != null
-                && e.getMessage().contains("Duplicate")) {
-
-            mostrarMensagem(
-                    "Este CPF já está cadastrado."
-            );
-
-        } else {
-
-            mostrarMensagem(
-                    "Erro ao cadastrar usuário."
-            );
-        }
+    private void esconderTodas() {
+        telaLogin.setVisible(false);
+        telaInicial.setVisible(false);
+        pesquisarLivro.setVisible(false);
+        telaSolicitacoes.setVisible(false);
+        telaNotificacoes.setVisible(false);
+        telaMeusLivros.setVisible(false);
+        perfil.setVisible(false);
+        cadastroLivro.setVisible(false);
+        criarConta.setVisible(false);
+        calendario.setVisible(false);
+        alterarCadastro.setVisible(false);
+        historico.setVisible(false);
     }
-}
 
-/*
- * =========================================================
- * CADASTRAR LIVRO
- * =========================================================
- */
-private void adicionarLivro() {
+    // =========================================================
+    // REGRAS DE NEGÓCIO E AÇÕES
+    // =========================================================
 
-    try {
+    private void cadastrarUsuario() {
+        String nome = criarConta.getTxtNome().getText().trim();
+        String email = criarConta.getTxtEmail().getText().trim();
+        String telefone = criarConta.getTxtTelefone().getText().trim();
+        String cpf = criarConta.getTxtCpf().getText().trim();
+        String dataNascimento = criarConta.getTxtDataNascimento().getText().trim();
+        String senha = new String(criarConta.getTxtSenha().getPassword());
+        String confirmarSenha = new String(criarConta.getTxtConfirmarSenha().getPassword());
 
-        String nome =
-                cadastro_livro.getTxtNome()
-                        .getText()
-                        .trim();
-
-        String editora =
-                cadastro_livro.getTxtEditora()
-                        .getText()
-                        .trim();
-
-        String genero =
-                cadastro_livro.getComboBox()
-                        .getSelectedItem()
-                        .toString();
-
-        String dataTexto =
-                cadastro_livro.getTxtAno()
-                        .getText()
-                        .trim();
-
-        // Verifica os campos
-        if (nome.isEmpty()
-                || editora.isEmpty()
-                || genero.isEmpty()
-                || dataTexto.isEmpty()
-                || dataTexto.contains("_")) {
-
-            mostrarMensagem(
-                    "Preencha todos os campos."
-            );
-
+        if (nome.isEmpty() || email.isEmpty() || telefone.isEmpty() || cpf.isEmpty()
+                || dataNascimento.contains("_") || senha.isEmpty() || confirmarSenha.isEmpty()) {
+            mostrarMensagem("Preencha todos os campos.");
             return;
         }
 
-        /*
-         * Converte a data digitada:
-         *
-         * 22/09/2026
-         *
-         * para:
-         *
-         * LocalDate
-         */
-        LocalDate dataLancamento =
-                LocalDate.parse(
-                        dataTexto,
-                        FORMATO_DATA
-                );
-
-        /*
-         * Como o banco utiliza ano_lancamento
-         * como número inteiro, salvamos somente
-         * o ano.
-         *
-         * Exemplo:
-         *
-         * 22/09/2026 -> 2026
-         */
-        int anoLancamento =
-                dataLancamento.getYear();
-
-        Livro livro =
-                new Livro(
-                        nome,
-                        editora,
-                        dataTexto,
-                        anoLancamento,
-                        genero, null
-                        );
-
-        /*
-         * Adiciona no modelo da tabela.
-         */
-        livroModel.adicionarLivro(livro);
-
-        /*
-         * Também salva no banco.
-         */
-        if (livroDAO != null) {
-
-            livroDAO.inserir(livro);
+        if (senha.length() > 20) {
+            mostrarMensagem("A senha deve ter no máximo 20 caracteres.");
+            return;
         }
 
-        limparCadastro();
-
-        mostrarMensagem(
-                "Livro cadastrado com sucesso."
-        );
-
-    } catch (DateTimeParseException e) {
-
-        mostrarMensagem(
-                "Digite uma data válida no formato DD/MM/AAAA."
-        );
-
-    } catch (SQLException e) {
-
-        e.printStackTrace();
-
-        mostrarMensagem(
-                "Erro ao salvar o livro no banco de dados."
-        );
-
-    } catch (Exception e) {
-
-        e.printStackTrace();
-
-        mostrarMensagem(
-                "Erro ao cadastrar o livro."
-        );
-    }
-}
-
-private void validarLogin() {
-
-    String email =
-            telaLogin.getTxtNome()
-                    .getText()
-                    .trim();
-
-    String senha =
-            new String(
-                    telaLogin.getTxtSenha()
-                            .getPassword()
-            );
-
-    if (email.isEmpty() || senha.isEmpty()) {
-
-        mostrarMensagem(
-                "Preencha o e-mail e a senha."
-        );
-
-        return;
-    }
-
-    try {
-
-        boolean loginValido =
-                usuarioDAO.login(
-                        email,
-                        senha
-                );
-
-        if (loginValido) {
-
-            emailUsuarioLogado = email;
-
-            cpfUsuarioLogado =
-                    usuarioDAO.buscarCpfPorEmail(
-                            email
-                    );
-
-            telaLogin.setVisible(false);
-
-            abrirHome();
-
-        } else {
-
-            mostrarMensagem(
-                    "E-mail ou senha incorretos."
-            );
+        if (!senha.equals(confirmarSenha)) {
+            mostrarMensagem("As senhas não são iguais.");
+            return;
         }
 
-    } catch (SQLException e) {
-
-        e.printStackTrace();
-
-        mostrarMensagem(
-                "Erro ao acessar o banco de dados."
-        );
-    }
-}
-
-private void limparCadastro() {
-
-    cadastro_livro.getTxtNome()
-            .setText("");
-
-    cadastro_livro.getTxtEditora()
-            .setText("");
-
-    cadastro_livro.getTxtAno()
-            .setText("");
-}
-
-private void pesquisar() {
-
-    String texto =
-            pesquisarLivro.getTextoPesquisa();
-
-    if (texto.isEmpty()) {
-
-        mostrarMensagem(
-                "Digite o nome do livro para pesquisar."
-        );
-
-        return;
-    }
-
-    try {
-
-        List<Livro> listaLivros = livroDAO.listar();
-               /** livroDAO.buscarLivrosPorNome(
-                        texto
-                );**/
-
-        if (listaLivros == null
-                || listaLivros.isEmpty()) {
-
-            mostrarMensagem(
-                    "Nenhum livro encontrado para: "
-                            + texto
-            );
-
-        } else {
-
-            mostrarMensagem(
-                    listaLivros.size()
-                            + " livro(s) encontrado(s) para: "
-                            + texto
-            );
+        cpf = cpf.replaceAll("\\D", "");
+        if (cpf.length() != 11) {
+            mostrarMensagem("CPF deve possuir 11 números.");
+            return;
         }
 
-    } catch (SQLException e) {
-
-        e.printStackTrace();
-
-        mostrarMensagem(
-                "Erro ao pesquisar livros."
-        );
+        try {
+            usuarioDAO.cadastrar(cpf, nome, telefone, email, senha, dataNascimento);
+            mostrarMensagem("Cadastro realizado com sucesso!");
+            iniciar();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            if (e.getMessage() != null && e.getMessage().contains("Duplicate")) {
+                mostrarMensagem("Este CPF já está cadastrado.");
+            } else {
+                mostrarMensagem("Erro ao cadastrar usuário.");
+            }
+        }
     }
-}
 
-private void aceitarSolicitacao() {
+    private void adicionarLivro() {
+        try {
+            String nome = cadastroLivro.getTxtNome().getText().trim();
+            String editora = cadastroLivro.getTxtEditora().getText().trim();
+            String genero = "";
 
-    mostrarMensagem(
-            "Solicitação aceita."
-    );
-}
+            if (cadastroLivro.getComboBox().getSelectedItem() != null) {
+                genero = cadastroLivro.getComboBox().getSelectedItem().toString().trim();
+            }
 
-private void excluirSolicitacao() {
+            String dataTexto = cadastroLivro.getTxtAno().getText().trim();
 
-    mostrarMensagem(
-            "Solicitação excluída."
-    );
-}
+            if (nome.isEmpty() || editora.isEmpty() || genero.isEmpty()
+                    || dataTexto.isEmpty() || dataTexto.contains("_")) {
+                mostrarMensagem("Preencha todos os campos.");
+                return;
+            }
 
-// =========================================================
-// UTILITÁRIO
-// =========================================================
+            LocalDate dataLancamento = LocalDate.parse(dataTexto, FORMATO_DATA);
+            int anoLancamento = dataLancamento.getYear();
 
-private void mostrarMensagem(String mensagem) {
+            Livro livro = new Livro(nome, editora, dataTexto, anoLancamento, genero, null);
 
-    UIManager.put(
-            "OptionPane.background",
-            new Color(175, 244, 198)
-    );
+            livroModel.adicionarLivro(livro);
 
-    UIManager.put(
-            "Panel.background",
-            new Color(175, 244, 198)
-    );
+            if (livroDAO != null) {
+                livroDAO.inserir(livro);
+            }
 
-    JOptionPane.showMessageDialog(
-            null,
-            mensagem
-    );
+            limparCadastro();
+            mostrarMensagem("Livro cadastrado com sucesso.");
 
-    UIManager.put(
-            "OptionPane.background",
-            null
-    );
+        } catch (DateTimeParseException e) {
+            mostrarMensagem("Digite uma data válida no formato DD/MM/AAAA.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            mostrarMensagem("Erro ao salvar o livro no banco de dados.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensagem("Erro ao cadastrar o livro.");
+        }
+    }
 
-    UIManager.put(
-            "Panel.background",
-            null
-    );
-}
+    private void validarLogin() {
+        String email = telaLogin.getTxtNome().getText().trim();
+        String senha = new String(telaLogin.getTxtSenha().getPassword());
 
-public LivroTableModel getLivroModel() {
-    return livroModel;
-}
+        if (email.isEmpty() || senha.isEmpty()) {
+            mostrarMensagem("Preencha o e-mail e a senha.");
+            return;
+        }
 
-public TelaLogin getTelaLogin() {
-    return telaLogin;
-}
+        try {
+            boolean loginValido = usuarioDAO.login(email, senha);
+            if (loginValido) {
+                emailUsuarioLogado = email;
+                cpfUsuarioLogado = usuarioDAO.buscarCpfPorEmail(email);
+                telaLogin.setVisible(false);
+                abrirHome();
+            } else {
+                mostrarMensagem("E-mail ou senha incorretos.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            mostrarMensagem("Erro ao acessar o banco de dados.");
+        }
+    }
 
-public tela_inicial getTelaInicial() {
-    return telaInicial;
-}
+    private void limparCadastro() {
+        cadastroLivro.getTxtNome().setText("");
+        cadastroLivro.getTxtEditora().setText("");
+        cadastroLivro.getTxtAno().setText("");
+    }
 
-public PesquisarLivro getPesquisarLivro() {
-    return pesquisarLivro;
-}
+    private void pesquisar() {
+        String texto = pesquisarLivro.getTextoPesquisa();
+        if (texto.isEmpty()) {
+            mostrarMensagem("Digite o nome do livro para pesquisar.");
+            return;
+        }
 
-public TelaSolicitacoes getTelaSolicitacoes() {
-    return telaSolicitacoes;
-}
+        try {
+            List<Livro> listaLivros = livroDAO.listar();
+            if (listaLivros == null || listaLivros.isEmpty()) {
+                mostrarMensagem("Nenhum livro encontrado para: " + texto);
+            } else {
+                mostrarMensagem(listaLivros.size() + " livro(s) encontrado(s) para: " + texto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            mostrarMensagem("Erro ao pesquisar livros.");
+        }
+    }
 
-public TelaNotificacoes getTelaNotificacoes() {
-    return telaNotificacoes;
-}
+    private void aceitarSolicitacao() {
+        mostrarMensagem("Solicitação aceita.");
+    }
 
-public TelaMeusLivros getTelaMeusLivros() {
-    return telaMeusLivros;
-}
+    private void excluirSolicitacao() {
+        mostrarMensagem("Solicitação excluída.");
+    }
 
-public Perfil getPerfil() {
-    return perfil;
-}
+    private void mostrarMensagem(String mensagem) {
+        UIManager.put("OptionPane.background", new Color(175, 244, 198));
+        UIManager.put("Panel.background", new Color(175, 244, 198));
 
-public Cadastro_Livro getCadastro() {
-    return cadastro_livro;
-}
+        JOptionPane.showMessageDialog(null, mensagem);
+
+        UIManager.put("OptionPane.background", null);
+        UIManager.put("Panel.background", null);
+    }
+
+    // =========================================================
+    // GETTERS
+    // =========================================================
+
+    public LivroTableModel getLivroModel() { return livroModel; }
+    public TelaLogin getTelaLogin() { return telaLogin; }
+    public tela_inicial getTelaInicial() { return telaInicial; }
+    public PesquisarLivro getPesquisarLivro() { return pesquisarLivro; }
+    public TelaSolicitacoes getTelaSolicitacoes() { return telaSolicitacoes; }
+    public TelaNotificacoes getTelaNotificacoes() { return telaNotificacoes; }
+    public TelaMeusLivros getTelaMeusLivros() { return telaMeusLivros; }
+    public Perfil getPerfil() { return perfil; }
+    public Cadastro_Livro getCadastro() { return cadastroLivro; }
 }

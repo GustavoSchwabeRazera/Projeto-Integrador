@@ -27,6 +27,7 @@ public class TelaMeusLivros extends JFrame {
 	private JPanel contentPane;
 	private JButton btnHome;
 	private JButton btnMostrarMais;
+	private JButton btnNewButton;
 
 	// =====================================================
 	// PAINEL COM CANTOS ARREDONDADOS
@@ -220,7 +221,7 @@ public class TelaMeusLivros extends JFrame {
 		Image imagemCadastrar = cadastrarIcon.getImage()
 		        .getScaledInstance(250, 100, Image.SCALE_SMOOTH);
 
-		JButton btnNewButton = new JButton("");
+		 btnNewButton = new JButton("");
 
 		btnNewButton.setContentAreaFilled(false);
 		btnNewButton.setBorderPainted(false);
@@ -228,12 +229,7 @@ public class TelaMeusLivros extends JFrame {
 
 		btnNewButton.setIcon(new ImageIcon(imagemCadastrar));
 
-		btnNewButton.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        Cadastro_Livro telaCadastro = new Cadastro_Livro();
-		        telaCadastro.setVisible(true);
-		    }
-		});
+		
 
 		painelLivros.add(
 		        btnNewButton,
@@ -248,6 +244,14 @@ public class TelaMeusLivros extends JFrame {
 	// =====================================================
 	// MÉTODO PARA CRIAR A CAPA DO LIVRO
 	// =====================================================
+
+	public JButton getBtnNewButton() {
+		return btnNewButton;
+	}
+
+	public void setBtnNewButton(JButton btnNewButton) {
+		this.btnNewButton = btnNewButton;
+	}
 
 	private JLabel criarLivro(String caminho) {
 
