@@ -165,6 +165,7 @@ private void configurarEventos() {
     // PERFIL
     perfil.getBtnHome()
             .addActionListener(e -> abrirHome());
+   perfil.getBtnSair().addActionListener(e -> logoff());
 
     perfil.getBtnAlterarCadastro()
             .addActionListener(e -> abrirAlterarCadastro());
@@ -218,6 +219,27 @@ public void iniciar() {
 
     telaLogin.setVisible(true);
 }
+public void logoff() {
+
+    // Limpa os dados do usuário logado
+    emailUsuarioLogado = null;
+    cpfUsuarioLogado = null;
+
+    // Volta as fotos para a imagem padrão
+    telaInicial.atualizarFotoPerfil(null);
+    perfil.carregarFoto(null);
+
+    // Esconde todas as telas
+    esconderTodas();
+
+    // Limpa os campos da tela de login
+    telaLogin.getTxtNome().setText("");
+    telaLogin.getTxtSenha().setText("");
+
+    // Volta para a tela de login
+    telaLogin.setVisible(true);
+}
+
 
 private void abrirHome() {
 

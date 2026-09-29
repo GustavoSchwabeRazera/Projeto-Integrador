@@ -42,7 +42,7 @@ public class Perfil extends JFrame {
 	private CircularImageLabel lblFoto;
 	private byte[] fotoSelecionada;
 	private String cpfUsuario;
-	private JButton btnNewButton;
+	private JButton btnSair;
 
 	/**
 	 * Launch the application.
@@ -490,9 +490,9 @@ public class Perfil extends JFrame {
 		// BOTÃO SAIR - DIMINUÍDO
 		// =========================================================
 
-		btnNewButton = new JButton("");
+		btnSair = new JButton("");
 
-		btnNewButton.addActionListener(
+		btnSair.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 					}
@@ -500,7 +500,7 @@ public class Perfil extends JFrame {
 		);
 
 		// Ícone da porta menor
-		btnNewButton.setIcon(
+		btnSair.setIcon(
 				carregarIconeRedimensionado(
 						"/imagens/sairAjustado.png",
 						0.95
@@ -508,34 +508,34 @@ public class Perfil extends JFrame {
 		);
 
 		// Tamanho do botão
-		btnNewButton.setPreferredSize(
+		btnSair.setPreferredSize(
 				new java.awt.Dimension(
 						110,
 						110
 				)
 		);
 
-		btnNewButton.setMinimumSize(
+		btnSair.setMinimumSize(
 				new java.awt.Dimension(
 						110,
 						110
 				)
 		);
 
-		btnNewButton.setMaximumSize(
+		btnSair.setMaximumSize(
 				new java.awt.Dimension(
 						110,
 						110
 				)
 		);
 
-		btnNewButton.setFocusPainted(false);
-		btnNewButton.setBorderPainted(false);
-		btnNewButton.setContentAreaFilled(false);
-		btnNewButton.setOpaque(false);
+		btnSair.setFocusPainted(false);
+		btnSair.setBorderPainted(false);
+		btnSair.setContentAreaFilled(false);
+		btnSair.setOpaque(false);
 
 		contentPane.add(
-				btnNewButton,
+				btnSair,
 				"cell 3 0, alignx right, aligny center"
 		);
 
@@ -824,6 +824,8 @@ public class Perfil extends JFrame {
 	// ATUALIZAR DADOS
 	// =========================================================
 
+	
+
 	public void atualizarDados(
 			String nome,
 			String email,
@@ -872,21 +874,31 @@ public class Perfil extends JFrame {
 	// CARREGAR FOTO
 	// =========================================================
 
-	public void carregarFoto(
-			byte[] foto) {
+	public void carregarFoto(byte[] foto) {
 
-		if (foto != null && foto.length > 0) {
+	    Image imagem;
 
-			ImageIcon imagem =
-					new ImageIcon(foto);
+	    // Se não tiver foto cadastrada,
+	    // utiliza a foto padrão
+	    if (foto == null || foto.length == 0) {
 
-			lblFoto.setImage(
-					imagem.getImage()
-			);
+	        ImageIcon fotoPadrao = new ImageIcon(
+	                Perfil.class.getResource("/imagens/perfil3.png")
+	        );
 
-			lblFoto.revalidate();
-			lblFoto.repaint();
-		}
+	        imagem = fotoPadrao.getImage();
+
+	    } else {
+
+	        // Foto cadastrada no banco
+	        imagem = new ImageIcon(foto).getImage();
+	    }
+
+	    // Coloca a imagem no componente circular
+	    lblFoto.setImage(imagem);
+
+	    lblFoto.revalidate();
+	    lblFoto.repaint();
 	}
 
 	// =========================================================
@@ -906,5 +918,12 @@ public class Perfil extends JFrame {
 	public JButton getBtnAlterarFoto() {
 
 		return btnAlterarFoto;
+	}
+	public JButton getBtnSair() {
+		return btnSair;
+	}
+
+	public void setBtnSair(JButton btnSair) {
+		this.btnSair = btnSair;
 	}
 }

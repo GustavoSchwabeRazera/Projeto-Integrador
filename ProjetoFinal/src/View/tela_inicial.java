@@ -208,7 +208,7 @@ public class tela_inicial extends JFrame {
         if (foto == null || foto.length == 0) {
 
             ImageIcon fotoPadrao = new ImageIcon(
-                tela_inicial.class.getResource("/imagens/FotoPerfil.png")
+                tela_inicial.class.getResource("/imagens/perfil3.png")
             );
 
             imagem = fotoPadrao.getImage();
@@ -267,6 +267,8 @@ public class tela_inicial extends JFrame {
 
         btnPerfil.revalidate();
         btnPerfil.repaint();
+        
+        
     }
     // =========================================================
     // GETTERS
