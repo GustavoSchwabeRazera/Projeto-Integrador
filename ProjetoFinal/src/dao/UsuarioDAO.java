@@ -144,6 +144,83 @@ public class UsuarioDAO {
         return null;
     }
     
+    public String[] buscarDadosParaAlteracao(String cpf) throws SQLException {
+
+        String sql = "SELECT CPF, nome, email, telefone, data_nascimento, senha "
+                   + "FROM Usuarios WHERE CPF = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, cpf);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+
+                    String dataNascimento = "";
+
+                    if (rs.getDate("data_nascimento") != null) {
+                        SimpleDateFormat formato =
+                                new SimpleDateFormat("dd/MM/yyyy");
+
+                        dataNascimento =
+                                formato.format(rs.getDate("data_nascimento"));
+                    }
+
+                    return new String[] {
+                        rs.getString("CPF"),
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("telefone"),
+                        dataNascimento,
+                        rs.getString("senha")
+                    };
+                }
+            }
+        }
+
+        return null;
+    }
+    public void atualizarCadastro(String cpfAtual, String cpfNovo,
+            String nome, String telefone,
+            String email, String senha,
+            String dataNascimento) throws SQLException {
+
+String sql = "UPDATE Usuarios SET "
++ "CPF = ?, "
++ "nome = ?, "
++ "telefone = ?, "
++ "email = ?, "
++ "senha = ?, "
++ "data_nascimento = ? "
++ "WHERE CPF = ?";
+
+try (Connection conn = ConnectionFactory.getConnection();
+PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+stmt.setString(1, cpfNovo);
+stmt.setString(2, nome);
+stmt.setString(3, telefone);
+stmt.setString(4, email);
+stmt.setString(5, senha);
+
+// Converte dd/MM/yyyy para yyyy-MM-dd
+String[] partes = dataNascimento.split("/");
+
+String dataMySQL = partes[2] + "-"
+       + partes[1] + "-"
+       + partes[0];
+
+stmt.setString(6, dataMySQL);
+
+// CPF que identifica o registro atualmente
+stmt.setString(7, cpfAtual);
+
+stmt.executeUpdate();
+}
+}
+    
     
     
 }
