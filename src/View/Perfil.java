@@ -1,0 +1,929 @@
+package View;
+
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.LayoutManager;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Ellipse2D;
+import java.io.File;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import net.miginfocom.swing.MigLayout;
+
+import java.awt.Toolkit;
+
+public class Perfil extends JFrame {
+
+	private static final long serialVersionUID = 1L;
+
+	private JPanel contentPane;
+	private JButton btnHome;
+	private JButton btnAlterarCadastro;
+	private JButton btnAlterarFoto;
+	private JLabel lblNomeUser;
+	private JLabel lblEmailUser;
+	private JLabel lblTelefone;
+	private JLabel lblDataDeNascimento;
+	private CircularImageLabel lblFoto;
+	private byte[] fotoSelecionada;
+	private String cpfUsuario;
+	private JButton btnSair;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Perfil frame = new Perfil();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Painel com cantos arredondados.
+	 */
+	private static class RoundedPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		private final int radius;
+
+		public RoundedPanel(LayoutManager layout, int radius) {
+			super(layout);
+			this.radius = radius;
+			setOpaque(false);
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+
+			Graphics2D g2 = (Graphics2D) g.create();
+
+			g2.setRenderingHint(
+					RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON
+			);
+
+			g2.setColor(getBackground());
+
+			g2.fillRoundRect(
+					0,
+					0,
+					getWidth(),
+					getHeight(),
+					radius,
+					radius
+			);
+
+			g2.dispose();
+
+			super.paintComponent(g);
+		}
+	}
+
+	/**
+	 * Botão com cantos arredondados.
+	 */
+	private static class RoundedButton extends JButton {
+
+		private static final long serialVersionUID = 1L;
+		private final int radius;
+		private boolean hovering = false;
+
+		public RoundedButton(String text, int radius) {
+
+			super(text);
+
+			this.radius = radius;
+
+			setContentAreaFilled(false);
+			setFocusPainted(false);
+			setBorderPainted(false);
+			setOpaque(false);
+
+			setCursor(
+					new java.awt.Cursor(
+							java.awt.Cursor.HAND_CURSOR
+					)
+			);
+
+			addMouseListener(
+					new java.awt.event.MouseAdapter() {
+
+						@Override
+						public void mouseEntered(java.awt.event.MouseEvent e) {
+							hovering = true;
+							repaint();
+						}
+
+						@Override
+						public void mouseExited(java.awt.event.MouseEvent e) {
+							hovering = false;
+							repaint();
+						}
+					}
+			);
+		}
+
+		private Color corAtual() {
+
+			Color base = getBackground();
+
+			if (getModel().isPressed()) {
+				return base.darker();
+			}
+
+			if (hovering) {
+
+				return new Color(
+						Math.max((int) (base.getRed() * 0.9), 0),
+						Math.max((int) (base.getGreen() * 0.9), 0),
+						Math.max((int) (base.getBlue() * 0.9), 0)
+				);
+			}
+
+			return base;
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+
+			Graphics2D g2 = (Graphics2D) g.create();
+
+			g2.setRenderingHint(
+					RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON
+			);
+
+			g2.setColor(corAtual());
+
+			g2.fillRoundRect(
+					0,
+					0,
+					getWidth(),
+					getHeight(),
+					radius,
+					radius
+			);
+
+			g2.dispose();
+
+			super.paintComponent(g);
+		}
+	}
+
+	/**
+	 * Componente que exibe a imagem em formato circular.
+	 */
+	private static class CircularImageLabel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+
+		private Image image;
+
+		public CircularImageLabel(Image image) {
+			this.image = image;
+			setOpaque(false);
+		}
+
+		public void setImage(Image image) {
+			this.image = image;
+			repaint();
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+
+			super.paintComponent(g);
+
+			if (image == null) {
+				return;
+			}
+
+			Graphics2D g2 = (Graphics2D) g.create();
+
+			g2.setRenderingHint(
+					RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON
+			);
+
+			g2.setRenderingHint(
+					RenderingHints.KEY_INTERPOLATION,
+					RenderingHints.VALUE_INTERPOLATION_BILINEAR
+			);
+
+			int size = Math.min(
+					getWidth(),
+					getHeight()
+			);
+
+			int xOffset = (getWidth() - size) / 2;
+			int yOffset = (getHeight() - size) / 2;
+
+			g2.setClip(
+					new Ellipse2D.Float(
+							xOffset,
+							yOffset,
+							size,
+							size
+					)
+			);
+
+			int imgWidth = image.getWidth(this);
+			int imgHeight = image.getHeight(this);
+
+			if (imgWidth > 0 && imgHeight > 0) {
+
+				double scaleWidth =
+						(double) size / imgWidth;
+
+				double scaleHeight =
+						(double) size / imgHeight;
+
+				double scale =
+						Math.max(
+								scaleWidth,
+								scaleHeight
+						);
+
+				int drawWidth =
+						(int) (imgWidth * scale);
+
+				int drawHeight =
+						(int) (imgHeight * scale);
+
+				int x =
+						xOffset
+						+ (size - drawWidth) / 2;
+
+				int y =
+						yOffset
+						+ (size - drawHeight) / 2;
+
+				g2.drawImage(
+						image,
+						x,
+						y,
+						drawWidth,
+						drawHeight,
+						this
+				);
+			}
+
+			g2.dispose();
+		}
+	}
+
+	/**
+	 * Carrega um ícone a partir do classpath
+	 * e redimensiona proporcionalmente.
+	 */
+	private static ImageIcon carregarIconeRedimensionado(
+			String caminho,
+			double escala) {
+
+		java.net.URL url =
+				Perfil.class.getResource(caminho);
+
+		if (url == null) {
+
+			System.err.println(
+					"Aviso: não encontrei o ícone "
+					+ caminho
+					+ " no classpath."
+			);
+
+			return null;
+		}
+
+		ImageIcon original =
+				new ImageIcon(url);
+
+		int novaLargura =
+				Math.max(
+						(int) Math.round(
+								original.getIconWidth()
+								* escala
+						),
+						1
+				);
+
+		int novaAltura =
+				Math.max(
+						(int) Math.round(
+								original.getIconHeight()
+								* escala
+						),
+						1
+				);
+
+		Image imagemRedimensionada =
+				original.getImage().getScaledInstance(
+						novaLargura,
+						novaAltura,
+						Image.SCALE_SMOOTH
+				);
+
+		return new ImageIcon(
+				imagemRedimensionada
+		);
+	}
+
+	/**
+	 * Seleciona e carrega a foto do usuário.
+	 */
+	public void selecionarEAtualizarFoto() {
+
+		JFileChooser fileChooser =
+				new JFileChooser();
+
+		FileNameExtensionFilter filtro =
+				new FileNameExtensionFilter(
+						"Imagens (*.png, *.jpg, *.jpeg, *.gif)",
+						"png",
+						"jpg",
+						"jpeg",
+						"gif"
+				);
+
+		fileChooser.setFileFilter(filtro);
+
+		int resultado =
+				fileChooser.showOpenDialog(this);
+
+		if (resultado == JFileChooser.APPROVE_OPTION) {
+
+			File arquivoSelecionado =
+					fileChooser.getSelectedFile();
+
+			try {
+
+				// Converte a imagem para byte[]
+				fotoSelecionada =
+						java.nio.file.Files.readAllBytes(
+								arquivoSelecionado.toPath()
+						);
+
+				// Mostra a imagem imediatamente
+				ImageIcon imagem =
+						new ImageIcon(
+								arquivoSelecionado.getAbsolutePath()
+						);
+
+				lblFoto.setImage(
+						imagem.getImage()
+				);
+
+				lblFoto.revalidate();
+				lblFoto.repaint();
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+
+				JOptionPane.showMessageDialog(
+						this,
+						"Erro ao carregar a imagem."
+				);
+			}
+		}
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public Perfil() {
+
+		setDefaultCloseOperation(
+				JFrame.EXIT_ON_CLOSE
+		);
+
+		setBounds(
+				100,
+				100,
+				1300,
+				721
+		);
+
+		this.setExtendedState(
+				JFrame.MAXIMIZED_BOTH
+		);
+
+		setLocationRelativeTo(null);
+
+		contentPane = new JPanel();
+
+		contentPane.setBackground(
+				new Color(175, 244, 198)
+		);
+
+		contentPane.setBorder(
+				new EmptyBorder(
+						15,
+						15,
+						15,
+						15
+				)
+		);
+
+		setContentPane(contentPane);
+
+		contentPane.setLayout(
+				new MigLayout(
+						"",
+						"[30px][350px,grow][650px,grow][30px]",
+						"[30px][50px][40px][380px][40px][60px][30px,grow]"
+				)
+		);
+
+		// =========================================================
+		// BOTÃO HOME - DIMINUÍDO
+		// =========================================================
+
+		btnHome = new JButton("");
+		btnHome.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+
+		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
+
+		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
+
+		btnHome.setForeground(new Color(10, 86, 27));
+
+		btnHome.setBorderPainted(false);
+		btnHome.setContentAreaFilled(false);
+		btnHome.setFocusPainted(false);
+
+		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
+
+		ImageIcon perfil = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
+
+		Image imgPerfil = perfil.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+		// =========================================================
+		// BOTÃO SAIR
+		// =========================================================
+
+		// =========================================================
+		// BOTÃO SAIR - DIMINUÍDO
+		// =========================================================
+
+		btnSair = new JButton("");
+
+		btnSair.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+					}
+				}
+		);
+
+		// Ícone da porta menor
+		btnSair.setIcon(
+				carregarIconeRedimensionado(
+						"/imagens/sairAjustado.png",
+						0.95
+				)
+		);
+
+		// Tamanho do botão
+		btnSair.setPreferredSize(
+				new java.awt.Dimension(
+						110,
+						110
+				)
+		);
+
+		btnSair.setMinimumSize(
+				new java.awt.Dimension(
+						110,
+						110
+				)
+		);
+
+		btnSair.setMaximumSize(
+				new java.awt.Dimension(
+						110,
+						110
+				)
+		);
+
+		btnSair.setFocusPainted(false);
+		btnSair.setBorderPainted(false);
+		btnSair.setContentAreaFilled(false);
+		btnSair.setOpaque(false);
+
+		contentPane.add(
+				btnSair,
+				"cell 3 0, alignx right, aligny center"
+		);
+
+
+		// =========================================================
+		// TÍTULO INFORMAÇÕES
+		// =========================================================
+
+		JLabel lblPerfil =
+				new JLabel("Informações:");
+
+		lblPerfil.setForeground(
+				new Color(19, 74, 38)
+		);
+
+		lblPerfil.setFont(
+				new Font(
+						"Tahoma",
+						Font.BOLD,
+						22
+				)
+		);
+
+		contentPane.add(
+				lblPerfil,
+				"cell 2 2, alignx center, aligny bottom"
+		);
+
+		// =========================================================
+		// TEXTO FOTO DE PERFIL
+		// =========================================================
+
+		JLabel lblFotoPerfilText =
+				new JLabel("Foto de perfil:");
+
+		lblFotoPerfilText.setForeground(
+				new Color(19, 74, 38)
+		);
+
+		lblFotoPerfilText.setFont(
+				new Font(
+						"Tahoma",
+						Font.BOLD,
+						22
+				)
+		);
+
+		contentPane.add(
+				lblFotoPerfilText,
+				"cell 1 2, alignx center, aligny bottom"
+		);
+
+		// =========================================================
+		// FOTO DE PERFIL
+		// =========================================================
+
+		lblFoto =
+				new CircularImageLabel(null);
+
+		lblFoto.setImage(
+				Toolkit
+						.getDefaultToolkit()
+						.getImage(
+								Perfil.class.getResource(
+										"/imagens/perfil3.png"
+								)
+						)
+		);
+
+		contentPane.add(
+				lblFoto,
+				"cell 1 3, width 280!, height 280!, alignx center, aligny center"
+		);
+
+		// =========================================================
+		// PAINEL DE DADOS
+		// =========================================================
+
+		RoundedPanel panelDados =
+				new RoundedPanel(
+						new MigLayout(
+								"",
+								"[20px][580px][20px]",
+								"[20px][50px][50px][50px][50px][20px]"
+						),
+						30
+				);
+
+		panelDados.setBackground(
+				new Color(25, 90, 45)
+		);
+
+		// Nome
+		lblNomeUser =
+				new JLabel("Nome de usuário:");
+
+		lblNomeUser.setForeground(
+				Color.WHITE
+		);
+
+		lblNomeUser.setFont(
+				new Font(
+						"Tahoma",
+						Font.BOLD,
+						18
+				)
+		);
+
+		panelDados.add(
+				lblNomeUser,
+				"cell 1 1, alignx left"
+		);
+
+		// E-mail
+		lblEmailUser =
+				new JLabel("E-Mail:");
+
+		lblEmailUser.setForeground(
+				Color.WHITE
+		);
+
+		lblEmailUser.setFont(
+				new Font(
+						"Tahoma",
+						Font.BOLD,
+						18
+				)
+		);
+
+		panelDados.add(
+				lblEmailUser,
+				"cell 1 2, alignx left"
+		);
+
+		// Telefone
+		lblTelefone =
+				new JLabel("Telefone:");
+
+		lblTelefone.setForeground(
+				Color.WHITE
+		);
+
+		lblTelefone.setFont(
+				new Font(
+						"Tahoma",
+						Font.BOLD,
+						18
+				)
+		);
+
+		panelDados.add(
+				lblTelefone,
+				"cell 1 3, alignx left"
+		);
+
+		// Data de nascimento
+		lblDataDeNascimento =
+				new JLabel("Data de Nascimento:");
+
+		lblDataDeNascimento.setForeground(
+				Color.WHITE
+		);
+
+		lblDataDeNascimento.setFont(
+				new Font(
+						"Tahoma",
+						Font.BOLD,
+						18
+				)
+		);
+
+		panelDados.add(
+				lblDataDeNascimento,
+				"cell 1 4, alignx left"
+		);
+
+		contentPane.add(
+				panelDados,
+				"cell 2 3, alignx center, aligny center"
+		);
+
+		// =========================================================
+		// BOTÃO ALTERAR FOTO
+		// =========================================================
+
+		btnAlterarFoto =
+				new RoundedButton(
+						"Alterar foto",
+						40
+				);
+
+		btnAlterarFoto.setBackground(
+				new Color(114, 219, 145)
+		);
+
+		btnAlterarFoto.setForeground(
+				Color.BLACK
+		);
+
+		btnAlterarFoto.setFont(
+				new Font(
+						"Tahoma",
+						Font.BOLD,
+						20
+				)
+		);
+
+		btnAlterarFoto.setMargin(
+				new java.awt.Insets(
+						10,
+						30,
+						10,
+						30
+				)
+		);
+
+		contentPane.add(
+				btnAlterarFoto,
+				"cell 1 5, alignx center, aligny center"
+		);
+
+		// =========================================================
+		// BOTÃO ALTERAR CADASTRO
+		// =========================================================
+
+		btnAlterarCadastro =
+				new RoundedButton(
+						"Alterar cadastro",
+						40
+				);
+
+		btnAlterarCadastro.setBackground(
+				new Color(114, 219, 145)
+		);
+
+		btnAlterarCadastro.setForeground(
+				Color.BLACK
+		);
+
+		btnAlterarCadastro.setFont(
+				new Font(
+						"Tahoma",
+						Font.BOLD,
+						20
+				)
+		);
+
+		btnAlterarCadastro.setMargin(
+				new java.awt.Insets(
+						10,
+						30,
+						10,
+						30
+				)
+		);
+
+		contentPane.add(
+				btnAlterarCadastro,
+				"cell 2 5, alignx center, aligny center"
+		);
+
+		// =========================================================
+		// PAINEL LATERAL - CALENDÁRIO E SINO
+		// =========================================================
+
+		JPanel panelLateralDireita =
+				new JPanel();
+
+		panelLateralDireita.setOpaque(false);
+
+		panelLateralDireita.setLayout(
+				new MigLayout(
+						"",
+						"[64px]",
+						"[64px][15px][64px]"
+				)
+		);
+
+		contentPane.add(
+				panelLateralDireita,
+				"cell 3 3 1 4, alignx right, aligny bottom"
+		);
+	}
+
+	// =========================================================
+	// ATUALIZAR DADOS
+	// =========================================================
+
+	
+
+	public void atualizarDados(
+			String nome,
+			String email,
+			String telefone,
+			String dataNascimento) {
+
+		lblNomeUser.setText(
+				"Nome de usuário:   " + nome
+		);
+
+		lblEmailUser.setText(
+				"E-Mail:   " + email
+		);
+
+		lblTelefone.setText(
+				"Telefone:   " + telefone
+		);
+
+		lblDataDeNascimento.setText(
+				"Data de Nascimento:   "
+				+ dataNascimento
+		);
+	}
+
+	// =========================================================
+	// CPF DO USUÁRIO
+	// =========================================================
+
+	public void setCpfUsuario(
+			String cpfUsuario) {
+
+		this.cpfUsuario =
+				cpfUsuario;
+	}
+
+	// =========================================================
+	// FOTO SELECIONADA
+	// =========================================================
+
+	public byte[] getFotoSelecionada() {
+
+		return fotoSelecionada;
+	}
+
+	// =========================================================
+	// CARREGAR FOTO
+	// =========================================================
+
+	public void carregarFoto(byte[] foto) {
+
+	    Image imagem;
+
+	    // Se não tiver foto cadastrada,
+	    // utiliza a foto padrão
+	    if (foto == null || foto.length == 0) {
+
+	        ImageIcon fotoPadrao = new ImageIcon(
+	                Perfil.class.getResource("/imagens/perfil3.png")
+	        );
+
+	        imagem = fotoPadrao.getImage();
+
+	    } else {
+
+	        // Foto cadastrada no banco
+	        imagem = new ImageIcon(foto).getImage();
+	    }
+
+	    // Coloca a imagem no componente circular
+	    lblFoto.setImage(imagem);
+
+	    lblFoto.revalidate();
+	    lblFoto.repaint();
+	}
+
+	// =========================================================
+	// GETTERS DOS BOTÕES
+	// =========================================================
+
+	public JButton getBtnHome() {
+
+		return btnHome;
+	}
+
+	public JButton getBtnAlterarCadastro() {
+
+		return btnAlterarCadastro;
+	}
+
+	public JButton getBtnAlterarFoto() {
+
+		return btnAlterarFoto;
+	}
+	public JButton getBtnSair() {
+		return btnSair;
+	}
+
+	public void setBtnSair(JButton btnSair) {
+		this.btnSair = btnSair;
+	}
+}
