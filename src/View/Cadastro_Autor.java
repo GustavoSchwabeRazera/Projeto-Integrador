@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import dao.AutorDAO;
@@ -421,8 +422,7 @@ private void cadastrarAutor() {
 
     if (nome.isEmpty()) {
 
-        JOptionPane.showMessageDialog(
-                this,
+        mensagem(
                 "Digite o nome do autor."
         );
 
@@ -434,8 +434,7 @@ private void cadastrarAutor() {
 
     if (nacionalidade.isEmpty()) {
 
-        JOptionPane.showMessageDialog(
-                this,
+        mensagem(
                 "Selecione a nacionalidade."
         );
 
@@ -468,8 +467,7 @@ private void cadastrarAutor() {
         );
 
 
-        JOptionPane.showMessageDialog(
-                this,
+        mensagem(
                 "Autor cadastrado com sucesso!"
         );
 
@@ -492,8 +490,7 @@ private void cadastrarAutor() {
 
         ex.printStackTrace();
 
-        JOptionPane.showMessageDialog(
-                this,
+        mensagem(
                 "Erro ao cadastrar o autor:\n"
                         + ex.getMessage(),
                 "Erro",
@@ -538,6 +535,26 @@ public void setComboBox(
 public JButton getBtnAdicionar() {
 
     return botaoCadastrar;
+}
+
+
+// =========================================================
+// JANELA DE MENSAGEM VERDE (IGUAL AO RESTO DO PROJETO)
+// =========================================================
+
+private void mensagem(String texto) {
+    mensagem(texto, "Mensagem", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void mensagem(String texto, String titulo, int tipo) {
+
+    UIManager.put("OptionPane.background", new Color(175, 244, 198));
+    UIManager.put("Panel.background", new Color(175, 244, 198));
+
+    JOptionPane.showMessageDialog(this, texto, titulo, tipo);
+
+    UIManager.put("OptionPane.background", null);
+    UIManager.put("Panel.background", null);
 }
 
 }

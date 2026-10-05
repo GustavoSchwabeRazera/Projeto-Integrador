@@ -95,6 +95,11 @@ public class LivroDAO {
             }
         }
 
+        // Busca os autores de cada livro
+        for (Livro livro : livros) {
+            livro.setAutores(buscarAutores(livro.getIsbn()));
+        }
+
         return livros;
     }
 

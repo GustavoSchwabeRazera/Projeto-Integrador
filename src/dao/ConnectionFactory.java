@@ -14,7 +14,7 @@ public class ConnectionFactory {
 
             String url = "jdbc:mysql://localhost:3306/capasvivas";
             String usuario = "root";
-            String senha = "Jadyllene223";
+            String senha = "admin";
 
             conn = DriverManager.getConnection(url, usuario, senha);
         }

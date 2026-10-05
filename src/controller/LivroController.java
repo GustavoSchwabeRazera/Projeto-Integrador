@@ -728,49 +728,36 @@ public class LivroController {
     private void pesquisar() {
 
         String texto =
-                pesquisarLivro.getTextoPesquisa();
-
-
-        if (texto.isEmpty()) {
-
-            mostrarMensagem(
-                    "Digite o nome do livro para pesquisar."
-            );
-
-            return;
-        }
-
+                pesquisarLivro.getTextoPesquisa().toLowerCase();
 
         try {
 
+            // Busca todos os livros do banco
             List<Livro> listaLivros =
                     livroDAO.listar();
 
-
-            if (listaLivros == null
-                    || listaLivros.isEmpty()) {
-
-                mostrarMensagem(
-                        "Nenhum livro encontrado para: "
-                                + texto
-                );
-
-            } else {
-
-                mostrarMensagem(
-                        listaLivros.size()
-                                + " livro(s) encontrado(s) para: "
-                                + texto
-                );
+            // Se digitou algo, filtra pelo título
+            if (!texto.isEmpty()) {
+                listaLivros.removeIf(livro ->
+                        livro.getNome() == null
+                        || !livro.getNome().toLowerCase().contains(texto));
             }
 
+            pesquisarLivro.mostrarLivros(listaLivros);
+
+            if (listaLivros.isEmpty()) {
+
+                mostrarMensagem(
+                        "Nenhum livro encontrado."
+                );
+            }
 
         } catch (SQLException e) {
 
             e.printStackTrace();
 
             mostrarMensagem(
-                    "Erro ao pesquisar livros."
+                    "Erro ao pesquisar livros:\n" + e.getMessage()
             );
         }
     }

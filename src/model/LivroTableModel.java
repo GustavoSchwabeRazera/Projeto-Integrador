@@ -35,7 +35,6 @@ public class LivroTableModel extends AbstractTableModel{
 
 	@Override
 	public String getValueAt(int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
 		Livro livro = lista.get(rowIndex);
 		if(columnIndex == 0) {
 			return livro.getNome();
@@ -48,6 +47,19 @@ public class LivroTableModel extends AbstractTableModel{
 		}
 		
 		if(columnIndex == 3) {
+			StringBuilder nomes = new StringBuilder();
+			if (livro.getAutores() != null) {
+				for (Autor autor : livro.getAutores()) {
+					if (nomes.length() > 0) {
+						nomes.append(", ");
+					}
+					nomes.append(autor.getNome());
+				}
+			}
+			return nomes.toString();
+		}
+		
+		if(columnIndex == 4) {
 			return livro.getGenero();
 		}
 		
@@ -58,6 +70,11 @@ public class LivroTableModel extends AbstractTableModel{
 		lista.remove(linhaSelecionada);
 		fireTableDataChanged();
 		
+	}
+
+	public void setLista(java.util.List<Livro> livros) {
+		this.lista = new ArrayList<Livro>(livros);
+		fireTableDataChanged();
 	}
 
 	public void adicionarLivro(Livro l) {

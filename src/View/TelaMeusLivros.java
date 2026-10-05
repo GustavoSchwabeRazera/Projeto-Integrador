@@ -15,6 +15,8 @@ import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
 
+import javax.swing.Icon;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
@@ -319,20 +321,13 @@ public class TelaMeusLivros extends JFrame {
 		// Botões da janela
 		String[] opcoes = { "Remover livro", "Fechar" };
 
-		ligarVerde();
-
-		int escolha = JOptionPane.showOptionDialog(
-				this,
+		int escolha = mostrarJanela(
 				texto,
 				livro.getNome(),
-				JOptionPane.DEFAULT_OPTION,
 				JOptionPane.PLAIN_MESSAGE,
 				new ImageIcon(pegarImagem(livro, 200, 260)),
-				opcoes,
-				opcoes[1]
+				opcoes
 		);
-
-		desligarVerde();
 
 		// 0 = clicou em "Remover livro"
 		if (escolha == 0) {
@@ -346,18 +341,16 @@ public class TelaMeusLivros extends JFrame {
 
 	private void removerLivro(Livro livro) {
 
-		ligarVerde();
-
-		int resposta = JOptionPane.showConfirmDialog(
-				this,
+		int resposta = mostrarJanela(
 				"Tem certeza que quer remover \"" + livro.getNome() + "\"?",
 				"Remover livro",
-				JOptionPane.YES_NO_OPTION
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				"Sim", "Não"
 		);
 
-		desligarVerde();
-
-		if (resposta != JOptionPane.YES_OPTION) {
+		// 0 = clicou em "Sim"
+		if (resposta != 0) {
 			return;
 		}
 
@@ -399,9 +392,122 @@ public class TelaMeusLivros extends JFrame {
 	}
 
 	private void mensagem(String texto) {
+		mostrarJanela(texto, "Mensagem", JOptionPane.INFORMATION_MESSAGE, null, "OK");
+	}
+
+	// =====================================================
+	// JANELA COM OS BOTÕES ARREDONDADOS (IGUAL AO PERFIL)
+	// Devolve o número do botão clicado (0, 1, ...) ou -1 se fechou no X
+	// =====================================================
+
+	private int mostrarJanela(Object texto, String titulo, int tipo, Icon icone, String... opcoes) {
+
 		ligarVerde();
-		JOptionPane.showMessageDialog(this, texto);
+
+		JOptionPane painel = new JOptionPane(texto, tipo, JOptionPane.DEFAULT_OPTION, icone);
+
+		JButton[] botoes = new JButton[opcoes.length];
+
+		for (int i = 0; i < opcoes.length; i++) {
+			botoes[i] = criarBotaoJanela(opcoes[i]);
+			JButton botao = botoes[i];
+			botao.addActionListener(e -> painel.setValue(botao));
+		}
+
+		painel.setOptions(botoes);
+		painel.setInitialValue(botoes[botoes.length - 1]);
+
+		JDialog janela = painel.createDialog(this, titulo);
+		janela.setVisible(true);
+		janela.dispose();
+
 		desligarVerde();
+
+		for (int i = 0; i < botoes.length; i++) {
+			if (painel.getValue() == botoes[i]) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	// Mesmo formato e cor do botão "Alterar foto" do Perfil
+	private JButton criarBotaoJanela(String texto) {
+
+		BotaoArredondado botao = new BotaoArredondado(texto, 40);
+		botao.setBackground(new Color(114, 219, 145));
+		botao.setForeground(Color.BLACK);
+		botao.setFont(new Font("Tahoma", Font.BOLD, 15));
+		botao.setMargin(new java.awt.Insets(6, 18, 6, 18));
+
+		return botao;
+	}
+
+	// Botão arredondado (copiado do Perfil)
+	private static class BotaoArredondado extends JButton {
+
+		private static final long serialVersionUID = 1L;
+		private final int radius;
+		private boolean hovering = false;
+
+		public BotaoArredondado(String text, int radius) {
+
+			super(text);
+
+			this.radius = radius;
+
+			setContentAreaFilled(false);
+			setFocusPainted(false);
+			setBorderPainted(false);
+			setOpaque(false);
+			setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+			addMouseListener(new java.awt.event.MouseAdapter() {
+
+				@Override
+				public void mouseEntered(java.awt.event.MouseEvent e) {
+					hovering = true;
+					repaint();
+				}
+
+				@Override
+				public void mouseExited(java.awt.event.MouseEvent e) {
+					hovering = false;
+					repaint();
+				}
+			});
+		}
+
+		private Color corAtual() {
+
+			Color base = getBackground();
+
+			if (getModel().isPressed()) {
+				return base.darker();
+			}
+
+			if (hovering) {
+				return new Color(
+						(int) (base.getRed() * 0.9),
+						(int) (base.getGreen() * 0.9),
+						(int) (base.getBlue() * 0.9));
+			}
+
+			return base;
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+
+			Graphics2D g2 = (Graphics2D) g.create();
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2.setColor(corAtual());
+			g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+			g2.dispose();
+
+			super.paintComponent(g);
+		}
 	}
 
 	// =====================================================
