@@ -84,14 +84,17 @@ public class LivroDAO {
 
         List<Livro> livros = new ArrayList<>();
 
-        String sql = "SELECT ISBN, titulo, editora, data_lancamento, generos "
+        String sql = "SELECT ISBN, titulo, editora, data_lancamento, generos, fotoCapa, CPF_dono "
                 + "FROM Livros ORDER BY titulo";
 
         try (PreparedStatement stmt = getConn().prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                livros.add(criarLivro(rs));
+                Livro livro = criarLivro(rs);
+                livro.setFotoCapa(rs.getBytes("fotoCapa"));
+                livro.setCpfDono(rs.getString("CPF_dono"));
+                livros.add(livro);
             }
         }
 

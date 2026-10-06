@@ -20,14 +20,26 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import javax.swing.BorderFactory;
+import javax.swing.JScrollPane;
+import javax.imageio.ImageIO;
+import java.awt.Cursor;
+import java.io.ByteArrayInputStream;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import model.Solicitacao;
 
 public class TelaSolicitacoes extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JButton btnHome;
-	private JButton btnExcluir;
-	private JButton btnAceitar;
+	private JPanel listaSolicitacoes;
+	private Consumer<Solicitacao> aoAceitar;
+	private Consumer<Solicitacao> aoRecusar;
+	private JLabel lblNewLabel;
 
     /**
      * Painel com cantos arredondados
@@ -114,7 +126,7 @@ public class TelaSolicitacoes extends JFrame {
             new MigLayout(
                 "",
                 "[200,grow][200,grow][200,grow][200,grow][200,grow]",
-                "[][113.00,grow][][grow][grow][grow][grow][grow][grow][grow][grow]"
+                "[][][grow][grow][grow][grow][grow][grow][grow][grow]"
             )
         );
 
@@ -140,10 +152,11 @@ public class TelaSolicitacoes extends JFrame {
 		btnHome.setFocusPainted(false);
 
 		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
+        
+        lblNewLabel = new JLabel("");
+        lblNewLabel.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/Logo.png")));
+        contentPane.add(lblNewLabel, "cell 1 0 3 1,alignx center,aligny top");
 
-		ImageIcon perfil = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
-
-		Image imgPerfil = perfil.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 
         // =====================================================
         // TÍTULO
@@ -161,17 +174,7 @@ public class TelaSolicitacoes extends JFrame {
 
         contentPane.add(
             lblSolicitacoes,
-            "cell 0 2 5 1,alignx center"
-        );
-
-        ImageIcon perfil1 = new ImageIcon(
-            TelaSolicitacoes.class.getResource("/imagens/perfil3.png")
-        );
-
-        Image imgPerfil1 = perfil1.getImage().getScaledInstance(
-            70,
-            70,
-            Image.SCALE_SMOOTH
+            "cell 0 1 5 1,alignx center"
         );
 
 
@@ -181,9 +184,9 @@ public class TelaSolicitacoes extends JFrame {
 
         RoundedPanel painelSolicitacoes = new RoundedPanel(
             new MigLayout(
-                "",
+                "insets 0",
                 "[grow]",
-                "[]15[]15[]"
+                "[grow]"
             ),
             40
         );
@@ -204,163 +207,163 @@ public class TelaSolicitacoes extends JFrame {
 
         contentPane.add(
             painelSolicitacoes,
-            "cell 0 3 5 8,grow"
+            "cell 0 2 5 8,grow"
         );
 
+        // Lista dos cartões (com barra de rolagem quando tiver muitos)
+        listaSolicitacoes = new JPanel(
+            new MigLayout("insets 0, wrap 1", "[grow]", "[]15[]")
+        );
+        listaSolicitacoes.setOpaque(false);
 
-        // =====================================================
-        // SOLICITAÇÃO
-        // =====================================================
+        JScrollPane scroll = new JScrollPane(listaSolicitacoes);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(null);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
 
-        RoundedPanel solicitacao = new RoundedPanel(
+        painelSolicitacoes.add(scroll, "cell 0 0,grow");
+
+        mostrarSolicitacoes(new ArrayList<Solicitacao>());
+    }
+
+
+    // =====================================================
+    // MOSTRA AS SOLICITAÇÕES NA TELA
+    // =====================================================
+
+    public void mostrarSolicitacoes(List<Solicitacao> solicitacoes) {
+
+        listaSolicitacoes.removeAll();
+
+        if (solicitacoes.isEmpty()) {
+
+            JLabel lblVazio = new JLabel("Nenhuma solicitação pendente.");
+            lblVazio.setForeground(Color.WHITE);
+            lblVazio.setFont(new Font("Tahoma", Font.BOLD, 22));
+            listaSolicitacoes.add(lblVazio, "alignx center,gaptop 40");
+
+        } else {
+
+            for (Solicitacao s : solicitacoes) {
+                listaSolicitacoes.add(criarCartao(s), "growx");
+            }
+        }
+
+        listaSolicitacoes.revalidate();
+        listaSolicitacoes.repaint();
+    }
+
+
+    // =====================================================
+    // CARTÃO DE UMA SOLICITAÇÃO
+    // =====================================================
+
+    private JPanel criarCartao(Solicitacao s) {
+
+        RoundedPanel cartao = new RoundedPanel(
             new MigLayout(
                 "insets 14 25 14 25",
-                "[]20[grow]20[40!]20[40!]",
+                "[]20[grow]20[]20[]",
                 "[center]"
             ),
             35
         );
-        solicitacao.setForeground(new Color(255, 255, 255));
+        cartao.setForeground(new Color(255, 255, 255));
 
-        solicitacao.setBackground(
-            new Color(174, 244, 198)
+        // Foto de quem pediu
+        JLabel lblFoto = new JLabel(new ImageIcon(pegarFoto(s.getFotoSolicitante(), 45)));
+        cartao.add(lblFoto, "cell 0 0,alignx center,aligny center");
+
+        // Nome + livro
+        JPanel informacoes = new JPanel(
+            new MigLayout("insets 0", "[grow]", "[]2[]")
         );
-
-        painelSolicitacoes.add(
-            solicitacao,
-            "cell 0 0,growx,aligny top"
-        );
-
-
-        // =====================================================
-        // FOTO DO USUÁRIO
-        // =====================================================
-
-        JLabel lblFoto = new JLabel();
-
-        ImageIcon foto = new ImageIcon(
-            TelaSolicitacoes.class.getResource("/imagens/perfil3.png")
-        );
-
-        Image imgFoto = foto.getImage().getScaledInstance(
-            45,
-            45,
-            Image.SCALE_SMOOTH
-        );
-
-        lblFoto.setIcon(
-            new ImageIcon(imgFoto)
-        );
-
-        solicitacao.add(
-            lblFoto,
-            "cell 0 0,alignx center,aligny center"
-        );
-
-
-        // =====================================================
-        // NOME + LIVRO
-        // =====================================================
-
-        JPanel informacoes = new JPanel();
-
         informacoes.setOpaque(false);
-
-        informacoes.setLayout(
-            new MigLayout(
-                "insets 0",
-                "[grow]",
-                "[]2[]"
-            )
-        );
-
-        solicitacao.add(
-            informacoes,
-            "flowx,cell 1 0,growx,aligny center"
-        );
-
+        cartao.add(informacoes, "cell 1 0,growx,aligny center");
 
         JLabel lblNome = new JLabel(
-            "Robson Machado quer Harry Potter"
+            s.getNomeSolicitante() + " quer " + s.getTituloLivro()
         );
+        lblNome.setFont(new Font("Tahoma", Font.BOLD, 21));
+        informacoes.add(lblNome, "cell 0 0");
 
-        lblNome.setFont(
-            new Font("Tahoma", Font.BOLD, 21)
+        JLabel lblDetalhes = new JLabel(
+            "Solicitação de empréstimo em "
+            + s.getDataPedido().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+            + "   •   " + s.getEmailSolicitante()
+            + "   •   " + s.getTelefoneSolicitante()
         );
+        lblDetalhes.setForeground(new Color(60, 60, 60));
+        lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        informacoes.add(lblDetalhes, "cell 0 1");
 
-        informacoes.add(
-            lblNome,
-            "cell 0 0"
-        );
+        // Botão recusar
+        JButton btnExcluir = criarBotaoIcone("/imagens/excluirdim.png", "Recusar");
+        btnExcluir.addActionListener(e -> {
+            if (aoRecusar != null) {
+                aoRecusar.accept(s);
+            }
+        });
+        cartao.add(btnExcluir, "cell 2 0,alignx center,aligny center");
 
+        // Botão aceitar
+        JButton btnAceitar = criarBotaoIcone("/imagens/verificadim.png", "Aceitar");
+        btnAceitar.addActionListener(e -> {
+            if (aoAceitar != null) {
+                aoAceitar.accept(s);
+            }
+        });
+        cartao.add(btnAceitar, "cell 3 0,alignx center,aligny center");
 
-        JLabel lblLivro = new JLabel(
-            "Solicitação de empréstimo"
-        );
+        return cartao;
+    }
 
-        lblLivro.setForeground(
-            new Color(60, 60, 60)
-        );
+    private JButton criarBotaoIcone(String imagem, String dica) {
 
-        lblLivro.setFont(
-            new Font("Tahoma", Font.PLAIN, 15)
-        );
+        JButton botao = new JButton("");
+        botao.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource(imagem)));
+        botao.setToolTipText(dica);
+        botao.setBorderPainted(false);
+        botao.setContentAreaFilled(false);
+        botao.setFocusPainted(false);
+        botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        informacoes.add(
-            lblLivro,
-            "cell 0 1"
-        );
-        
-               
-                
-                btnExcluir = new JButton("");
-                btnExcluir.setBorderPainted(false);
-                btnExcluir.setContentAreaFilled(false);
-                btnExcluir.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/excluirdim.png")));
-                solicitacao.add(btnExcluir, "cell 1 0");
-                
-                
-                        // =====================================================
-                        // BOTÃO ACEITAR
-                        // =====================================================
-                
-                        btnAceitar = new JButton("");
-                        btnAceitar.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/verificadim.png")));
-                        
-                                btnAceitar.setFont(
-                                    new Font("Tahoma", Font.BOLD, 32)
-                                );
-                                
-                                        btnAceitar.setForeground(
-                                            new Color(20, 60, 25)
-                                        );
-                                        
-                                                btnAceitar.setBackground(
-                                                    new Color(174, 244, 198)
-                                                );
-                                                
-                                                        btnAceitar.setBorderPainted(false);
-                                                        btnAceitar.setContentAreaFilled(false);
-                                                        btnAceitar.setFocusPainted(false);
-                                                        
-                                                                solicitacao.add(
-                                                                    btnAceitar,
-                                                                    "cell 2 0,alignx center,aligny center"
-                                                                );
+        return botao;
+    }
+
+    // Foto do usuário (ou a imagem padrão se ele não tiver)
+    private Image pegarFoto(byte[] bytes, int tamanho) {
+
+        Image imagem = null;
+
+        if (bytes != null && bytes.length > 0) {
+            try {
+                imagem = ImageIO.read(new ByteArrayInputStream(bytes));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (imagem == null) {
+            imagem = new ImageIcon(TelaSolicitacoes.class.getResource("/imagens/perfil3.png")).getImage();
+        }
+
+        return imagem.getScaledInstance(tamanho, tamanho, Image.SCALE_SMOOTH);
     }
 
     public JButton getBtnHome() {
         return btnHome;
     }
 
-  
-
-    public JButton getBtnExcluir() {
-        return btnExcluir;
+    // O controller diz o que fazer quando clicar em aceitar/recusar
+    public void setAoAceitar(Consumer<Solicitacao> aoAceitar) {
+        this.aoAceitar = aoAceitar;
     }
 
-    public JButton getBtnAceitar() {
-        return btnAceitar;
+    public void setAoRecusar(Consumer<Solicitacao> aoRecusar) {
+        this.aoRecusar = aoRecusar;
     }
 
 }

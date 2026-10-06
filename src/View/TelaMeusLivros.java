@@ -135,8 +135,8 @@ public class TelaMeusLivros extends JFrame {
 		// MIGLAYOUT PRINCIPAL
 		// =====================================================
 
-		contentPane.setLayout(new MigLayout("", "[200,grow][344.00,grow][561.00,grow][200,grow][200,grow]",
-				"[113.00,grow][][grow][grow][grow][grow][grow][grow][grow][grow]"));
+		contentPane.setLayout(new MigLayout("", "[200,grow][200,grow][200,grow][200,grow][200,grow]",
+				"[][][grow][grow][grow][grow][grow][grow][grow][grow]"));
 
 		// =====================================================
 		// BOTÃO HOME
@@ -227,7 +227,7 @@ public class TelaMeusLivros extends JFrame {
 
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/Logo.png")));
-		contentPane.add(lblNewLabel, "cell 1 0 3 1,alignx center");
+		contentPane.add(lblNewLabel, "cell 1 0 3 1,alignx center,aligny top");
 	}
 
 	public JButton getBtnNewButton() {
@@ -445,7 +445,7 @@ public class TelaMeusLivros extends JFrame {
 	}
 
 	// Botão arredondado (copiado do Perfil)
-	private static class BotaoArredondado extends JButton {
+	static class BotaoArredondado extends JButton {
 
 		private static final long serialVersionUID = 1L;
 		private final int radius;
@@ -514,7 +514,7 @@ public class TelaMeusLivros extends JFrame {
 	// PEGA A FOTO DO LIVRO (OU A IMAGEM PADRÃO)
 	// =====================================================
 
-	private Image pegarImagem(Livro livro, int largura, int altura) {
+	static Image pegarImagem(Livro livro, int largura, int altura) {
 
 		Image imagem = null;
 

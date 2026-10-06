@@ -77,6 +77,10 @@ public class LivroTableModel extends AbstractTableModel{
 		fireTableDataChanged();
 	}
 
+	public Livro getLivro(int linha) {
+		return lista.get(linha);
+	}
+
 	public void adicionarLivro(Livro l) {
 		lista.add(l);
 		fireTableDataChanged();

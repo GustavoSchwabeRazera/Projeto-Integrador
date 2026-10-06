@@ -20,17 +20,20 @@ import View.TelaNotificacoes;
 import View.TelaSolicitacoes;
 import View.tela_inicial;
 
+import dao.EmprestimoDAO;
 import dao.LivroDAO;
 import dao.UsuarioDAO;
 
 import model.Livro;
 import model.LivroTableModel;
+import model.Solicitacao;
 
 public class LivroController {
 
     private final LivroTableModel livroModel;
     private final UsuarioDAO usuarioDAO;
     private final LivroDAO livroDAO;
+    private final EmprestimoDAO emprestimoDAO = new EmprestimoDAO();
 
     private final TelaLogin telaLogin;
     private final tela_inicial telaInicial;
@@ -161,11 +164,9 @@ public class LivroController {
         telaSolicitacoes.getBtnHome()
                 .addActionListener(e -> abrirHome());
 
-        telaSolicitacoes.getBtnAceitar()
-                .addActionListener(e -> aceitarSolicitacao());
+        telaSolicitacoes.setAoAceitar(this::aceitarSolicitacao);
 
-        telaSolicitacoes.getBtnExcluir()
-                .addActionListener(e -> excluirSolicitacao());
+        telaSolicitacoes.setAoRecusar(this::recusarSolicitacao);
 
 
         // --- CADASTRO DE LIVROS ---
@@ -313,6 +314,8 @@ public class LivroController {
 
     private void abrirPesquisa() {
 
+        pesquisarLivro.setCpfUsuario(cpfUsuarioLogado);
+
         esconderTodas();
 
         pesquisarLivro.setVisible(true);
@@ -341,6 +344,8 @@ public class LivroController {
 
 
     private void abrirSolicitacoes() {
+
+        carregarSolicitacoes();
 
         esconderTodas();
 
@@ -767,19 +772,90 @@ public class LivroController {
     // SOLICITAÇÕES
     // =========================================================
 
-    private void aceitarSolicitacao() {
+    private void carregarSolicitacoes() {
 
-        mostrarMensagem(
-                "Solicitação aceita."
-        );
+        try {
+
+            telaSolicitacoes.mostrarSolicitacoes(
+                    emprestimoDAO.listarPendentesDoDono(cpfUsuarioLogado)
+            );
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem(
+                    "Erro ao carregar solicitações:\n" + e.getMessage()
+            );
+        }
     }
 
 
-    private void excluirSolicitacao() {
+    private void aceitarSolicitacao(Solicitacao solicitacao) {
 
-        mostrarMensagem(
-                "Solicitação excluída."
-        );
+        try {
+
+            if (!emprestimoDAO.livroDisponivel(solicitacao.getIsbn())) {
+
+                mostrarMensagem(
+                        "\"" + solicitacao.getTituloLivro()
+                        + "\" já está emprestado."
+                );
+                return;
+            }
+
+            if (!confirmar("Emprestar \"" + solicitacao.getTituloLivro()
+                    + "\" para " + solicitacao.getNomeSolicitante() + "?")) {
+                return;
+            }
+
+            emprestimoDAO.aceitar(solicitacao);
+
+            mostrarMensagem(
+                    "Solicitação aceita!\n"
+                    + "Combine a entrega com " + solicitacao.getNomeSolicitante()
+                    + ":\n" + solicitacao.getEmailSolicitante()
+                    + "  |  " + solicitacao.getTelefoneSolicitante()
+            );
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem(
+                    "Erro ao aceitar solicitação:\n" + e.getMessage()
+            );
+        }
+
+        carregarSolicitacoes();
+    }
+
+
+    private void recusarSolicitacao(Solicitacao solicitacao) {
+
+        if (!confirmar("Recusar o pedido de " + solicitacao.getNomeSolicitante()
+                + " para \"" + solicitacao.getTituloLivro() + "\"?")) {
+            return;
+        }
+
+        try {
+
+            emprestimoDAO.recusar(solicitacao);
+
+            mostrarMensagem(
+                    "Solicitação recusada."
+            );
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem(
+                    "Erro ao recusar solicitação:\n" + e.getMessage()
+            );
+        }
+
+        carregarSolicitacoes();
     }
 
 
@@ -997,6 +1073,46 @@ public class LivroController {
                 "Panel.background",
                 null
         );
+    }
+
+
+    // Pergunta Sim/Não com a janela verde
+    private boolean confirmar(String pergunta) {
+
+        UIManager.put(
+                "OptionPane.background",
+                new Color(175, 244, 198)
+        );
+
+        UIManager.put(
+                "Panel.background",
+                new Color(175, 244, 198)
+        );
+
+        Object[] opcoes = { "Sim", "Não" };
+
+        int resposta = JOptionPane.showOptionDialog(
+                null,
+                pergunta,
+                "Confirmar",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opcoes,
+                opcoes[1]
+        );
+
+        UIManager.put(
+                "OptionPane.background",
+                null
+        );
+
+        UIManager.put(
+                "Panel.background",
+                null
+        );
+
+        return resposta == 0;
     }
 
 

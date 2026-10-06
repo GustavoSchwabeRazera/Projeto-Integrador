@@ -144,6 +144,31 @@ public class UsuarioDAO {
         return null;
     }
     
+    // Dados públicos do usuário (sem senha), usados para mostrar quem cadastrou um livro
+    public String[] buscarContatoPorCpf(String cpf) throws SQLException {
+
+        String sql = "SELECT nome, email, telefone FROM Usuarios WHERE CPF = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, cpf);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+                    return new String[] {
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("telefone")
+                    };
+                }
+            }
+        }
+
+        return null;
+    }
+
     public String[] buscarDadosParaAlteracao(String cpf) throws SQLException {
 
         String sql = "SELECT CPF, nome, email, telefone, data_nascimento, senha "
