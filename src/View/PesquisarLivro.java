@@ -57,18 +57,7 @@ public class PesquisarLivro extends JFrame {
     private LivroTableModel livroTableModel;
     private String cpfUsuario; // usuário logado
  
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    PesquisarLivro frame = new PesquisarLivro();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+    
  
     public PesquisarLivro() {
  

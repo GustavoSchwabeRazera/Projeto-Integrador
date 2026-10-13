@@ -528,12 +528,46 @@ public class TelaMeusLivros extends JFrame {
 			}
 		}
 
-		// Sem foto (ou foto estragada): usa a imagem padrão
+		// Sem foto (ou foto estragada): mostra uma capa com "?"
 		if (imagem == null) {
-			imagem = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/livroDemo.png")).getImage();
+			return capaSemFoto(largura, altura);
 		}
 
 		return imagem.getScaledInstance(largura, altura, Image.SCALE_SMOOTH);
+	}
+
+	// =====================================================
+	// CAPA PADRÃO COM PONTO DE INTERROGAÇÃO
+	// =====================================================
+
+	private static Image capaSemFoto(int largura, int altura) {
+
+		BufferedImage capa = new BufferedImage(largura, altura, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2 = capa.createGraphics();
+
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+		// Fundo claro
+		g2.setColor(new Color(235, 235, 235));
+		g2.fillRect(0, 0, largura, altura);
+
+		// Borda verde
+		g2.setColor(new Color(10, 86, 27));
+		g2.drawRect(0, 0, largura - 1, altura - 1);
+
+		// "?" grande no meio
+		g2.setFont(new Font("Tahoma", Font.BOLD, altura / 2));
+
+		int larguraTexto = g2.getFontMetrics().stringWidth("?");
+		int x = (largura - larguraTexto) / 2;
+		int y = (altura - g2.getFontMetrics().getHeight()) / 2 + g2.getFontMetrics().getAscent();
+
+		g2.drawString("?", x, y);
+
+		g2.dispose();
+
+		return capa;
 	}
 
 	public JButton getBtnHome() {

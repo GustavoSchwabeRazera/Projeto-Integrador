@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -37,6 +38,8 @@ public class Lista_Autores extends JFrame {
     private JButton botaoSelecionar;
 
     private JButton botaoNovoAutor;
+
+    private JButton btnVoltar;
 
     private Cadastro_Livro cadastroLivro;
 
@@ -126,12 +129,36 @@ public class Lista_Autores extends JFrame {
         );
 
         contentPane.setLayout(
-                new MigLayout(
-                        "",
-                        "[grow][700!][grow]",
-                        "[grow][80!][grow][60!][grow]"
-                )
+                new MigLayout("", "[grow][700!][grow]", "[grow][80!][grow][60!][][grow]")
         );
+
+
+        // =====================================================
+        // BOTÃO VOLTAR
+        // =====================================================
+
+        btnVoltar = new JButton("");
+
+        btnVoltar.setIcon(
+                new ImageIcon(Lista_Autores.class.getResource("/imagens/Voltar.png"))
+        );
+
+        btnVoltar.setFont(new Font("Tahoma", Font.PLAIN, 28));
+
+        btnVoltar.setForeground(new Color(10, 86, 27));
+
+        btnVoltar.setBorderPainted(false);
+
+        btnVoltar.setContentAreaFilled(false);
+
+        btnVoltar.setFocusPainted(false);
+
+        // Fecha a lista e volta para o cadastro de livro
+        btnVoltar.addActionListener(
+                e -> dispose()
+        );
+
+        contentPane.add(btnVoltar, "cell 0 0,alignx left,aligny top");
 
 
         // =====================================================
@@ -226,34 +253,34 @@ public class Lista_Autores extends JFrame {
                 new RoundedButton(
                         "Cadastrar novo autor"
                 );
-
-        botaoNovoAutor.addActionListener(
-                e -> abrirCadastroAutor()
-        );
-
-        contentPane.add(
-                botaoNovoAutor,
-                "cell 1 3,growx"
-        );
-
-
-        // =====================================================
-        // BOTÃO SELECIONAR
-        // =====================================================
-
-        botaoSelecionar =
-                new RoundedButton(
-                        "Selecionar autor(es)"
+        
+                botaoNovoAutor.addActionListener(
+                        e -> abrirCadastroAutor()
                 );
-
-        botaoSelecionar.addActionListener(
-                e -> selecionarAutores()
-        );
-
-        contentPane.add(
-                botaoSelecionar,
-                "cell 1 4,growx"
-        );
+                
+                        contentPane.add(
+                                botaoNovoAutor,
+                                "cell 1 3,growx"
+                        );
+        
+        
+                // =====================================================
+                // BOTÃO SELECIONAR
+                // =====================================================
+        
+                botaoSelecionar =
+                        new RoundedButton(
+                                "Selecionar autor(es)"
+                        );
+                
+                        botaoSelecionar.addActionListener(
+                                e -> selecionarAutores()
+                        );
+                        
+                                contentPane.add(
+                                        botaoSelecionar,
+                                        "cell 1 4,growx"
+                                );
 
 
         // =====================================================
@@ -406,6 +433,12 @@ public class Lista_Autores extends JFrame {
     public JButton getBotaoNovoAutor() {
 
         return botaoNovoAutor;
+    }
+
+
+    public JButton getBtnVoltar() {
+
+        return btnVoltar;
     }
 
 

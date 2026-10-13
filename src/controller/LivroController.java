@@ -2,7 +2,6 @@ package controller;
 
 import java.awt.Color;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -24,9 +23,7 @@ import dao.EmprestimoDAO;
 import dao.LivroDAO;
 import dao.UsuarioDAO;
 
-import model.Livro;
 import model.LivroTableModel;
-import model.Solicitacao;
 
 public class LivroController {
 
@@ -47,6 +44,11 @@ public class LivroController {
     private final Calendario calendario;
     private final TelaAlterar alterarCadastro;
     private final Historico historico;
+
+    private final PesquisarController pesquisarController;
+    private final LoginController loginController;
+    private final SolicitacaoController solicitacaoController;
+    private final PerfilController perfilController;
 
     private String emailUsuarioLogado;
     private String cpfUsuarioLogado;
@@ -81,6 +83,18 @@ public class LivroController {
         this.usuarioDAO = new UsuarioDAO();
         this.historico = new Historico();
 
+        this.pesquisarController =
+                new PesquisarController(livroDAO, pesquisarLivro);
+
+        this.loginController =
+                new LoginController(usuarioDAO, telaLogin, criarConta);
+
+        this.solicitacaoController =
+                new SolicitacaoController(emprestimoDAO, telaSolicitacoes);
+
+        this.perfilController =
+                new PerfilController(usuarioDAO, perfil, alterarCadastro, telaInicial);
+
         configurarEventos();
     }
 
@@ -114,7 +128,13 @@ public class LivroController {
         // --- CRIAR CONTA ---
 
         criarConta.getBotaoCadastrar()
-                .addActionListener(e -> cadastrarUsuario());
+                .addActionListener(e -> {
+
+                    // Se cadastrou, volta para o login
+                    if (loginController.cadastrarUsuario()) {
+                        iniciar();
+                    }
+                });
 
         criarConta.getBotaoEntrar()
                 .addActionListener(e -> iniciar());
@@ -146,9 +166,6 @@ public class LivroController {
         pesquisarLivro.getBtnHome()
                 .addActionListener(e -> abrirHome());
 
-        pesquisarLivro.getBtnPesquisar()
-                .addActionListener(e -> pesquisar());
-
 
         // --- MEUS LIVROS ---
 
@@ -163,10 +180,6 @@ public class LivroController {
 
         telaSolicitacoes.getBtnHome()
                 .addActionListener(e -> abrirHome());
-
-        telaSolicitacoes.setAoAceitar(this::aceitarSolicitacao);
-
-        telaSolicitacoes.setAoRecusar(this::recusarSolicitacao);
 
 
         // --- CADASTRO DE LIVROS ---
@@ -209,37 +222,8 @@ public class LivroController {
 
 
         perfil.getBtnAlterarFoto()
-                .addActionListener(e -> {
-
-                    try {
-
-                        perfil.selecionarEAtualizarFoto();
-
-                        byte[] foto = perfil.getFotoSelecionada();
-
-                        if (foto != null && foto.length > 0) {
-
-                            usuarioDAO.atualizarFoto(
-                                    cpfUsuarioLogado,
-                                    foto
-                            );
-
-                            telaInicial.atualizarFotoPerfil(foto);
-
-                            mostrarMensagem(
-                                    "Foto atualizada com sucesso!"
-                            );
-                        }
-
-                    } catch (SQLException ex) {
-
-                        ex.printStackTrace();
-
-                        mostrarMensagem(
-                                "Erro ao salvar a foto."
-                        );
-                    }
-                });
+                .addActionListener(e ->
+                        perfilController.alterarFoto(cpfUsuarioLogado));
 
 
         // --- ALTERAR CADASTRO ---
@@ -317,7 +301,7 @@ public class LivroController {
         pesquisarLivro.setCpfUsuario(cpfUsuarioLogado);
 
         esconderTodas();
-
+        pesquisarController.pesquisar();
         pesquisarLivro.setVisible(true);
     }
 
@@ -345,7 +329,7 @@ public class LivroController {
 
     private void abrirSolicitacoes() {
 
-        carregarSolicitacoes();
+        solicitacaoController.carregarSolicitacoes(cpfUsuarioLogado);
 
         esconderTodas();
 
@@ -369,42 +353,10 @@ public class LivroController {
 
     private void abrirPerfil() {
 
-        try {
-
-            perfil.setCpfUsuario(cpfUsuarioLogado);
-
-            String[] dados =
-                    usuarioDAO.buscarUsuarioPorEmail(
-                            emailUsuarioLogado
-                    );
-
-            if (dados != null) {
-
-                perfil.atualizarDados(
-                        dados[0],
-                        dados[1],
-                        dados[2],
-                        dados[3]
-                );
-            }
-
-
-            byte[] foto =
-                    usuarioDAO.buscarFoto(cpfUsuarioLogado);
-
-            if (foto != null && foto.length > 0) {
-
-                perfil.carregarFoto(foto);
-            }
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            mostrarMensagem(
-                    "Erro ao carregar os dados do perfil."
-            );
-        }
+        perfilController.carregarPerfil(
+                emailUsuarioLogado,
+                cpfUsuarioLogado
+        );
 
         esconderTodas();
 
@@ -440,60 +392,7 @@ public class LivroController {
 
     private void abrirAlterarCadastro() {
 
-        try {
-
-            String[] dados =
-                    usuarioDAO.buscarDadosParaAlteracao(
-                            cpfUsuarioLogado
-                    );
-
-            if (dados != null) {
-
-                // CPF
-                alterarCadastro.getTxtCpf()
-                        .setText(dados[0]);
-
-                // Nome
-                alterarCadastro.getTxtNome()
-                        .setText(dados[1]);
-
-                // E-mail
-                alterarCadastro.getTxtEmail()
-                        .setText(dados[2]);
-
-                // Telefone
-                alterarCadastro.getTxtTelefone()
-                        .setText(dados[3]);
-
-                // Data de nascimento
-                alterarCadastro.getTxtDataNascimento()
-                        .setText(dados[4]);
-
-                // Senha
-                alterarCadastro.getTxtSenha()
-                        .setText(dados[5]);
-
-                // Confirmar senha
-                alterarCadastro.getTxtConfirmarSenha()
-                        .setText(dados[5]);
-
-            } else {
-
-                mostrarMensagem(
-                        "Não foi possível encontrar os dados do usuário."
-                );
-
-                return;
-            }
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            mostrarMensagem(
-                    "Erro ao carregar os dados do cadastro."
-            );
-
+        if (!perfilController.carregarDadosAlteracao(cpfUsuarioLogado)) {
             return;
         }
 
@@ -529,333 +428,20 @@ public class LivroController {
 
 
     // =========================================================
-    // CADASTRAR USUÁRIO
-    // =========================================================
-
-    private void cadastrarUsuario() {
-
-        String nome =
-                criarConta.getTxtNome()
-                        .getText()
-                        .trim();
-
-        String email =
-                criarConta.getTxtEmail()
-                        .getText()
-                        .trim();
-
-        String telefone =
-                criarConta.getTxtTelefone()
-                        .getText()
-                        .trim();
-
-        String cpf =
-                criarConta.getTxtCpf()
-                        .getText()
-                        .trim();
-
-        String dataNascimento =
-                criarConta.getTxtDataNascimento()
-                        .getText()
-                        .trim();
-
-        String senha =
-                new String(
-                        criarConta.getTxtSenha()
-                                .getPassword()
-                );
-
-        String confirmarSenha =
-                new String(
-                        criarConta.getTxtConfirmarSenha()
-                                .getPassword()
-                );
-
-
-        if (nome.isEmpty()
-                || email.isEmpty()
-                || telefone.isEmpty()
-                || cpf.isEmpty()
-                || dataNascimento.contains("_")
-                || senha.isEmpty()
-                || confirmarSenha.isEmpty()) {
-
-            mostrarMensagem(
-                    "Preencha todos os campos."
-            );
-
-            return;
-        }
-
-
-        if (senha.length() > 20) {
-
-            mostrarMensagem(
-                    "A senha deve ter no máximo 20 caracteres."
-            );
-
-            return;
-        }
-
-
-        if (!senha.equals(confirmarSenha)) {
-
-            mostrarMensagem(
-                    "As senhas não são iguais."
-            );
-
-            return;
-        }
-
-
-        cpf = cpf.replaceAll("\\D", "");
-
-
-        if (cpf.length() != 11) {
-
-            mostrarMensagem(
-                    "CPF deve possuir 11 números."
-            );
-
-            return;
-        }
-
-
-        try {
-
-            usuarioDAO.cadastrar(
-                    cpf,
-                    nome,
-                    telefone,
-                    email,
-                    senha,
-                    dataNascimento
-            );
-
-            mostrarMensagem(
-                    "Cadastro realizado com sucesso!"
-            );
-
-            iniciar();
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            if (e.getMessage() != null
-                    && e.getMessage().contains("Duplicate")) {
-
-                mostrarMensagem(
-                        "Este CPF já está cadastrado."
-                );
-
-            } else {
-
-                mostrarMensagem(
-                        "Erro ao cadastrar usuário."
-                );
-            }
-        }
-    }
-
-
-    // =========================================================
     // LOGIN
     // =========================================================
 
     private void validarLogin() {
 
-        String email =
-                telaLogin.getTxtNome()
-                        .getText()
-                        .trim();
+        if (loginController.validarLogin()) {
 
-        String senha =
-                new String(
-                        telaLogin.getTxtSenha()
-                                .getPassword()
-                );
+            emailUsuarioLogado = loginController.getEmailLogado();
+            cpfUsuarioLogado = loginController.getCpfLogado();
 
+            telaLogin.setVisible(false);
 
-        if (email.isEmpty() || senha.isEmpty()) {
-
-            mostrarMensagem(
-                    "Preencha o e-mail e a senha."
-            );
-
-            return;
+            abrirHome();
         }
-
-
-        try {
-
-            boolean loginValido =
-                    usuarioDAO.login(
-                            email,
-                            senha
-                    );
-
-
-            if (loginValido) {
-
-                emailUsuarioLogado = email;
-
-                cpfUsuarioLogado =
-                        usuarioDAO.buscarCpfPorEmail(email);
-
-                telaLogin.setVisible(false);
-
-                abrirHome();
-
-            } else {
-
-                mostrarMensagem(
-                        "E-mail ou senha incorretos."
-                );
-            }
-
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            mostrarMensagem(
-                    "Erro ao acessar o banco de dados."
-            );
-        }
-    }
-
-
-    // =========================================================
-    // PESQUISAR LIVRO
-    // =========================================================
-
-    private void pesquisar() {
-
-        String texto =
-                pesquisarLivro.getTextoPesquisa().toLowerCase();
-
-        try {
-
-            // Busca todos os livros do banco
-            List<Livro> listaLivros =
-                    livroDAO.listar();
-
-            // Se digitou algo, filtra pelo título
-            if (!texto.isEmpty()) {
-                listaLivros.removeIf(livro ->
-                        livro.getNome() == null
-                        || !livro.getNome().toLowerCase().contains(texto));
-            }
-
-            pesquisarLivro.mostrarLivros(listaLivros);
-
-            if (listaLivros.isEmpty()) {
-
-                mostrarMensagem(
-                        "Nenhum livro encontrado."
-                );
-            }
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            mostrarMensagem(
-                    "Erro ao pesquisar livros:\n" + e.getMessage()
-            );
-        }
-    }
-
-
-    // =========================================================
-    // SOLICITAÇÕES
-    // =========================================================
-
-    private void carregarSolicitacoes() {
-
-        try {
-
-            telaSolicitacoes.mostrarSolicitacoes(
-                    emprestimoDAO.listarPendentesDoDono(cpfUsuarioLogado)
-            );
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            mostrarMensagem(
-                    "Erro ao carregar solicitações:\n" + e.getMessage()
-            );
-        }
-    }
-
-
-    private void aceitarSolicitacao(Solicitacao solicitacao) {
-
-        try {
-
-            if (!emprestimoDAO.livroDisponivel(solicitacao.getIsbn())) {
-
-                mostrarMensagem(
-                        "\"" + solicitacao.getTituloLivro()
-                        + "\" já está emprestado."
-                );
-                return;
-            }
-
-            if (!confirmar("Emprestar \"" + solicitacao.getTituloLivro()
-                    + "\" para " + solicitacao.getNomeSolicitante() + "?")) {
-                return;
-            }
-
-            emprestimoDAO.aceitar(solicitacao);
-
-            mostrarMensagem(
-                    "Solicitação aceita!\n"
-                    + "Combine a entrega com " + solicitacao.getNomeSolicitante()
-                    + ":\n" + solicitacao.getEmailSolicitante()
-                    + "  |  " + solicitacao.getTelefoneSolicitante()
-            );
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            mostrarMensagem(
-                    "Erro ao aceitar solicitação:\n" + e.getMessage()
-            );
-        }
-
-        carregarSolicitacoes();
-    }
-
-
-    private void recusarSolicitacao(Solicitacao solicitacao) {
-
-        if (!confirmar("Recusar o pedido de " + solicitacao.getNomeSolicitante()
-                + " para \"" + solicitacao.getTituloLivro() + "\"?")) {
-            return;
-        }
-
-        try {
-
-            emprestimoDAO.recusar(solicitacao);
-
-            mostrarMensagem(
-                    "Solicitação recusada."
-            );
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            mostrarMensagem(
-                    "Erro ao recusar solicitação:\n" + e.getMessage()
-            );
-        }
-
-        carregarSolicitacoes();
     }
 
 
@@ -865,179 +451,30 @@ public class LivroController {
 
     private void atualizarCadastro() {
 
-        String cpfAtual =
-                cpfUsuarioLogado;
-
-
-        String cpfNovo =
-                alterarCadastro.getTxtCpf()
-                        .getText()
-                        .trim();
-
-        String nome =
-                alterarCadastro.getTxtNome()
-                        .getText()
-                        .trim();
-
-        String telefone =
-                alterarCadastro.getTxtTelefone()
-                        .getText()
-                        .trim();
-
-        String email =
-                alterarCadastro.getTxtEmail()
-                        .getText()
-                        .trim();
-
-        String dataNascimento =
-                alterarCadastro.getTxtDataNascimento()
-                        .getText()
-                        .trim();
-
-        String senha =
-                new String(
-                        alterarCadastro.getTxtSenha()
-                                .getPassword()
-                );
-
-        String confirmarSenha =
-                new String(
-                        alterarCadastro.getTxtConfirmarSenha()
-                                .getPassword()
-                );
-
-
-        // ==============================
-        // VALIDA CAMPOS
-        // ==============================
-
-        if (cpfNovo.isEmpty()
-                || nome.isEmpty()
-                || telefone.isEmpty()
-                || email.isEmpty()
-                || dataNascimento.isEmpty()
-                || senha.isEmpty()
-                || confirmarSenha.isEmpty()) {
-
-            mostrarMensagem(
-                    "Preencha todos os campos."
-            );
-
+        if (!perfilController.atualizarCadastro(cpfUsuarioLogado)) {
             return;
         }
 
-
         // ==============================
-        // VALIDA SENHA
+        // ATUALIZA SESSÃO
         // ==============================
 
-        if (senha.length() > 20) {
-
-            mostrarMensagem(
-                    "A senha deve ter no máximo 20 caracteres."
-            );
-
-            return;
-        }
-
-
-        if (!senha.equals(confirmarSenha)) {
-
-            mostrarMensagem(
-                    "As senhas não são iguais."
-            );
-
-            return;
-        }
+        cpfUsuarioLogado = perfilController.getCpfAtualizado();
+        emailUsuarioLogado = perfilController.getEmailAtualizado();
 
 
         // ==============================
-        // VALIDA CPF
+        // VOLTA PARA O PERFIL
         // ==============================
 
-        String cpfLimpo =
-                cpfNovo.replaceAll("\\D", "");
+        esconderTodas();
+
+        perfil.setVisible(true);
 
 
-        if (cpfLimpo.length() != 11) {
-
-            mostrarMensagem(
-                    "CPF deve possuir 11 números."
-            );
-
-            return;
-        }
-
-
-        try {
-
-            // ==============================
-            // ATUALIZA NO BANCO
-            // ==============================
-
-            usuarioDAO.atualizarCadastro(
-                    cpfAtual,
-                    cpfLimpo,
-                    nome,
-                    telefone,
-                    email,
-                    senha,
-                    dataNascimento
-            );
-
-
-            // ==============================
-            // ATUALIZA SESSÃO
-            // ==============================
-
-            cpfUsuarioLogado = cpfLimpo;
-            emailUsuarioLogado = email;
-
-
-            // ==============================
-            // BUSCA DADOS ATUALIZADOS
-            // ==============================
-
-            String[] dadosAtualizados =
-                    usuarioDAO.buscarUsuarioPorEmail(
-                            emailUsuarioLogado
-                    );
-
-
-            if (dadosAtualizados != null) {
-
-                perfil.atualizarDados(
-                        dadosAtualizados[0],
-                        dadosAtualizados[1],
-                        dadosAtualizados[2],
-                        dadosAtualizados[3]
-                );
-            }
-
-
-            // ==============================
-            // VOLTA PARA O PERFIL
-            // ==============================
-
-            esconderTodas();
-
-            perfil.setVisible(true);
-
-
-            mostrarMensagem(
-                    "Cadastro atualizado com sucesso!"
-            );
-
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            mostrarMensagem(
-                    "Erro ao atualizar cadastro:\n"
-                            + e.getMessage()
-            );
-        }
+        mostrarMensagem(
+                "Cadastro atualizado com sucesso!"
+        );
     }
 
 
@@ -1073,46 +510,6 @@ public class LivroController {
                 "Panel.background",
                 null
         );
-    }
-
-
-    // Pergunta Sim/Não com a janela verde
-    private boolean confirmar(String pergunta) {
-
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-        Object[] opcoes = { "Sim", "Não" };
-
-        int resposta = JOptionPane.showOptionDialog(
-                null,
-                pergunta,
-                "Confirmar",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                opcoes,
-                opcoes[1]
-        );
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
-
-        return resposta == 0;
     }
 
 

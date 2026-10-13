@@ -76,6 +76,8 @@ public class Historico extends JFrame {
 		contentPane.setLayout(new MigLayout("", "[307.00,grow][300.00,grow][grow][338.00,grow][322.00,grow]", "[grow][grow][grow][grow][grow]"));
 		
 		 btnHome = new JButton("");
+		 btnHome.setFocusable(false);
+		 btnHome.setFocusTraversalKeysEnabled(false);
 		btnHome.setDefaultCapable(false);
 		btnHome.setBorderPainted(false);
 		btnHome.setContentAreaFilled(false);
