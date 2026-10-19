@@ -43,6 +43,7 @@ public class Perfil extends JFrame {
 	private byte[] fotoSelecionada;
 	private String cpfUsuario;
 	private JButton btnSair;
+	private JButton btnExcluirConta;
 
 	/**
 	 * Launch the application.
@@ -452,7 +453,7 @@ public class Perfil extends JFrame {
 				new MigLayout(
 						"",
 						"[30px][350px,grow][650px,grow][30px]",
-						"[30px][50px][40px][380px][40px][60px][30px,grow]"
+						"[30px][50px][40px][380px][40px][60px][60px][30px,grow]"
 				)
 		);
 
@@ -798,6 +799,17 @@ public class Perfil extends JFrame {
 		);
 
 		// =========================================================
+		// BOTÃO EXCLUIR CONTA
+		// =========================================================
+
+		btnExcluirConta = new RoundedButton("Excluir conta", 40);
+		btnExcluirConta.setBackground(new Color(200, 60, 60));
+		btnExcluirConta.setForeground(Color.WHITE);
+		btnExcluirConta.setFont(new Font("Tahoma", Font.BOLD, 20));
+		btnExcluirConta.setMargin(new java.awt.Insets(10, 30, 10, 30));
+		contentPane.add(btnExcluirConta, "cell 2 6, alignx center, aligny center");
+
+		// =========================================================
 		// PAINEL LATERAL - CALENDÁRIO E SINO
 		// =========================================================
 
@@ -925,5 +937,9 @@ public class Perfil extends JFrame {
 
 	public void setBtnSair(JButton btnSair) {
 		this.btnSair = btnSair;
+	}
+
+	public JButton getBtnExcluirConta() {
+		return btnExcluirConta;
 	}
 }

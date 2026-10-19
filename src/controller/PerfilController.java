@@ -345,6 +345,78 @@ public class PerfilController {
 
 
     // =========================================================
+    // EXCLUIR CONTA
+    // =========================================================
+
+    // Pede confirmação e exclui a conta. Retorna true se excluiu.
+    public boolean excluirConta(String cpf) {
+
+        UIManager.put(
+                "OptionPane.background",
+                new Color(175, 244, 198)
+        );
+
+        UIManager.put(
+                "Panel.background",
+                new Color(175, 244, 198)
+        );
+
+
+        String[] opcoes = { "Sim", "Não" };
+
+        int opcao = JOptionPane.showOptionDialog(
+                perfil,
+                "Tem certeza que deseja excluir sua conta?\n"
+                        + "Seus livros e empréstimos também serão apagados.",
+                "Excluir conta",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                opcoes,
+                opcoes[1]
+        );
+
+
+        UIManager.put(
+                "OptionPane.background",
+                null
+        );
+
+        UIManager.put(
+                "Panel.background",
+                null
+        );
+
+
+        if (opcao != 0) {
+            return false;
+        }
+
+        try {
+
+            usuarioDAO.excluirConta(cpf);
+
+            mostrarMensagem(
+                    "Conta excluída com sucesso."
+            );
+
+            return true;
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem(
+                    "Erro ao excluir conta:\n"
+                            + e.getMessage()
+            );
+
+            return false;
+        }
+    }
+
+
+    // =========================================================
     // GETTERS
     // =========================================================
 

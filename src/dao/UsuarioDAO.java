@@ -245,7 +245,56 @@ stmt.setString(7, cpfAtual);
 stmt.executeUpdate();
 }
 }
-    
+
+    // Exclui o usuário e tudo que depende dele (empréstimos, livros e autores dos livros)
+    public void excluirConta(String cpf) throws SQLException {
+
+        // A ordem importa por causa das chaves estrangeiras
+        String[] sqls = {
+            "DELETE FROM Emprestimos WHERE CPF_usuario = ? "
+                + "OR ISBN IN (SELECT ISBN FROM Livros WHERE CPF_dono = ?)",
+            "DELETE FROM Pertence WHERE ISBN IN "
+                + "(SELECT ISBN FROM Livros WHERE CPF_dono = ?)",
+            "DELETE FROM Livros WHERE CPF_dono = ?",
+            "DELETE FROM Usuarios WHERE CPF = ?"
+        };
+
+        try (Connection conn = ConnectionFactory.getConnection()) {
+
+            // Tudo ou nada: se um DELETE falhar, desfaz os anteriores
+            conn.setAutoCommit(false);
+
+            try {
+
+                for (String sql : sqls) {
+
+                    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                        stmt.setString(1, cpf);
+
+                        // Só o primeiro DELETE tem dois parâmetros
+                        if (sql.startsWith("DELETE FROM Emprestimos")) {
+                            stmt.setString(2, cpf);
+                        }
+
+                        stmt.executeUpdate();
+                    }
+                }
+
+                conn.commit();
+
+            } catch (SQLException e) {
+
+                conn.rollback();
+                throw e;
+
+            } finally {
+
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
     
     
 }

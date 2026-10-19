@@ -225,6 +225,15 @@ public class LivroController {
                 .addActionListener(e ->
                         perfilController.alterarFoto(cpfUsuarioLogado));
 
+        perfil.getBtnExcluirConta()
+                .addActionListener(e -> {
+
+                    // Se excluiu, volta para o login
+                    if (perfilController.excluirConta(cpfUsuarioLogado)) {
+                        logoff();
+                    }
+                });
+
 
         // --- ALTERAR CADASTRO ---
 
