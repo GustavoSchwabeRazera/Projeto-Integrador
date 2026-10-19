@@ -244,6 +244,11 @@ stmt.setString(7, cpfAtual);
 
 stmt.executeUpdate();
 }
+
+// O histórico acompanha o CPF novo
+if (!cpfNovo.equals(cpfAtual)) {
+    new HistoricoDAO().trocarCpf(cpfAtual, cpfNovo);
+}
 }
 
     // Exclui o usuário e tudo que depende dele (empréstimos, livros e autores dos livros)
@@ -294,6 +299,8 @@ stmt.executeUpdate();
                 conn.setAutoCommit(true);
             }
         }
+
+        new HistoricoDAO().excluirDoUsuario(cpf);
     }
 
     

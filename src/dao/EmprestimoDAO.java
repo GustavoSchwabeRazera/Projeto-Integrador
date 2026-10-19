@@ -11,12 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 import model.AvisoPrazo;
+import model.RegistroHistorico;
 import model.Solicitacao;
 
 public class EmprestimoDAO {
 
     // Prazo padrão de um empréstimo (em dias)
     private static final int DIAS_EMPRESTIMO = 14;
+
+    private final HistoricoDAO historicoDAO = new HistoricoDAO();
 
     // Sempre devolve uma conexão aberta
     private Connection getConn() throws SQLException {
@@ -263,6 +266,35 @@ public class EmprestimoDAO {
             stmt.setString(1, solicitacao.getIsbn());
             stmt.setInt(2, solicitacao.getIdEmprestimo());
             stmt.executeUpdate();
+        }
+
+        // Histórico dos dois lados: o dono emprestou e o solicitante pegou emprestado
+        try (PreparedStatement stmt = getConn().prepareStatement(
+                "SELECT l.CPF_dono, d.nome AS nome_dono, e.CPF_usuario "
+                + "FROM Emprestimos e "
+                + "JOIN Livros l ON l.ISBN = e.ISBN "
+                + "JOIN Usuarios d ON d.CPF = l.CPF_dono "
+                + "WHERE e.id_emprestimo = ?")) {
+
+            stmt.setInt(1, solicitacao.getIdEmprestimo());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    historicoDAO.registrarSemFalhar(
+                            rs.getString("CPF_dono"),
+                            RegistroHistorico.EMPRESTIMO_CONCEDIDO,
+                            solicitacao.getIsbn(),
+                            solicitacao.getTituloLivro(),
+                            solicitacao.getNomeSolicitante());
+
+                    historicoDAO.registrarSemFalhar(
+                            rs.getString("CPF_usuario"),
+                            RegistroHistorico.EMPRESTIMO_RECEBIDO,
+                            solicitacao.getIsbn(),
+                            solicitacao.getTituloLivro(),
+                            rs.getString("nome_dono"));
+                }
+            }
         }
     }
 

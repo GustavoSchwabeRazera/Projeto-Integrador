@@ -20,6 +20,7 @@ import View.TelaSolicitacoes;
 import View.tela_inicial;
 
 import dao.EmprestimoDAO;
+import dao.HistoricoDAO;
 import dao.EventoDAO;
 import dao.LivroDAO;
 import dao.UsuarioDAO;
@@ -52,6 +53,7 @@ public class LivroController {
     private final NotificacaoController notificacaoController;
     private final CalendarioController calendarioController;
     private final PerfilController perfilController;
+    private final HistoricoController historicoController;
 
     private String emailUsuarioLogado;
     private String cpfUsuarioLogado;
@@ -103,6 +105,9 @@ public class LivroController {
 
         this.perfilController =
                 new PerfilController(usuarioDAO, perfil, alterarCadastro, telaInicial);
+
+        this.historicoController =
+                new HistoricoController(new HistoricoDAO(), historico);
 
         configurarEventos();
     }
@@ -448,6 +453,8 @@ public class LivroController {
 
 
     private void abrirHistorico() {
+
+        historicoController.carregarHistorico(cpfUsuarioLogado);
 
         esconderTodas();
 

@@ -183,6 +183,20 @@ CREATE TABLE Eventos
         ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+-- Histórico de empréstimos do usuário (livros que emprestou e que pegou emprestado).
+-- detalhe = nome da outra pessoa do empréstimo.
+-- Sem chave estrangeira para Livros: o livro removido continua aparecendo aqui.
+CREATE TABLE Historico
+(
+    id_historico INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    CPF_usuario VARCHAR(11) NOT NULL,
+    tipo VARCHAR(30) NOT NULL,
+    ISBN VARCHAR(13),
+    titulo VARCHAR(50),
+    detalhe VARCHAR(150),
+    data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- INSERÇÃO DE USUÁRIOS
 INSERT INTO Usuarios 
 (CPF, nome, telefone, email, data_nascimento, senha, foto)

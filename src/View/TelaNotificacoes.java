@@ -111,7 +111,7 @@ public class TelaNotificacoes extends JFrame {
         btnHome = new JButton("");
         btnHome.setPreferredSize(new Dimension(50, 50));
         ImageIcon iconeHome = new ImageIcon(TelaNotificacoes.class.getResource("/imagens/casa 1.png"));
-        Image imagemHome = iconeHome.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+        Image imagemHome = iconeHome.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
         btnHome.setIcon(new ImageIcon(imagemHome));
         btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
         btnHome.setForeground(new Color(10, 86, 27));
