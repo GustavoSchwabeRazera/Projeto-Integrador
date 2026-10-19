@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.AvisoPrazo;
 import model.Solicitacao;
 
 public class EmprestimoDAO {
@@ -122,6 +123,46 @@ public class EmprestimoDAO {
         }
 
         return solicitacoes;
+    }
+
+    // =========================================================
+    // EMPRÉSTIMOS ATIVOS DO USUÁRIO QUE ACABAM NOS PRÓXIMOS DIAS
+    // =========================================================
+
+    public List<AvisoPrazo> listarAtivosPertoDoFim(String cpfUsuario, int dias) throws SQLException {
+
+        List<AvisoPrazo> avisos = new ArrayList<>();
+
+        String sql = "SELECT e.id_emprestimo, e.data_termino, l.ISBN, l.titulo, u.nome "
+                + "FROM Emprestimos e "
+                + "JOIN Livros l ON l.ISBN = e.ISBN "
+                + "JOIN Usuarios u ON u.CPF = l.CPF_dono "
+                + "WHERE e.CPF_usuario = ? AND e.statusEmprestimo = TRUE "
+                + "AND e.data_termino BETWEEN ? AND ? "
+                + "ORDER BY e.data_termino, e.id_emprestimo";
+
+        LocalDate hoje = LocalDate.now();
+
+        try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
+
+            stmt.setString(1, cpfUsuario);
+            stmt.setDate(2, java.sql.Date.valueOf(hoje));
+            stmt.setDate(3, java.sql.Date.valueOf(hoje.plusDays(dias)));
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    AvisoPrazo a = new AvisoPrazo();
+                    a.setIdEmprestimo(rs.getInt("id_emprestimo"));
+                    a.setDataTermino(rs.getDate("data_termino").toLocalDate());
+                    a.setIsbn(rs.getString("ISBN"));
+                    a.setTituloLivro(rs.getString("titulo"));
+                    a.setNomeDono(rs.getString("nome"));
+                    avisos.add(a);
+                }
+            }
+        }
+
+        return avisos;
     }
 
     // =========================================================

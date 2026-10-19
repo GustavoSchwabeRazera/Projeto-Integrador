@@ -297,4 +297,7 @@ public class tela_inicial extends JFrame {
 	public JButton getBtnHistorico() {
 		return btnHistorico;
 	}
+	public JButton getBtnNotificacao() {
+		return btnNotificacao;
+	}
 }
