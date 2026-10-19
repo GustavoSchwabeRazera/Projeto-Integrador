@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import model.AvisoPrazo;
 import model.Solicitacao;
@@ -163,6 +165,71 @@ public class EmprestimoDAO {
         }
 
         return avisos;
+    }
+
+    // =========================================================
+    // EVENTOS DO CALENDÁRIO
+    // Início e devolução dos empréstimos do usuário, tanto dos
+    // livros que ele pegou quanto dos que emprestou. Pedidos
+    // ainda não aceitos aparecem no dia em que foram feitos.
+    // =========================================================
+
+    public Map<LocalDate, List<String>> listarEventosCalendario(String cpfUsuario) throws SQLException {
+
+        Map<LocalDate, List<String>> eventos = new HashMap<>();
+
+        String sql = "SELECT e.statusEmprestimo, e.data_inicio, e.data_termino, e.CPF_usuario, l.titulo, "
+                + "dono.nome AS nome_dono, leitor.nome AS nome_leitor "
+                + "FROM Emprestimos e "
+                + "JOIN Livros l ON l.ISBN = e.ISBN "
+                + "JOIN Usuarios dono ON dono.CPF = l.CPF_dono "
+                + "JOIN Usuarios leitor ON leitor.CPF = e.CPF_usuario "
+                // aceitos sempre; pedidos pendentes só enquanto não vencem
+                + "WHERE (e.statusEmprestimo = TRUE OR e.data_termino >= CURDATE()) "
+                + "AND (e.CPF_usuario = ? OR l.CPF_dono = ?) "
+                + "ORDER BY e.data_inicio, e.id_emprestimo";
+
+        try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
+
+            stmt.setString(1, cpfUsuario);
+            stmt.setString(2, cpfUsuario);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    LocalDate inicio = rs.getDate("data_inicio").toLocalDate();
+                    LocalDate termino = rs.getDate("data_termino").toLocalDate();
+                    String titulo = rs.getString("titulo");
+                    boolean pegouLivro = cpfUsuario.equals(rs.getString("CPF_usuario"));
+
+                    if (!rs.getBoolean("statusEmprestimo")) {
+                        // Pedido feito, aguardando o dono aceitar
+                        if (pegouLivro) {
+                            adicionarEvento(eventos, inicio, "Pediu \"" + titulo + "\" para "
+                                    + rs.getString("nome_dono") + " (aguardando)");
+                        } else {
+                            adicionarEvento(eventos, inicio, rs.getString("nome_leitor") + " pediu \""
+                                    + titulo + "\" (aguardando você)");
+                        }
+                    } else if (pegouLivro) {
+                        // Livro que o usuário pegou emprestado
+                        String dono = rs.getString("nome_dono");
+                        adicionarEvento(eventos, inicio, "Pegou \"" + titulo + "\" de " + dono);
+                        adicionarEvento(eventos, termino, "Devolver \"" + titulo + "\" para " + dono);
+                    } else {
+                        // Livro do usuário emprestado para outra pessoa
+                        String leitor = rs.getString("nome_leitor");
+                        adicionarEvento(eventos, inicio, "Emprestou \"" + titulo + "\" para " + leitor);
+                        adicionarEvento(eventos, termino, "Receber \"" + titulo + "\" de " + leitor);
+                    }
+                }
+            }
+        }
+
+        return eventos;
+    }
+
+    private void adicionarEvento(Map<LocalDate, List<String>> eventos, LocalDate data, String texto) {
+        eventos.computeIfAbsent(data, d -> new ArrayList<>()).add(texto);
     }
 
     // =========================================================

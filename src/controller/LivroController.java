@@ -20,6 +20,7 @@ import View.TelaSolicitacoes;
 import View.tela_inicial;
 
 import dao.EmprestimoDAO;
+import dao.EventoDAO;
 import dao.LivroDAO;
 import dao.UsuarioDAO;
 
@@ -49,6 +50,7 @@ public class LivroController {
     private final LoginController loginController;
     private final SolicitacaoController solicitacaoController;
     private final NotificacaoController notificacaoController;
+    private final CalendarioController calendarioController;
     private final PerfilController perfilController;
 
     private String emailUsuarioLogado;
@@ -92,6 +94,9 @@ public class LivroController {
 
         this.solicitacaoController =
                 new SolicitacaoController(emprestimoDAO, telaSolicitacoes);
+
+        this.calendarioController =
+                new CalendarioController(new EventoDAO(), emprestimoDAO, calendario);
 
         this.notificacaoController =
                 new NotificacaoController(emprestimoDAO, telaNotificacoes, solicitacaoController);
@@ -219,6 +224,15 @@ public class LivroController {
 
         calendario.getBtnHome()
                 .addActionListener(e -> abrirHome());
+
+        calendario.getBtnAdicionarEvento()
+                .addActionListener(e -> calendarioController.adicionarEvento());
+
+        calendario.getCampoNovoEvento()
+                .addActionListener(e -> calendarioController.adicionarEvento());
+
+        calendario.getBtnRemoverEvento()
+                .addActionListener(e -> calendarioController.removerEvento());
 
 
         // --- HISTÓRICO ---
@@ -413,6 +427,8 @@ public class LivroController {
 
     private void abrirCalendario() {
 
+        calendarioController.carregarCalendario(cpfUsuarioLogado);
+
         esconderTodas();
 
         calendario.setVisible(true);
@@ -453,6 +469,7 @@ public class LivroController {
         calendario.setVisible(false);
         alterarCadastro.setVisible(false);
         historico.setVisible(false);
+        
     }
 
 

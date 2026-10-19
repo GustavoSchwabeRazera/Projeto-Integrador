@@ -172,6 +172,17 @@ CREATE TABLE Emprestimos
     FOREIGN KEY (ISBN) REFERENCES Livros(ISBN)
 );
 
+-- Tabela de eventos/lembretes do calendário
+CREATE TABLE Eventos
+(
+    id_evento INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    CPF_usuario VARCHAR(11) NOT NULL,
+    data_evento DATE NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    FOREIGN KEY (CPF_usuario) REFERENCES Usuarios(CPF)
+        ON UPDATE CASCADE ON DELETE CASCADE
+);
+
 -- INSERÇÃO DE USUÁRIOS
 INSERT INTO Usuarios 
 (CPF, nome, telefone, email, data_nascimento, senha, foto)

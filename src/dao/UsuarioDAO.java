@@ -251,6 +251,7 @@ stmt.executeUpdate();
 
         // A ordem importa por causa das chaves estrangeiras
         String[] sqls = {
+            "DELETE FROM Eventos WHERE CPF_usuario = ?",
             "DELETE FROM Emprestimos WHERE CPF_usuario = ? "
                 + "OR ISBN IN (SELECT ISBN FROM Livros WHERE CPF_dono = ?)",
             "DELETE FROM Pertence WHERE ISBN IN "

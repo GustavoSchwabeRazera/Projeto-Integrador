@@ -1,49 +1,47 @@
 package View;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.Image;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.LayoutManager;
-import java.awt.Dimension;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.ActionListener;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.DefaultListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.BorderFactory;
-
-import net.miginfocom.swing.MigLayout;
-
-import com.toedter.calendar.JCalendar;
-import com.toedter.calendar.IDateEvaluator;
-
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.DayOfWeek;
 import java.time.format.TextStyle;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import com.toedter.calendar.IDateEvaluator;
+import com.toedter.calendar.JCalendar;
+import com.toedter.calendar.JDayChooser;
+
+import model.Evento;
+import net.miginfocom.swing.MigLayout;
 
 public class Calendario extends JFrame {
 
@@ -52,29 +50,31 @@ public class Calendario extends JFrame {
     // =====================================================
     // PALETA DE CORES (mesma identidade visual do sistema)
     // =====================================================
-    private static final Color VERDE_FUNDO      = new Color(175, 244, 198); // fundo geral
-    private static final Color VERDE_ESCURO      = new Color(10, 86, 27);   // textos/título
-    private static final Color VERDE_PAINEL      = new Color(36, 107, 45);  // painel principal
-    private static final Color VERDE_CARD        = new Color(174, 244, 198); // cards internos
-    private static final Color DOURADO_EVENTO    = new Color(230, 178, 44); // marcador de evento
+    private static final Color VERDE_FUNDO   = new Color(175, 244, 198); // fundo geral
+    private static final Color VERDE_ESCURO  = new Color(19, 74, 38);    // textos/título
+    private static final Color VERDE_PAINEL  = new Color(25, 90, 45);    // painel do calendário
+    private static final Color VERDE_BOTAO   = new Color(114, 219, 145); // dia selecionado
+    private static final Color DOURADO       = new Color(240, 196, 80);  // dia com empréstimo
+    private static final Color VERMELHO      = new Color(170, 50, 50);   // devoluções
+
+    private static final Locale PT_BR = new Locale("pt", "BR");
 
     private JPanel contentPane;
     private JButton btnHome;
-
     private JCalendar calendario;
-
     private JLabel lblDataSelecionada;
-    private DefaultListModel<String> modeloEventos;
-    private JList<String> listaEventos;
+    private DefaultListModel<Object> modeloEventos;
+    private JList<Object> listaEventos;
     private JTextField campoNovoEvento;
     private JButton btnAdicionarEvento;
     private JButton btnRemoverEvento;
 
     private LocalDate dataSelecionada;
-    private final Map<LocalDate, List<String>> eventosPorData = new LinkedHashMap<>();
+    private Map<LocalDate, List<String>> emprestimosPorData = new HashMap<>();
+    private Map<LocalDate, List<Evento>> lembretesPorData = new HashMap<>();
 
     /**
-     * Painel com cantos arredondados (idêntico ao usado nas demais telas)
+     * Painel com cantos arredondados (igual ao das demais telas)
      */
     private static class RoundedPanel extends JPanel {
 
@@ -90,23 +90,10 @@ public class Calendario extends JFrame {
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
-
-            g2.setRenderingHint(
-                RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON
-            );
-
-            g2.fillRoundRect(
-                0,
-                0,
-                getWidth() - 1,
-                getHeight() - 1,
-                radius,
-                radius
-            );
-
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
             g2.dispose();
-
             super.paintComponent(g);
         }
     }
@@ -115,20 +102,13 @@ public class Calendario extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-
         EventQueue.invokeLater(new Runnable() {
-
             public void run() {
-
                 try {
-
                     Calendario frame = new Calendario();
                     frame.setVisible(true);
-
                 } catch (Exception e) {
-
                     e.printStackTrace();
-
                 }
             }
         });
@@ -140,388 +120,289 @@ public class Calendario extends JFrame {
     public Calendario() {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setBounds(100, 100, 1920, 1080);
+        setBounds(100, 100, 1300, 721);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setLocationRelativeTo(null);
 
         contentPane = new JPanel();
         contentPane.setBackground(VERDE_FUNDO);
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
+        contentPane.setBorder(new EmptyBorder(15, 15, 15, 15));
         setContentPane(contentPane);
-
-        contentPane.setLayout(
-            new MigLayout("", "[200,grow][200,grow][200,grow][200,grow][200,grow]", "[][113.00,grow][][][grow][grow][grow][grow][grow][grow][grow][grow]")
-        );
+        contentPane.setLayout(new MigLayout("", "[30px][grow 60]30[grow 40][30px]", "[][]20[grow,fill][30px]"));
 
         // =====================================================
         // BOTÃO HOME
         // =====================================================
 
         btnHome = new JButton("");
-		btnHome.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-
-		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
-
-		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-
-		btnHome.setForeground(new Color(10, 86, 27));
-
-		btnHome.setBorderPainted(false);
-		btnHome.setContentAreaFilled(false);
-		btnHome.setFocusPainted(false);
-
-		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
-
-		ImageIcon perfil = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
-
-		Image imgPerfil = perfil.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-
-        // =====================================================
-        // LOGO
-        // =====================================================
-
-        JLabel lblNewLabel = new JLabel("");
-
-        try {
-            lblNewLabel.setIcon(
-                new ImageIcon(
-                    Calendario.class.getResource("/imagens/Logo.png")
-                )
-            );
-        } catch (Exception e) {
-            // segue sem logo caso o recurso não exista
-        }
-
-        contentPane.add(
-            lblNewLabel,
-            "cell 0 1 5 1,alignx center"
-        );
+        btnHome.setIcon(new ImageIcon(Calendario.class.getResource("/imagens/casa 1.png")));
+        btnHome.setBorderPainted(false);
+        btnHome.setContentAreaFilled(false);
+        btnHome.setFocusPainted(false);
+        contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
         // =====================================================
         // TÍTULO
         // =====================================================
 
         JLabel lblCalendario = new JLabel("Calendário");
-
         lblCalendario.setForeground(VERDE_ESCURO);
         lblCalendario.setFont(new Font("Tahoma", Font.BOLD, 34));
-
-        contentPane.add(
-            lblCalendario,
-            "cell 2 2,alignx center"
-        );
+        contentPane.add(lblCalendario, "cell 1 1 2 1,alignx center");
 
         // =====================================================
-        // PAINEL DO CALENDÁRIO (esquerda) - agora usando JCalendar
+        // PAINEL DO CALENDÁRIO (esquerda)
         // =====================================================
 
-        RoundedPanel painelCalendario = new RoundedPanel(
-            new MigLayout(
-                "insets 25 30 25 30, fill",
-                "[grow]",
-                "[grow]"
-            ),
-            40
-        );
-
+        RoundedPanel painelCalendario = new RoundedPanel(new MigLayout("insets 25, fill", "[grow]", "[grow]"), 40);
         painelCalendario.setBackground(VERDE_PAINEL);
+        contentPane.add(painelCalendario, "cell 1 2,grow");
 
-        contentPane.add(
-            painelCalendario,
-            "cell 0 4 3 8,grow"
-        );
-
-        calendario = new JCalendar(new Locale("pt", "BR"));
+        calendario = new JCalendar(PT_BR);
         calendario.setWeekOfYearVisible(false);
-        estilizarCalendario(calendario);
-
-        // marca com uma bolinha dourada os dias que já têm evento cadastrado
-        calendario.getDayChooser().addDateEvaluator(new IDateEvaluator() {
-
-            @Override
-            public boolean isSpecial(Date date) {
-                LocalDate data = converterParaLocalDate(date);
-                List<String> eventos = eventosPorData.get(data);
-                return eventos != null && !eventos.isEmpty();
-            }
-
-            @Override
-            public Color getSpecialForegroundColor() {
-                return VERDE_ESCURO;
-            }
-
-            @Override
-            public Color getSpecialBackroundColor() {
-                return DOURADO_EVENTO;
-            }
-
-            @Override
-            public String getSpecialTooltip() {
-                return "Há eventos nesse dia";
-            }
-
-            @Override
-            public boolean isInvalid(Date date) {
-                return false;
-            }
-
-            @Override
-            public Color getInvalidForegroundColor() {
-                return null;
-            }
-
-            @Override
-            public Color getInvalidBackroundColor() {
-                return null;
-            }
-
-            @Override
-            public String getInvalidTooltip() {
-                return null;
-            }
-        });
-
+        estilizarCalendario();
         painelCalendario.add(calendario, "cell 0 0,grow");
 
         // =====================================================
         // PAINEL DE EVENTOS (direita)
         // =====================================================
 
-        RoundedPanel painelEventos = new RoundedPanel(
-            new MigLayout(
-                "insets 25 25 25 25",
-                "[grow]",
-                "[]15[grow]15[]10[]"
-            ),
-            40
-        );
-
-        painelEventos.setBackground(VERDE_CARD);
-
-        contentPane.add(
-            painelEventos,
-            "cell 3 4 2 8,grow"
-        );
+        RoundedPanel painelEventos = new RoundedPanel(new MigLayout("insets 25", "[grow]", "[]5[]15[grow]15[]10[]15[]"), 40);
+        painelEventos.setBackground(VERDE_PAINEL);
+        contentPane.add(painelEventos, "cell 2 2,grow");
 
         lblDataSelecionada = new JLabel("Selecione uma data");
-        lblDataSelecionada.setForeground(VERDE_ESCURO);
-        lblDataSelecionada.setFont(new Font("Tahoma", Font.BOLD, 19));
+        lblDataSelecionada.setForeground(Color.WHITE);
+        lblDataSelecionada.setFont(new Font("Tahoma", Font.BOLD, 22));
+        painelEventos.add(lblDataSelecionada, "cell 0 0");
 
-        painelEventos.add(lblDataSelecionada, "cell 0 0,growx");
+        JLabel lblSubtitulo = new JLabel("Empréstimos e lembretes do dia");
+        lblSubtitulo.setForeground(VERDE_FUNDO);
+        lblSubtitulo.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        painelEventos.add(lblSubtitulo, "cell 0 1");
 
         modeloEventos = new DefaultListModel<>();
         listaEventos = new JList<>(modeloEventos);
-        listaEventos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listaEventos.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        listaEventos.setFont(new Font("Tahoma", Font.PLAIN, 16));
         listaEventos.setBackground(Color.WHITE);
+        listaEventos.setCellRenderer(new RenderizadorEvento());
 
         JScrollPane scrollEventos = new JScrollPane(listaEventos);
-        scrollEventos.setBorder(BorderFactory.createLineBorder(VERDE_PAINEL, 1));
-
-        painelEventos.add(scrollEventos, "cell 0 1,grow");
-
-        JPanel painelAdicionar = new JPanel(
-            new MigLayout(
-                "insets 0",
-                "[grow][]",
-                "[]"
-            )
-        );
-        painelAdicionar.setOpaque(false);
+        scrollEventos.setBorder(BorderFactory.createEmptyBorder());
+        painelEventos.add(scrollEventos, "cell 0 2,grow");
 
         campoNovoEvento = new JTextField();
-        campoNovoEvento.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        campoNovoEvento.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        painelEventos.add(campoNovoEvento, "flowx,cell 0 3,growx,h 36!");
 
-        btnAdicionarEvento = new JButton("Adicionar");
-        estilizarBotaoAcao(btnAdicionarEvento, VERDE_ESCURO);
+        btnAdicionarEvento = new JButton("Adicionar lembrete");
+        estilizarBotao(btnAdicionarEvento, VERDE_BOTAO, Color.BLACK);
+        painelEventos.add(btnAdicionarEvento, "cell 0 3,h 36!");
 
-        painelAdicionar.add(campoNovoEvento, "cell 0 0,growx");
-        painelAdicionar.add(btnAdicionarEvento, "cell 1 0");
+        btnRemoverEvento = new JButton("Remover lembrete selecionado");
+        estilizarBotao(btnRemoverEvento, new Color(200, 60, 60), Color.WHITE);
+        painelEventos.add(btnRemoverEvento, "cell 0 4,alignx right,h 36!");
 
-        painelEventos.add(painelAdicionar, "cell 0 2,growx");
-
-        btnRemoverEvento = new JButton("Remover evento selecionado");
-        estilizarBotaoAcao(btnRemoverEvento, new Color(150, 40, 40));
-
-        painelEventos.add(btnRemoverEvento, "cell 0 4,alignx center");
+        JLabel lblLegenda = new JLabel("  Dias marcados têm empréstimo ou lembrete");
+        lblLegenda.setOpaque(false);
+        lblLegenda.setForeground(Color.WHITE);
+        lblLegenda.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        lblLegenda.setIcon(new QuadradoCor(DOURADO));
+        painelEventos.add(lblLegenda, "cell 0 5");
 
         // =====================================================
         // AÇÕES
         // =====================================================
 
-        // dispara sempre que o usuário troca o dia (ou navega de mês/ano e clica num dia)
-        calendario.addPropertyChangeListener("date", new PropertyChangeListener() {
-            @Override
+        calendario.addPropertyChangeListener("calendar", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                Date novaData = calendario.getDate();
-                if (novaData != null) {
-                    selecionarData(converterParaLocalDate(novaData));
-                }
+                selecionarData(converterParaLocalDate(calendario.getDate()));
+                redesenharDias();
             }
         });
 
-        btnAdicionarEvento.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                adicionarEvento();
-            }
-        });
-
-        campoNovoEvento.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                adicionarEvento();
-            }
-        });
-
-        btnRemoverEvento.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                removerEventoSelecionado();
-            }
-        });
-
-        // seleciona hoje já na abertura da tela
         selecionarData(LocalDate.now());
     }
 
     // =====================================================
-    // CONVERSÃO Date <-> LocalDate
+    // DADOS VINDOS DO BANCO
     // =====================================================
-    private LocalDate converterParaLocalDate(Date date) {
-        return Instant.ofEpochMilli(date.getTime())
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate();
+
+    public void mostrarEventos(Map<LocalDate, List<String>> emprestimos, Map<LocalDate, List<Evento>> lembretes) {
+        emprestimosPorData = emprestimos;
+        lembretesPorData = lembretes;
+
+        // atualiza a lista do dia e repinta os dias marcados
+        selecionarData(dataSelecionada);
+        redesenharDias();
     }
 
-    // =====================================================
-    // SELEÇÃO DE DATA
-    // =====================================================
-    private void selecionarData(LocalDate data) {
+    // Ao trocar de dia o JCalendar apaga a cor do dia anterior,
+    // então redesenha o mês para os dias marcados continuarem dourados
+    private void redesenharDias() {
+        calendario.getDayChooser().setMonth(calendario.getMonthChooser().getMonth());
+    }
 
+    private void selecionarData(LocalDate data) {
         dataSelecionada = data;
 
-        String[] diasSemana = {"domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"};
-        DayOfWeek dow = data.getDayOfWeek();
-        String nomeDia = diasSemana[dow.getValue() % 7];
+        String nomeDia = data.getDayOfWeek().getDisplayName(TextStyle.FULL, PT_BR);
+        String nomeMes = data.getMonth().getDisplayName(TextStyle.FULL, PT_BR);
+        lblDataSelecionada.setText(data.getDayOfMonth() + " de " + nomeMes + " (" + nomeDia + ")");
 
-        lblDataSelecionada.setText(
-            data.getDayOfMonth() + " de " +
-            capitalizar(data.getMonth().getDisplayName(TextStyle.FULL, new Locale("pt", "BR"))) +
-            " (" + capitalizar(nomeDia) + ")"
-        );
-
-        atualizarListaEventos();
-    }
-
-    private String capitalizar(String texto) {
-        if (texto == null || texto.isEmpty()) return texto;
-        return texto.substring(0, 1).toUpperCase() + texto.substring(1);
-    }
-
-    // =====================================================
-    // EVENTOS
-    // =====================================================
-    private void atualizarListaEventos() {
         modeloEventos.clear();
-        if (dataSelecionada == null) return;
 
-        List<String> eventos = eventosPorData.get(dataSelecionada);
-        if (eventos != null) {
-            for (String evento : eventos) {
-                modeloEventos.addElement(evento);
-            }
-        }
-    }
-
-    private void adicionarEvento() {
-
-        if (dataSelecionada == null) {
-            lblDataSelecionada.setText("Selecione uma data primeiro");
-            return;
-        }
-
-        String texto = campoNovoEvento.getText().trim();
-        if (texto.isEmpty()) return;
-
-        eventosPorData.computeIfAbsent(dataSelecionada, k -> new ArrayList<>()).add(texto);
-        campoNovoEvento.setText("");
-
-        atualizarListaEventos();
-        // repinta a grade do JCalendar pra mostrar/atualizar a bolinha dourada do dia
-        calendario.getDayChooser().repaint();
-    }
-
-    private void removerEventoSelecionado() {
-
-        if (dataSelecionada == null) return;
-
-        int indice = listaEventos.getSelectedIndex();
-        if (indice == -1) return;
-
-        List<String> eventos = eventosPorData.get(dataSelecionada);
-        if (eventos != null && indice < eventos.size()) {
-            eventos.remove(indice);
-            if (eventos.isEmpty()) {
-                eventosPorData.remove(dataSelecionada);
+        List<String> emprestimos = emprestimosPorData.get(data);
+        if (emprestimos != null) {
+            for (String emprestimo : emprestimos) {
+                modeloEventos.addElement(emprestimo);
             }
         }
 
-        atualizarListaEventos();
-        calendario.getDayChooser().repaint();
+        List<Evento> lembretes = lembretesPorData.get(data);
+        if (lembretes != null) {
+            for (Evento lembrete : lembretes) {
+                modeloEventos.addElement(lembrete);
+            }
+        }
+
+        if (modeloEventos.isEmpty()) {
+            modeloEventos.addElement("Nada marcado neste dia.");
+        }
+    }
+
+    private LocalDate converterParaLocalDate(Date date) {
+        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     // =====================================================
-    // ESTILOS AUXILIARES
+    // ESTILO DO JCALENDAR
     // =====================================================
 
-    /**
-     * Aplica a paleta de cores do sistema (verde escuro/dourado) ao JCalendar.
-     * A API da lib expõe estilização de: fundo/fonte geral (propaga pros
-     * componentes internos), linha de cabeçalho dos dias da semana e as
-     * cores do texto de domingo x dias úteis. O combo de mês e o campo de
-     * ano também são pegos manualmente para ficarem no mesmo tom.
-     */
-    private void estilizarCalendario(JCalendar calendario) {
+    private void estilizarCalendario() {
 
-        calendario.setBackground(Color.WHITE);
+        calendario.setFont(new Font("Tahoma", Font.BOLD, 18));
         calendario.setForeground(VERDE_ESCURO);
-        calendario.setFont(new Font("Tahoma", Font.PLAIN, 14));
-
-        // linha "Dom Seg Ter Qua Qui Sex Sáb"
+        calendario.setBackground(VERDE_PAINEL);
         calendario.setDecorationBackgroundColor(VERDE_PAINEL);
+        calendario.setDecorationBordersVisible(false);
         calendario.setWeekdayForeground(Color.WHITE);
-        calendario.setSundayForeground(DOURADO_EVENTO);
+        calendario.setSundayForeground(DOURADO);
 
-        calendario.getDayChooser().setBackground(Color.WHITE);
+        JDayChooser dias = calendario.getDayChooser();
+        dias.setDayBordersVisible(false);
+        dias.getDayPanel().setBackground(Color.WHITE);
+        dias.setAlwaysFireDayProperty(true);
 
-        // combo de mês (ex: "Janeiro")
-        Object comboMes = calendario.getMonthChooser().getComboBox();
-        if (comboMes instanceof JComboBox) {
-            JComboBox<?> combo = (JComboBox<?>) comboMes;
-            combo.setBackground(Color.WHITE);
-            combo.setForeground(VERDE_ESCURO);
-            combo.setFont(new Font("Tahoma", Font.BOLD, 14));
-        }
+        // fundo dos dias e cor do dia selecionado (a biblioteca não tem setter para isso)
+        mudarCorDoDayChooser(dias, "oldDayBackgroundColor", Color.WHITE);
+        mudarCorDoDayChooser(dias, "selectedColor", VERDE_BOTAO);
 
-        // campo/spinner de ano
-        calendario.getYearChooser().setBackground(Color.WHITE);
+        // marca em dourado os dias com empréstimo/devolução
+        dias.addDateEvaluator(new IDateEvaluator() {
+            public boolean isSpecial(Date date) {
+                LocalDate data = converterParaLocalDate(date);
+                return emprestimosPorData.containsKey(data) || lembretesPorData.containsKey(data);
+            }
+            public Color getSpecialForegroundColor() { return VERDE_ESCURO; }
+            public Color getSpecialBackroundColor() { return DOURADO; }
+            public String getSpecialTooltip() { return "Empréstimo ou lembrete neste dia"; }
+            public boolean isInvalid(Date date) { return false; }
+            public Color getInvalidForegroundColor() { return null; }
+            public Color getInvalidBackroundColor() { return null; }
+            public String getInvalidTooltip() { return null; }
+        });
+
+        // mês e ano
+        calendario.getMonthChooser().setFont(new Font("Tahoma", Font.BOLD, 18));
+        JComboBox<?> comboMes = (JComboBox<?>) calendario.getMonthChooser().getComboBox();
+        comboMes.setFont(new Font("Tahoma", Font.BOLD, 18));
+        comboMes.setBackground(Color.WHITE);
+        comboMes.setForeground(VERDE_ESCURO);
+
+        calendario.getYearChooser().setFont(new Font("Tahoma", Font.BOLD, 18));
         calendario.getYearChooser().setForeground(VERDE_ESCURO);
-        calendario.getYearChooser().setFont(new Font("Tahoma", Font.BOLD, 14));
     }
 
-    private void estilizarBotaoAcao(JButton botao, Color cor) {
-        botao.setFont(new Font("Tahoma", Font.BOLD, 14));
-        botao.setForeground(Color.WHITE);
-        botao.setBackground(cor);
-        botao.setOpaque(true);
-        botao.setBorderPainted(false);
+    private void estilizarBotao(JButton botao, Color fundo, Color texto) {
+        botao.setFont(new Font("Tahoma", Font.BOLD, 15));
+        botao.setBackground(fundo);
+        botao.setForeground(texto);
         botao.setFocusPainted(false);
+        botao.setBorderPainted(false);
+    }
+
+    private void mudarCorDoDayChooser(JDayChooser dias, String campo, Color cor) {
+        try {
+            java.lang.reflect.Field f = JDayChooser.class.getDeclaredField(campo);
+            f.setAccessible(true);
+            f.set(dias, cor);
+        } catch (Exception e) {
+            // segue com a cor padrão
+        }
+    }
+
+    // Deixa cada linha da lista com espaço e cor conforme o tipo
+    private static class RenderizadorEvento extends DefaultListCellRenderer {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+
+            JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, false, false);
+            String texto = String.valueOf(value);
+
+            lbl.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, VERDE_FUNDO),
+                    new EmptyBorder(12, 14, 12, 14)));
+
+            if (value instanceof Evento) {
+                lbl.setText("• " + texto);
+                lbl.setForeground(VERDE_ESCURO);
+                lbl.setFont(lbl.getFont().deriveFont(Font.ITALIC));
+                if (isSelected) {
+                    lbl.setBackground(VERDE_FUNDO);
+                }
+            } else if (texto.endsWith("(aguardando)") || texto.endsWith("(aguardando você)")) {
+                lbl.setForeground(new Color(160, 110, 0));
+            } else if (texto.startsWith("Devolver") || texto.startsWith("Receber")) {
+                lbl.setForeground(VERMELHO);
+                lbl.setFont(lbl.getFont().deriveFont(Font.BOLD));
+            } else if (texto.startsWith("Nenhum")) {
+                lbl.setForeground(Color.GRAY);
+            } else {
+                lbl.setForeground(VERDE_ESCURO);
+            }
+
+            return lbl;
+        }
+    }
+
+    // Quadradinho colorido usado na legenda
+    private static class QuadradoCor implements javax.swing.Icon {
+
+        private final Color cor;
+
+        QuadradoCor(Color cor) {
+            this.cor = cor;
+        }
+
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            g.setColor(cor);
+            g.fillRect(x, y, getIconWidth(), getIconHeight());
+        }
+
+        public int getIconWidth() { return 16; }
+
+        public int getIconHeight() { return 16; }
     }
 
     // =====================================================
     // GETTERS
     // =====================================================
+
     public JButton getBtnHome() {
         return btnHome;
     }
@@ -534,7 +415,21 @@ public class Calendario extends JFrame {
         return dataSelecionada;
     }
 
-    public Map<LocalDate, List<String>> getEventosPorData() {
-        return eventosPorData;
+    public JTextField getCampoNovoEvento() {
+        return campoNovoEvento;
+    }
+
+    public JButton getBtnAdicionarEvento() {
+        return btnAdicionarEvento;
+    }
+
+    public JButton getBtnRemoverEvento() {
+        return btnRemoverEvento;
+    }
+
+    // Lembrete selecionado na lista (null se for um empréstimo ou nada)
+    public Evento getEventoSelecionado() {
+        Object item = listaEventos.getSelectedValue();
+        return (item instanceof Evento) ? (Evento) item : null;
     }
 }
