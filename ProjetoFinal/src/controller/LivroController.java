@@ -814,7 +814,7 @@ public LivroTableModel getLivroModel() {
 public TelaLogin getTelaLogin() {
     return telaLogin;
 }
-
+''
 public tela_inicial getTelaInicial() {
     return telaInicial;
 }

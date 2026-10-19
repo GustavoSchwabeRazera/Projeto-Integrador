@@ -30,7 +30,7 @@ public class JanelaEditar extends JFrame {
     public JanelaEditar() {
 
         setIconImage(Toolkit.getDefaultToolkit().getImage(
-            JanelaEditar.class.getResource("/imagens/Logo.png")
+            JanelaEditar.class.getResource("/imagens/icone.png")
         ));
 
         setTitle("Editar Livro");

@@ -65,7 +65,7 @@ public class SolicitacaoController {
     }
 
 
-    private void aceitarSolicitacao(Solicitacao solicitacao) {
+    public void aceitarSolicitacao(Solicitacao solicitacao) {
 
         try {
 
@@ -105,7 +105,7 @@ public class SolicitacaoController {
     }
 
 
-    private void recusarSolicitacao(Solicitacao solicitacao) {
+    public void recusarSolicitacao(Solicitacao solicitacao) {
 
         if (!confirmar("Recusar o pedido de " + solicitacao.getNomeSolicitante()
                 + " para \"" + solicitacao.getTituloLivro() + "\"?")) {

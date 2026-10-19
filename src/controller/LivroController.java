@@ -48,6 +48,7 @@ public class LivroController {
     private final PesquisarController pesquisarController;
     private final LoginController loginController;
     private final SolicitacaoController solicitacaoController;
+    private final NotificacaoController notificacaoController;
     private final PerfilController perfilController;
 
     private String emailUsuarioLogado;
@@ -91,6 +92,9 @@ public class LivroController {
 
         this.solicitacaoController =
                 new SolicitacaoController(emprestimoDAO, telaSolicitacoes);
+
+        this.notificacaoController =
+                new NotificacaoController(emprestimoDAO, telaNotificacoes, solicitacaoController);
 
         this.perfilController =
                 new PerfilController(usuarioDAO, perfil, alterarCadastro, telaInicial);
@@ -160,6 +164,9 @@ public class LivroController {
         telaInicial.getBtnHistorico()
                 .addActionListener(e -> abrirHistorico());
 
+        telaInicial.getBtnNotificacao()
+                .addActionListener(e -> abrirNotificacoes());
+
 
         // --- PESQUISA ---
 
@@ -180,6 +187,17 @@ public class LivroController {
 
         telaSolicitacoes.getBtnHome()
                 .addActionListener(e -> abrirHome());
+
+
+        // --- NOTIFICAÇÕES ---
+
+        telaNotificacoes.getBtnHome()
+                .addActionListener(e -> abrirHome());
+
+        telaNotificacoes.getBtnPerfil()
+                .addActionListener(e -> abrirPerfil());
+
+        telaNotificacoes.setAoAbrirSolicitacao(s -> abrirSolicitacoes());
 
 
         // --- CADASTRO DE LIVROS ---
@@ -350,6 +368,8 @@ public class LivroController {
 
 
     public void abrirNotificacoes() {
+
+        notificacaoController.carregarNotificacoes(cpfUsuarioLogado);
 
         esconderTodas();
 
