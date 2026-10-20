@@ -22,6 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import dao.EmprestimoDAO;
 import dao.LivroDAO;
 
 import model.Autor;
@@ -310,16 +311,31 @@ public class TelaMeusLivros extends JFrame {
 			}
 		}
 
+		// Quem está com o livro (null se está disponível)
+		String comQuem = null;
+
+		if (!livro.isDisponivel()) {
+			try {
+				comQuem = new EmprestimoDAO().descreverEmprestimoAtivo(livro.getIsbn());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		String texto =
 				"Título: " + livro.getNome() + "\n"
 				+ "Autor(es): " + autores + "\n"
 				+ "Editora: " + livro.getEditora() + "\n"
 				+ "Ano de lançamento: " + livro.getAnoLancamento() + "\n"
 				+ "Gênero: " + livro.getGenero() + "\n"
-				+ "ISBN: " + livro.getIsbn();
+				+ "ISBN: " + livro.getIsbn() + "\n"
+				+ "Status: " + (livro.isDisponivel() ? "Disponível" : "Emprestado")
+				+ (comQuem != null ? " para " + comQuem : "");
 
-		// Botões da janela
-		String[] opcoes = { "Remover livro", "Fechar" };
+		// Livro emprestado: troca "Remover" por "Registrar devolução"
+		String[] opcoes = livro.isDisponivel()
+				? new String[] { "Remover livro", "Fechar" }
+				: new String[] { "Registrar devolução", "Fechar" };
 
 		int escolha = mostrarJanela(
 				texto,
@@ -329,9 +345,49 @@ public class TelaMeusLivros extends JFrame {
 				opcoes
 		);
 
-		// 0 = clicou em "Remover livro"
+		// 0 = primeiro botão
 		if (escolha == 0) {
-			removerLivro(livro);
+			if (livro.isDisponivel()) {
+				removerLivro(livro);
+			} else {
+				registrarDevolucao(livro);
+			}
+		}
+	}
+
+	// =====================================================
+	// REGISTRA QUE O LIVRO VOLTOU PARA O DONO
+	// O trigger do banco deixa o livro disponível de novo
+	// =====================================================
+
+	private void registrarDevolucao(Livro livro) {
+
+		int resposta = mostrarJanela(
+				"Confirmar que \"" + livro.getNome() + "\" foi devolvido?",
+				"Registrar devolução",
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				"Sim", "Não"
+		);
+
+		// 0 = clicou em "Sim"
+		if (resposta != 0) {
+			return;
+		}
+
+		try {
+
+			new EmprestimoDAO().registrarDevolucao(livro.getIsbn());
+
+			livro.setDisponivel(true);
+
+			mensagem("Devolução registrada! \"" + livro.getNome() + "\" está disponível de novo.");
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			mensagem("Erro ao registrar a devolução:\n" + e.getMessage());
 		}
 	}
 

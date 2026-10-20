@@ -13,6 +13,7 @@ public class Livro {
     private List<Autor> autores;
     private byte[] fotoCapa;   // foto da capa do livro
     private String cpfDono;    // CPF de quem cadastrou
+    private boolean disponivel = true; // FALSE enquanto está emprestado
 
     public Livro() {
         autores = new ArrayList<Autor>();
@@ -96,6 +97,14 @@ public class Livro {
 
     public void setCpfDono(String cpfDono) {
         this.cpfDono = cpfDono;
+    }
+
+    public boolean isDisponivel() {
+        return disponivel;
+    }
+
+    public void setDisponivel(boolean disponivel) {
+        this.disponivel = disponivel;
     }
 
     @Override

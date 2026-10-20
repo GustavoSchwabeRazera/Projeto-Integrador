@@ -257,8 +257,12 @@ if (!cpfNovo.equals(cpfAtual)) {
         // A ordem importa por causa das chaves estrangeiras
         String[] sqls = {
             "DELETE FROM Eventos WHERE CPF_usuario = ?",
-            "DELETE FROM Emprestimos WHERE CPF_usuario = ? "
+            "DELETE FROM Solicitacoes WHERE CPF_solicitante = ? "
                 + "OR ISBN IN (SELECT ISBN FROM Livros WHERE CPF_dono = ?)",
+            // Livros que o usuário estava lendo voltam a ficar disponíveis (trigger)
+            "UPDATE Emprestimo SET data_devolucao = CURDATE() "
+                + "WHERE CPF_leitor = ? AND data_devolucao IS NULL",
+            "DELETE FROM Emprestimo WHERE CPF_leitor = ? OR CPF_dono = ?",
             "DELETE FROM Pertence WHERE ISBN IN "
                 + "(SELECT ISBN FROM Livros WHERE CPF_dono = ?)",
             "DELETE FROM Livros WHERE CPF_dono = ?",
@@ -276,11 +280,10 @@ if (!cpfNovo.equals(cpfAtual)) {
 
                     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-                        stmt.setString(1, cpf);
-
-                        // Só o primeiro DELETE tem dois parâmetros
-                        if (sql.startsWith("DELETE FROM Emprestimos")) {
-                            stmt.setString(2, cpf);
+                        // Todos os parâmetros são o CPF do usuário
+                        int parametros = sql.length() - sql.replace("?", "").length();
+                        for (int i = 1; i <= parametros; i++) {
+                            stmt.setString(i, cpf);
                         }
 
                         stmt.executeUpdate();

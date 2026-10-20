@@ -167,9 +167,22 @@ public class PesquisarLivro extends JFrame {
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
                 setBorder(new EmptyBorder(0, 10, 0, 10));
-                if (!isSelected) {
-                    // Linhas alternadas em dois tons de verde
-                    setBackground(row % 2 == 0 ? new Color(175, 244, 198) : new Color(204, 250, 219));
+
+                Livro livro = livroTableModel.getLivro(table.convertRowIndexToModel(row));
+
+                if (!livro.isDisponivel()) {
+                    // Livro emprestado: linha avermelhada e aviso ao lado do nome
+                    setBackground(isSelected ? new Color(240, 170, 170) : new Color(255, 205, 205));
+                    setForeground(new Color(140, 20, 20));
+                    if (column == 0) {
+                        setText(value + "  (Indisponível)");
+                    }
+                } else {
+                    setForeground(new Color(30, 30, 30));
+                    if (!isSelected) {
+                        // Linhas alternadas em dois tons de verde
+                        setBackground(row % 2 == 0 ? new Color(175, 244, 198) : new Color(204, 250, 219));
+                    }
                 }
                 return this;
             }
@@ -294,7 +307,11 @@ public class PesquisarLivro extends JFrame {
                 + "<b>Editora:</b> " + livro.getEditora() + "<br>"
                 + "<b>Ano de lançamento:</b> " + livro.getAnoLancamento() + "<br>"
                 + "<b>Gênero:</b> " + livro.getGenero() + "<br>"
-                + "<b>ISBN:</b> " + livro.getIsbn() + "<br><br>"
+                + "<b>ISBN:</b> " + livro.getIsbn() + "<br>"
+                + "<b>Status:</b> " + (livro.isDisponivel()
+                        ? "<span style='color:#0A561B'><b>Disponível</b></span>"
+                        : "<span style='color:#8C1414'><b>Indisponível (emprestado)</b></span>")
+                + "<br><br>"
                 + "<span style='font-size:19px; color:#0A561B'><b>Cadastrado por</b></span><br>"
                 + "<b>Nome:</b> " + nomeDono + "<br>"
                 + "<b>E-mail:</b> " + emailDono + "<br>"
@@ -307,9 +324,12 @@ public class PesquisarLivro extends JFrame {
         lblTexto.setForeground(new Color(30, 30, 30));
         lblTexto.setBorder(new EmptyBorder(0, 15, 0, 0));
 
-        String[] opcoes = livroProprio
-                ? new String[] { "Fechar" }
-                : new String[] { "Solicitar empréstimo", "Fechar" };
+        // Livro próprio ou emprestado: só dá para fechar
+        boolean podeSolicitar = !livroProprio && livro.isDisponivel();
+
+        String[] opcoes = podeSolicitar
+                ? new String[] { "Solicitar empréstimo", "Fechar" }
+                : new String[] { "Fechar" };
 
         int escolha = mostrarJanela(
                 lblTexto,
@@ -319,7 +339,7 @@ public class PesquisarLivro extends JFrame {
                 opcoes);
 
         // 0 = clicou em "Solicitar empréstimo"
-        if (!livroProprio && escolha == 0) {
+        if (podeSolicitar && escolha == 0) {
             solicitarEmprestimo(livro);
         }
     }

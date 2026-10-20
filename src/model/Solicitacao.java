@@ -5,7 +5,7 @@ import java.time.LocalDate;
 // Pedido de empréstimo feito por um usuário para um livro de outro usuário
 public class Solicitacao {
 
-    private int idEmprestimo;
+    private int idSolicitacao;
     private String isbn;
     private String tituloLivro;
     private String nomeSolicitante;
@@ -14,12 +14,12 @@ public class Solicitacao {
     private byte[] fotoSolicitante;
     private LocalDate dataPedido;
 
-    public int getIdEmprestimo() {
-        return idEmprestimo;
+    public int getIdSolicitacao() {
+        return idSolicitacao;
     }
 
-    public void setIdEmprestimo(int idEmprestimo) {
-        this.idEmprestimo = idEmprestimo;
+    public void setIdSolicitacao(int idSolicitacao) {
+        this.idSolicitacao = idSolicitacao;
     }
 
     public String getIsbn() {

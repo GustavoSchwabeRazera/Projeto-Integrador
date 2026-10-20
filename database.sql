@@ -159,18 +159,68 @@ CREATE TABLE Pertence
     FOREIGN KEY (id_autor) REFERENCES Autor(id_autor)
 );
 
--- Tabela de empréstimos
-CREATE TABLE Emprestimos
+-- Pedidos de empréstimo esperando o dono aceitar ou recusar.
+-- O pedido vence 14 dias depois de feito.
+CREATE TABLE Solicitacoes
 (
-    id_emprestimo INT PRIMARY KEY NOT NULL,
-    CPF_usuario VARCHAR(11) NOT NULL,
+    id_solicitacao INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    CPF_solicitante VARCHAR(11) NOT NULL,
     ISBN VARCHAR(13) NOT NULL,
-    statusEmprestimo BOOLEAN NOT NULL,
-    data_inicio DATE NOT NULL,
-    data_termino DATE NOT NULL,
-    FOREIGN KEY (CPF_usuario) REFERENCES Usuarios(CPF),
+    data_pedido DATE NOT NULL,
+    FOREIGN KEY (CPF_solicitante) REFERENCES Usuarios(CPF),
     FOREIGN KEY (ISBN) REFERENCES Livros(ISBN)
 );
+
+-- Empréstimos aceitos: liga o dono do livro e quem pegou emprestado.
+-- data_devolucao fica NULL enquanto o livro está com o leitor.
+CREATE TABLE Emprestimo
+(
+    id_emprestimo INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    ISBN VARCHAR(13) NOT NULL,
+    titulo_livro VARCHAR(50) NOT NULL,
+    CPF_dono VARCHAR(11) NOT NULL,
+    CPF_leitor VARCHAR(11) NOT NULL,
+    data_emprestimo DATE NOT NULL,
+    data_entrega DATE NOT NULL,
+    data_devolucao DATE NULL,
+    FOREIGN KEY (ISBN) REFERENCES Livros(ISBN),
+    FOREIGN KEY (CPF_dono) REFERENCES Usuarios(CPF),
+    FOREIGN KEY (CPF_leitor) REFERENCES Usuarios(CPF)
+);
+
+DELIMITER $$
+
+-- Não deixa emprestar um livro que já está emprestado
+CREATE TRIGGER trg_emprestimo_antes_inserir
+BEFORE INSERT ON Emprestimo
+FOR EACH ROW
+BEGIN
+    IF (SELECT status FROM Livros WHERE ISBN = NEW.ISBN) = FALSE THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Livro indisponível: já está emprestado.';
+    END IF;
+END$$
+
+-- Registrou um empréstimo: o livro fica indisponível
+CREATE TRIGGER trg_emprestimo_inserido
+AFTER INSERT ON Emprestimo
+FOR EACH ROW
+BEGIN
+    IF NEW.data_devolucao IS NULL THEN
+        UPDATE Livros SET status = FALSE WHERE ISBN = NEW.ISBN;
+    END IF;
+END$$
+
+-- Registrou a devolução: o livro fica disponível de novo
+CREATE TRIGGER trg_emprestimo_devolvido
+AFTER UPDATE ON Emprestimo
+FOR EACH ROW
+BEGIN
+    IF OLD.data_devolucao IS NULL AND NEW.data_devolucao IS NOT NULL THEN
+        UPDATE Livros SET status = TRUE WHERE ISBN = NEW.ISBN;
+    END IF;
+END$$
+
+DELIMITER ;
 
 -- Tabela de eventos/lembretes do calendário
 CREATE TABLE Eventos
@@ -229,11 +279,17 @@ VALUES
 ('9788532530788', 2);
 
 -- INSERÇÃO DE EMPRÉSTIMOS
-INSERT INTO Emprestimos
-(id_emprestimo, CPF_usuario, ISBN, statusEmprestimo, data_inicio, data_termino)
+-- Lucas pegou "O Hobbit" do guilherme: o trigger deixa o livro indisponível
+INSERT INTO Emprestimo
+(ISBN, titulo_livro, CPF_dono, CPF_leitor, data_emprestimo, data_entrega)
 VALUES
-(1, '45678912300', '9788535902777', TRUE, '2026-09-15', '2026-09-29'),
-(2, '12345678911', '9788532530788', FALSE, '2026-09-01', '2026-09-15');
+('9788535902777', 'O Hobbit', '12345678911', '45678912300', '2026-09-15', '2026-09-29');
+
+-- INSERÇÃO DE SOLICITAÇÕES
+INSERT INTO Solicitacoes
+(CPF_solicitante, ISBN, data_pedido)
+VALUES
+('12345678911', '9788532530788', '2026-09-01');
 
 -- CONSULTA FINAL
 SELECT * FROM Usuarios;

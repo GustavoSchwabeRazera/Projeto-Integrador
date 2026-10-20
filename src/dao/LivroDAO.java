@@ -84,7 +84,7 @@ public class LivroDAO {
 
         List<Livro> livros = new ArrayList<>();
 
-        String sql = "SELECT ISBN, titulo, editora, data_lancamento, generos, fotoCapa, CPF_dono "
+        String sql = "SELECT ISBN, titulo, editora, data_lancamento, generos, fotoCapa, CPF_dono, status "
                 + "FROM Livros ORDER BY titulo";
 
         try (PreparedStatement stmt = getConn().prepareStatement(sql);
@@ -94,6 +94,7 @@ public class LivroDAO {
                 Livro livro = criarLivro(rs);
                 livro.setFotoCapa(rs.getBytes("fotoCapa"));
                 livro.setCpfDono(rs.getString("CPF_dono"));
+                livro.setDisponivel(rs.getBoolean("status"));
                 livros.add(livro);
             }
         }
@@ -114,7 +115,7 @@ public class LivroDAO {
 
         List<Livro> livros = new ArrayList<>();
 
-        String sql = "SELECT ISBN, titulo, editora, data_lancamento, generos, fotoCapa "
+        String sql = "SELECT ISBN, titulo, editora, data_lancamento, generos, fotoCapa, status "
                 + "FROM Livros WHERE CPF_dono = ? ORDER BY titulo";
 
         try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
@@ -126,6 +127,7 @@ public class LivroDAO {
                     Livro livro = criarLivro(rs);
                     livro.setFotoCapa(rs.getBytes("fotoCapa"));
                     livro.setCpfDono(cpf);
+                    livro.setDisponivel(rs.getBoolean("status"));
                     livros.add(livro);
                 }
             }
