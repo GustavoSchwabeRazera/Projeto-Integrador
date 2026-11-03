@@ -1,11 +1,9 @@
 package controller;
 
-import java.awt.Color;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
+import View.JanelaMensagem;
 import View.TelaSolicitacoes;
 
 import dao.EmprestimoDAO;
@@ -78,6 +76,16 @@ public class SolicitacaoController {
                 return;
             }
 
+            if (emprestimoDAO.solicitanteTemEmprestimoAtivo(solicitacao.getIdSolicitacao())) {
+
+                mostrarMensagem(
+                        solicitacao.getNomeSolicitante()
+                        + " já está com um livro emprestado.\n"
+                        + "Cada usuário só pode pegar 1 livro por vez."
+                );
+                return;
+            }
+
             if (!confirmar("Emprestar \"" + solicitacao.getTituloLivro()
                     + "\" para " + solicitacao.getNomeSolicitante() + "?")) {
                 return;
@@ -139,71 +147,13 @@ public class SolicitacaoController {
 
     private void mostrarMensagem(String mensagem) {
 
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-
-        JOptionPane.showMessageDialog(
-                null,
-                mensagem
-        );
-
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
+        JanelaMensagem.mostrar(mensagem);
     }
 
 
-    // Pergunta Sim/Não com a janela verde
+    // Pergunta Sim/Não
     private boolean confirmar(String pergunta) {
 
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-        Object[] opcoes = { "Sim", "Não" };
-
-        int resposta = JOptionPane.showOptionDialog(
-                null,
-                pergunta,
-                "Confirmar",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                opcoes,
-                opcoes[1]
-        );
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
-
-        return resposta == 0;
+        return JanelaMensagem.confirmar(pergunta, "Confirmar");
     }
 }

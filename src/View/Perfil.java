@@ -18,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -402,8 +401,7 @@ public class Perfil extends JFrame {
 
 				e.printStackTrace();
 
-				JOptionPane.showMessageDialog(
-						this,
+				JanelaMensagem.mostrar(
 						"Erro ao carregar a imagem."
 				);
 			}

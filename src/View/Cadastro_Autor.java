@@ -14,15 +14,11 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-import dao.AutorDAO;
-import dao.ConnectionFactory;
 import model.Autor;
 import net.miginfocom.swing.MigLayout;
 
@@ -38,8 +34,7 @@ private JComboBox<String> comboBox;
 
 private JButton botaoCadastrar;
 
-// Lista de autores que abriu esta tela
-private Lista_Autores listaAutores;
+private JLabel titulo;
 
 
 // =========================================================
@@ -164,7 +159,7 @@ public Cadastro_Autor() {
     // TÍTULO
     // =====================================================
 
-    JLabel titulo =
+    titulo =
             new JLabel(
                     "Cadastro de Autores"
             );
@@ -372,131 +367,34 @@ public Cadastro_Autor() {
             botaoCadastrar,
             "cell 2 12"
     );
+}
 
 
-    botaoCadastrar.addActionListener(
-            e -> cadastrarAutor()
+// =========================================================
+// PREPARA A TELA PARA ALTERAR UM AUTOR
+// =========================================================
+
+public void prepararEdicao(Autor autor) {
+
+    titulo.setText(
+            "Alterar Autor"
     );
-}
 
+    txtNome.setText(
+            autor.getNome()
+    );
 
-// =========================================================
-// CONSTRUTOR RECEBENDO LISTA
-// =========================================================
+    // Nacionalidade antiga pode não estar na lista de países
+    comboBox.removeItem(
+            autor.getNacionalidade()
+    );
 
-public Cadastro_Autor(
-        Lista_Autores listaAutores) {
+    comboBox.insertItemAt(
+            autor.getNacionalidade(),
+            0
+    );
 
-    this();
-
-    this.listaAutores =
-            listaAutores;
-}
-
-
-// =========================================================
-// CADASTRAR AUTOR
-// =========================================================
-
-private void cadastrarAutor() {
-
-    String nome =
-            txtNome.getText().trim();
-
-
-    String nacionalidade = "";
-
-
-    if (comboBox.getSelectedItem() != null) {
-
-        nacionalidade =
-                comboBox.getSelectedItem()
-                        .toString()
-                        .trim();
-    }
-
-
-    // =====================================================
-    // VALIDAÇÕES
-    // =====================================================
-
-    if (nome.isEmpty()) {
-
-        mensagem(
-                "Digite o nome do autor."
-        );
-
-        txtNome.requestFocus();
-
-        return;
-    }
-
-
-    if (nacionalidade.isEmpty()) {
-
-        mensagem(
-                "Selecione a nacionalidade."
-        );
-
-        return;
-    }
-
-
-    // =====================================================
-    // SALVAR NO BANCO
-    // =====================================================
-
-    try {
-
-        Autor autor =
-                new Autor(
-                        0,
-                        nome,
-                        nacionalidade
-                );
-
-
-        AutorDAO autorDAO =
-                new AutorDAO(
-                        ConnectionFactory.getConnection()
-                );
-
-
-        autorDAO.cadastrar(
-                autor
-        );
-
-
-        mensagem(
-                "Autor cadastrado com sucesso!"
-        );
-
-
-        // =================================================
-        // ATUALIZAR LISTA DE AUTORES
-        // =================================================
-
-        if (listaAutores != null) {
-
-            listaAutores.recarregarAutores();
-        }
-
-
-        // Fecha cadastro do autor
-        dispose();
-
-
-    } catch (Exception ex) {
-
-        ex.printStackTrace();
-
-        mensagem(
-                "Erro ao cadastrar o autor:\n"
-                        + ex.getMessage(),
-                "Erro",
-                JOptionPane.ERROR_MESSAGE
-        );
-    }
+    comboBox.setSelectedIndex(0);
 }
 
 
@@ -536,25 +434,4 @@ public JButton getBtnAdicionar() {
 
     return botaoCadastrar;
 }
-
-
-// =========================================================
-// JANELA DE MENSAGEM VERDE (IGUAL AO RESTO DO PROJETO)
-// =========================================================
-
-private void mensagem(String texto) {
-    mensagem(texto, "Mensagem", JOptionPane.INFORMATION_MESSAGE);
-}
-
-private void mensagem(String texto, String titulo, int tipo) {
-
-    UIManager.put("OptionPane.background", new Color(175, 244, 198));
-    UIManager.put("Panel.background", new Color(175, 244, 198));
-
-    JOptionPane.showMessageDialog(this, texto, titulo, tipo);
-
-    UIManager.put("OptionPane.background", null);
-    UIManager.put("Panel.background", null);
-}
-
 }

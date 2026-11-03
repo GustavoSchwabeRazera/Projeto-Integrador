@@ -54,6 +54,48 @@ public class AutorDAO {
         }
     }
 
+    // Alterar autor
+    public void atualizar(Autor autor) throws SQLException {
+
+        String sql =
+                "UPDATE Autor SET nome = ?, nacionalidade = ? WHERE id_autor = ?";
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setString(1, autor.getNome());
+            stmt.setString(2, autor.getNacionalidade());
+            stmt.setInt(3, autor.getId_autor());
+
+            stmt.executeUpdate();
+        }
+    }
+
+    // Excluir autor
+    public void excluir(int idAutor) throws SQLException {
+
+        try (PreparedStatement stmt = conexao.prepareStatement(
+                "DELETE FROM Autor WHERE id_autor = ?")) {
+
+            stmt.setInt(1, idAutor);
+
+            stmt.executeUpdate();
+        }
+    }
+
+    // Verifica se o autor está ligado a algum livro
+    public boolean temLivros(int idAutor) throws SQLException {
+
+        try (PreparedStatement stmt = conexao.prepareStatement(
+                "SELECT 1 FROM Pertence WHERE id_autor = ? LIMIT 1")) {
+
+            stmt.setInt(1, idAutor);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     // Listar todos os autores
     public List<Autor> listarAutores() throws SQLException {
 

@@ -1,11 +1,9 @@
 package controller;
 
-import java.awt.Color;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
+import View.JanelaMensagem;
 import View.Historico;
 
 import dao.HistoricoDAO;
@@ -54,31 +52,6 @@ public class HistoricoController {
 
     private void mostrarMensagem(String mensagem) {
 
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-
-        JOptionPane.showMessageDialog(
-                null,
-                mensagem
-        );
-
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
+        JanelaMensagem.mostrar(mensagem);
     }
 }

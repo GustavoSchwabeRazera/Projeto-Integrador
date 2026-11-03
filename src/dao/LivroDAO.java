@@ -77,6 +77,60 @@ public class LivroDAO {
     }
 
     // =========================================================
+    // ALTERAR LIVRO + AUTORES
+    // O ISBN identifica o livro e não muda
+    // =========================================================
+
+    public void atualizar(Livro livro) throws SQLException {
+
+        String sqlLivro = "UPDATE Livros SET "
+                + "fotoCapa = ?, titulo = ?, data_lancamento = ?, editora = ?, generos = ? "
+                + "WHERE ISBN = ?";
+
+        Connection connection = getConn();
+        boolean autoCommitAnterior = connection.getAutoCommit();
+
+        try {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement stmt = connection.prepareStatement(sqlLivro)) {
+                stmt.setBytes(1, livro.getFotoCapa());
+                stmt.setString(2, livro.getNome());
+                stmt.setDate(3, java.sql.Date.valueOf(
+                        String.format("%04d", livro.getAnoLancamento()) + "-01-01"));
+                stmt.setString(4, livro.getEditora());
+                stmt.setString(5, livro.getGenero());
+                stmt.setString(6, livro.getIsbn());
+                stmt.executeUpdate();
+            }
+
+            // Troca os autores pelos novos
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "DELETE FROM Pertence WHERE ISBN = ?")) {
+                stmt.setString(1, livro.getIsbn());
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "INSERT INTO Pertence (ISBN, id_autor) VALUES (?, ?)")) {
+                for (Autor autor : livro.getAutores()) {
+                    stmt.setString(1, livro.getIsbn());
+                    stmt.setInt(2, autor.getId_autor());
+                    stmt.executeUpdate();
+                }
+            }
+
+            connection.commit();
+
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(autoCommitAnterior);
+        }
+    }
+
+    // =========================================================
     // LISTAR TODOS OS LIVROS
     // =========================================================
 
@@ -199,16 +253,33 @@ public class LivroDAO {
 
     public void excluir(String isbn) throws SQLException {
 
-        try (PreparedStatement stmt = getConn().prepareStatement(
-                "DELETE FROM Pertence WHERE ISBN = ?")) {
-            stmt.setString(1, isbn);
-            stmt.executeUpdate();
-        }
+        Connection connection = getConn();
+        boolean autoCommitAnterior = connection.getAutoCommit();
 
-        try (PreparedStatement stmt = getConn().prepareStatement(
-                "DELETE FROM Livros WHERE ISBN = ?")) {
-            stmt.setString(1, isbn);
-            stmt.executeUpdate();
+        // Tudo junto: se o livro não puder ser apagado, os autores continuam
+        try {
+            connection.setAutoCommit(false);
+
+            String[] comandos = {
+                "DELETE FROM Solicitacoes WHERE ISBN = ?",
+                "DELETE FROM Pertence WHERE ISBN = ?",
+                "DELETE FROM Livros WHERE ISBN = ?"
+            };
+
+            for (String comando : comandos) {
+                try (PreparedStatement stmt = connection.prepareStatement(comando)) {
+                    stmt.setString(1, isbn);
+                    stmt.executeUpdate();
+                }
+            }
+
+            connection.commit();
+
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(autoCommitAnterior);
         }
     }
 

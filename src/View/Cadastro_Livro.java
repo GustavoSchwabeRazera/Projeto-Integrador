@@ -22,16 +22,12 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import dao.ConnectionFactory;
-import dao.LivroDAO;
 import model.Autor;
 import model.Livro;
 import net.miginfocom.swing.MigLayout;
@@ -52,6 +48,11 @@ public class Cadastro_Livro extends JFrame {
     private JButton botaoCadastrar;
     private JButton botaoNovoAutor;
     private JButton botaoFoto;
+
+    private JLabel lblTituloTela;
+
+    // Livro que está sendo alterado (null quando é um cadastro novo)
+    private Livro livroEmEdicao;
 
     // Foto da capa escolhida (em bytes)
     private byte[] fotoSelecionada;
@@ -173,7 +174,7 @@ public class Cadastro_Livro extends JFrame {
         // TÍTULO DA TELA
         // =================================================
 
-        JLabel lblTituloTela = new JLabel("Cadastro de Livros:");
+        lblTituloTela = new JLabel("Cadastro de Livros:");
 
         lblTituloTela.setForeground(new Color(10, 86, 27));
 
@@ -312,7 +313,7 @@ public class Cadastro_Livro extends JFrame {
 
         panel.add(botaoNovoAutor, "cell 2 11,growx,height 45!");
 
-        botaoNovoAutor.addActionListener(e -> abrirListaAutores());
+        // O clique do botão é tratado no LivroController
 
 
         // =================================================
@@ -447,13 +448,7 @@ public class Cadastro_Livro extends JFrame {
                 ImageIO.write(pequena, "jpg", saida);
                 fotoSelecionada = saida.toByteArray();
 
-                // Mostra uma miniatura no botão
-                Image mini = new ImageIcon(fotoSelecionada)
-                        .getImage()
-                        .getScaledInstance(40, 50, Image.SCALE_SMOOTH);
-
-                botaoFoto.setIcon(new ImageIcon(mini));
-                botaoFoto.setText("Foto selecionada (clique para trocar)");
+                mostrarMiniatura();
 
             } catch (Exception ex) {
 
@@ -465,15 +460,15 @@ public class Cadastro_Livro extends JFrame {
     }
 
 
-    // =====================================================
-    // ABRIR LISTA DE AUTORES
-    // =====================================================
+    // Mostra uma miniatura no botão
+    private void mostrarMiniatura() {
 
-    private void abrirListaAutores() {
+        Image mini = new ImageIcon(fotoSelecionada)
+                .getImage()
+                .getScaledInstance(40, 50, Image.SCALE_SMOOTH);
 
-        Lista_Autores lista = new Lista_Autores(this);
-
-        lista.setVisible(true);
+        botaoFoto.setIcon(new ImageIcon(mini));
+        botaoFoto.setText("Foto selecionada (clique para trocar)");
     }
 
 
@@ -504,218 +499,111 @@ public class Cadastro_Livro extends JFrame {
 
 
     // =====================================================
-    // CADASTRAR LIVRO
+    // PREPARA A TELA PARA CADASTRAR OU ALTERAR
     // =====================================================
 
-    // Retorna true se o livro foi salvo
-    public boolean cadastrarLivro() {
+    public void prepararCadastro() {
 
-        String titulo = txtNome.getText().trim();
+        livroEmEdicao = null;
 
-        String editora = txtEditora.getText().trim();
+        lblTituloTela.setText("Cadastro de Livros:");
 
-        String anoTexto = txtAno.getText().trim();
+        textField.setEditable(true);
 
-        String isbn = textField.getText().trim();
+        limparFormulario();
+    }
 
-        String genero = "";
 
-        if (comboBox.getSelectedItem() != null) {
+    public void prepararEdicao(Livro livro) {
 
-            genero = comboBox.getSelectedItem().toString().trim();
+        limparFormulario();
+
+        livroEmEdicao = livro;
+
+        lblTituloTela.setText("Alterar Livro:");
+
+        txtNome.setText(livro.getNome());
+
+        txtEditora.setText(livro.getEditora());
+
+        txtAno.setText(String.valueOf(livro.getAnoLancamento()));
+
+        // O ISBN identifica o livro e não pode ser alterado
+        textField.setText(livro.getIsbn());
+
+        textField.setEditable(false);
+
+        for (Generos genero : Generos.values()) {
+
+            if (genero.name().equalsIgnoreCase(livro.getGenero())) {
+
+                comboBox.setSelectedItem(genero);
+            }
         }
 
+        if (livro.getAutores() != null) {
 
-        // =================================================
-        // VALIDAÇÕES
-        // =================================================
-
-        if (titulo.isEmpty()) {
-
-            mostrarMensagem("Digite o título do livro.");
-
-            txtNome.requestFocus();
-
-            return false;
+            receberAutoresSelecionados(new ArrayList<>(livro.getAutores()));
         }
 
+        if (livro.getFotoCapa() != null && livro.getFotoCapa().length > 0) {
 
-        if (editora.isEmpty()) {
+            fotoSelecionada = livro.getFotoCapa();
 
-            mostrarMensagem("Digite a editora.");
-
-            txtEditora.requestFocus();
-
-            return false;
-        }
-
-
-        if (anoTexto.isEmpty()) {
-
-            mostrarMensagem("Digite o ano de lançamento.");
-
-            txtAno.requestFocus();
-
-            return false;
-        }
-
-
-        int ano;
-
-        try {
-
-            ano = Integer.parseInt(anoTexto);
-
-        } catch (NumberFormatException e) {
-
-            mostrarMensagem("Digite um ano válido.");
-
-            txtAno.requestFocus();
-
-            return false;
-        }
-
-
-        if (ano < 1 || ano > 9999) {
-
-            mostrarMensagem("Digite um ano válido.");
-
-            txtAno.requestFocus();
-
-            return false;
-        }
-
-
-        if (isbn.isEmpty()) {
-
-            mostrarMensagem("Digite o ISBN.");
-
-            textField.requestFocus();
-
-            return false;
-        }
-
-
-        if (!isbn.matches("\\d{13}")) {
-
-            mostrarMensagem("O ISBN deve conter exatamente 13 números.");
-
-            textField.requestFocus();
-
-            return false;
-        }
-
-
-        if (genero.isEmpty()) {
-
-            mostrarMensagem("Selecione o gênero.");
-
-            return false;
-        }
-
-
-        if (autoresSelecionados.isEmpty()) {
-
-            mostrarMensagem("Selecione pelo menos um autor.");
-
-            return false;
-        }
-
-
-        // =================================================
-        // CRIAR LIVRO
-        // =================================================
-
-        Livro livro =
-                new Livro(
-                        isbn,
-                        titulo,
-                        editora,
-                        ano,
-                        genero,
-                        autoresSelecionados
-                );
-
-        livro.setFotoCapa(fotoSelecionada);
-
-        livro.setCpfDono(cpfUsuario);
-
-
-        // =================================================
-        // SALVAR
-        // =================================================
-
-        try {
-
-            LivroDAO livroDAO =
-                    new LivroDAO(ConnectionFactory.getConnection());
-
-            livroDAO.inserir(livro);
-
-
-            mostrarMensagem("Livro cadastrado com sucesso!");
-
-
-            // Limpar campos
-
-            txtNome.setText("");
-
-            txtEditora.setText("");
-
-            txtAno.setText("");
-
-            textField.setText("");
-
-            autoresSelecionados.clear();
-
-            botaoNovoAutor.setText("Selecionar autor(es)");
-
-            fotoSelecionada = null;
-
-            botaoFoto.setIcon(null);
-
-            botaoFoto.setText("Adicionar foto da capa");
-
-            return true;
-
-
-        } catch (Exception ex) {
-
-            ex.printStackTrace();
-
-            mostrarMensagem(
-                    "Erro ao cadastrar o livro:\n" + ex.getMessage(),
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return false;
+            mostrarMiniatura();
         }
     }
 
 
+    public void limparFormulario() {
+
+        txtNome.setText("");
+
+        txtEditora.setText("");
+
+        txtAno.setText("");
+
+        textField.setText("");
+
+        comboBox.setSelectedIndex(0);
+
+        autoresSelecionados.clear();
+
+        botaoNovoAutor.setText("Selecionar autor(es)");
+
+        fotoSelecionada = null;
+
+        botaoFoto.setIcon(null);
+
+        botaoFoto.setText("Adicionar foto da capa");
+    }
+
+
+    public Livro getLivroEmEdicao() {
+
+        return livroEmEdicao;
+    }
+
+
+    public byte[] getFotoSelecionada() {
+
+        return fotoSelecionada;
+    }
+
+
+    public String getCpfUsuario() {
+
+        return cpfUsuario;
+    }
+
+
     // =====================================================
-    // MENSAGENS CUSTOMIZADAS (FUNDO VERDE)
+    // MENSAGEM
     // =====================================================
 
     private void mostrarMensagem(String mensagem) {
-        UIManager.put("OptionPane.background", new Color(175, 244, 198));
-        UIManager.put("Panel.background", new Color(175, 244, 198));
 
-        JOptionPane.showMessageDialog(this, mensagem);
-
-        UIManager.put("OptionPane.background", null);
-        UIManager.put("Panel.background", null);
-    }
-
-    private void mostrarMensagem(String mensagem, String titulo, int tipoMensagem) {
-        UIManager.put("OptionPane.background", new Color(175, 244, 198));
-        UIManager.put("Panel.background", new Color(175, 244, 198));
-
-        JOptionPane.showMessageDialog(this, mensagem, titulo, tipoMensagem);
-
-        UIManager.put("OptionPane.background", null);
-        UIManager.put("Panel.background", null);
+        JanelaMensagem.mostrar(mensagem);
     }
 
 

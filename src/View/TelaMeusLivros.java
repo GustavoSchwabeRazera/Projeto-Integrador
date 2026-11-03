@@ -10,20 +10,16 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Cursor;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.io.ByteArrayInputStream;
 import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
 
-import javax.swing.Icon;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 
-import dao.EmprestimoDAO;
-import dao.LivroDAO;
 
 import model.Autor;
 import model.Livro;
@@ -53,6 +49,12 @@ public class TelaMeusLivros extends JFrame {
 
 	// Livros que estão aparecendo na tela
 	private List<Livro> livrosNaTela;
+
+	// O LivroController preenche
+	private Consumer<Livro> aoAlterar;
+	private Consumer<Livro> aoRemover;
+	private Consumer<Livro> aoDevolver;
+	private Function<Livro, String> buscarComQuem;
 
 	// =====================================================
 	// PAINEL COM CANTOS ARREDONDADOS
@@ -315,11 +317,7 @@ public class TelaMeusLivros extends JFrame {
 		String comQuem = null;
 
 		if (!livro.isDisponivel()) {
-			try {
-				comQuem = new EmprestimoDAO().descreverEmprestimoAtivo(livro.getIsbn());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			comQuem = buscarComQuem.apply(livro);
 		}
 
 		String texto =
@@ -334,170 +332,41 @@ public class TelaMeusLivros extends JFrame {
 
 		// Livro emprestado: troca "Remover" por "Registrar devolução"
 		String[] opcoes = livro.isDisponivel()
-				? new String[] { "Remover livro", "Fechar" }
-				: new String[] { "Registrar devolução", "Fechar" };
+				? new String[] { "Alterar livro", "Remover livro", "Fechar" }
+				: new String[] { "Alterar livro", "Registrar devolução", "Fechar" };
 
-		int escolha = mostrarJanela(
+		int escolha = JanelaMensagem.escolher(
 				texto,
 				livro.getNome(),
-				JOptionPane.PLAIN_MESSAGE,
 				new ImageIcon(pegarImagem(livro, 200, 260)),
 				opcoes
 		);
 
-		// 0 = primeiro botão
 		if (escolha == 0) {
+			aoAlterar.accept(livro);
+		} else if (escolha == 1) {
 			if (livro.isDisponivel()) {
-				removerLivro(livro);
+				aoRemover.accept(livro);
 			} else {
-				registrarDevolucao(livro);
+				aoDevolver.accept(livro);
 			}
 		}
 	}
 
-	// =====================================================
-	// REGISTRA QUE O LIVRO VOLTOU PARA O DONO
-	// O trigger do banco deixa o livro disponível de novo
-	// =====================================================
-
-	private void registrarDevolucao(Livro livro) {
-
-		int resposta = mostrarJanela(
-				"Confirmar que \"" + livro.getNome() + "\" foi devolvido?",
-				"Registrar devolução",
-				JOptionPane.QUESTION_MESSAGE,
-				null,
-				"Sim", "Não"
-		);
-
-		// 0 = clicou em "Sim"
-		if (resposta != 0) {
-			return;
-		}
-
-		try {
-
-			new EmprestimoDAO().registrarDevolucao(livro.getIsbn());
-
-			livro.setDisponivel(true);
-
-			mensagem("Devolução registrada! \"" + livro.getNome() + "\" está disponível de novo.");
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-
-			mensagem("Erro ao registrar a devolução:\n" + e.getMessage());
-		}
+	public void setAoAlterar(Consumer<Livro> aoAlterar) {
+		this.aoAlterar = aoAlterar;
 	}
 
-	// =====================================================
-	// REMOVE O LIVRO
-	// =====================================================
-
-	private void removerLivro(Livro livro) {
-
-		int resposta = mostrarJanela(
-				"Tem certeza que quer remover \"" + livro.getNome() + "\"?",
-				"Remover livro",
-				JOptionPane.QUESTION_MESSAGE,
-				null,
-				"Sim", "Não"
-		);
-
-		// 0 = clicou em "Sim"
-		if (resposta != 0) {
-			return;
-		}
-
-		try {
-
-			new LivroDAO(null).excluir(livro.getIsbn());
-
-			// Tira o livro da tela
-			livrosNaTela.remove(livro);
-			mostrarLivros(livrosNaTela);
-
-			mensagem("Livro removido com sucesso!");
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-
-			// Livro que já foi emprestado não pode ser apagado
-			if (e.getMessage() != null && e.getMessage().contains("foreign key")) {
-				mensagem("Esse livro tem empréstimos registrados e não pode ser removido.");
-			} else {
-				mensagem("Erro ao remover o livro:\n" + e.getMessage());
-			}
-		}
+	public void setAoRemover(Consumer<Livro> aoRemover) {
+		this.aoRemover = aoRemover;
 	}
 
-	// =====================================================
-	// JANELAS VERDES (IGUAL AO RESTO DO PROJETO)
-	// =====================================================
-
-	private void ligarVerde() {
-		UIManager.put("OptionPane.background", new Color(175, 244, 198));
-		UIManager.put("Panel.background", new Color(175, 244, 198));
+	public void setAoDevolver(Consumer<Livro> aoDevolver) {
+		this.aoDevolver = aoDevolver;
 	}
 
-	private void desligarVerde() {
-		UIManager.put("OptionPane.background", null);
-		UIManager.put("Panel.background", null);
-	}
-
-	private void mensagem(String texto) {
-		mostrarJanela(texto, "Mensagem", JOptionPane.INFORMATION_MESSAGE, null, "OK");
-	}
-
-	// =====================================================
-	// JANELA COM OS BOTÕES ARREDONDADOS (IGUAL AO PERFIL)
-	// Devolve o número do botão clicado (0, 1, ...) ou -1 se fechou no X
-	// =====================================================
-
-	private int mostrarJanela(Object texto, String titulo, int tipo, Icon icone, String... opcoes) {
-
-		ligarVerde();
-
-		JOptionPane painel = new JOptionPane(texto, tipo, JOptionPane.DEFAULT_OPTION, icone);
-
-		JButton[] botoes = new JButton[opcoes.length];
-
-		for (int i = 0; i < opcoes.length; i++) {
-			botoes[i] = criarBotaoJanela(opcoes[i]);
-			JButton botao = botoes[i];
-			botao.addActionListener(e -> painel.setValue(botao));
-		}
-
-		painel.setOptions(botoes);
-		painel.setInitialValue(botoes[botoes.length - 1]);
-
-		JDialog janela = painel.createDialog(this, titulo);
-		janela.setVisible(true);
-		janela.dispose();
-
-		desligarVerde();
-
-		for (int i = 0; i < botoes.length; i++) {
-			if (painel.getValue() == botoes[i]) {
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	// Mesmo formato e cor do botão "Alterar foto" do Perfil
-	private JButton criarBotaoJanela(String texto) {
-
-		BotaoArredondado botao = new BotaoArredondado(texto, 40);
-		botao.setBackground(new Color(114, 219, 145));
-		botao.setForeground(Color.BLACK);
-		botao.setFont(new Font("Tahoma", Font.BOLD, 15));
-		botao.setMargin(new java.awt.Insets(6, 18, 6, 18));
-
-		return botao;
+	public void setBuscarComQuem(Function<Livro, String> buscarComQuem) {
+		this.buscarComQuem = buscarComQuem;
 	}
 
 	// Botão arredondado (copiado do Perfil)

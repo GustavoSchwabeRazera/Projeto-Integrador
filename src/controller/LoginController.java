@@ -1,11 +1,9 @@
 package controller;
 
-import java.awt.Color;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
+import View.JanelaMensagem;
 import View.TelaCriarConta;
 import View.TelaLogin;
 
@@ -162,6 +160,17 @@ public class LoginController {
         }
 
 
+        String erro =
+                Validador.validarUsuario(nome, email, telefone, dataNascimento);
+
+        if (erro != null) {
+
+            mostrarMensagem(erro);
+
+            return false;
+        }
+
+
         if (senha.length() > 20) {
 
             mostrarMensagem(
@@ -196,6 +205,15 @@ public class LoginController {
 
 
         try {
+
+            if (usuarioDAO.buscarCpfPorEmail(email) != null) {
+
+                mostrarMensagem(
+                        "Este e-mail já está cadastrado."
+                );
+
+                return false;
+            }
 
             usuarioDAO.cadastrar(
                     cpf,
@@ -255,31 +273,6 @@ public class LoginController {
 
     private void mostrarMensagem(String mensagem) {
 
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-
-        JOptionPane.showMessageDialog(
-                null,
-                mensagem
-        );
-
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
+        JanelaMensagem.mostrar(mensagem);
     }
 }

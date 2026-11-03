@@ -67,6 +67,7 @@ public class Calendario extends JFrame {
     private JList<Object> listaEventos;
     private JTextField campoNovoEvento;
     private JButton btnAdicionarEvento;
+    private JButton btnAlterarEvento;
     private JButton btnRemoverEvento;
 
     private LocalDate dataSelecionada;
@@ -199,9 +200,13 @@ public class Calendario extends JFrame {
         estilizarBotao(btnAdicionarEvento, VERDE_BOTAO, Color.BLACK);
         painelEventos.add(btnAdicionarEvento, "cell 0 3,h 36!");
 
+        btnAlterarEvento = new JButton("Alterar lembrete selecionado");
+        estilizarBotao(btnAlterarEvento, VERDE_BOTAO, Color.BLACK);
+        painelEventos.add(btnAlterarEvento, "flowx,cell 0 4,alignx right,h 36!");
+
         btnRemoverEvento = new JButton("Remover lembrete selecionado");
         estilizarBotao(btnRemoverEvento, new Color(200, 60, 60), Color.WHITE);
-        painelEventos.add(btnRemoverEvento, "cell 0 4,alignx right,h 36!");
+        painelEventos.add(btnRemoverEvento, "cell 0 4,h 36!");
 
         JLabel lblLegenda = new JLabel("  Dias marcados têm empréstimo ou lembrete");
         lblLegenda.setOpaque(false);
@@ -421,6 +426,10 @@ public class Calendario extends JFrame {
 
     public JButton getBtnAdicionarEvento() {
         return btnAdicionarEvento;
+    }
+
+    public JButton getBtnAlterarEvento() {
+        return btnAlterarEvento;
     }
 
     public JButton getBtnRemoverEvento() {

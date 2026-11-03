@@ -1,14 +1,14 @@
 package controller;
 
-import java.awt.Color;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
+import View.JanelaMensagem;
 import View.TelaNotificacoes;
 
 import dao.EmprestimoDAO;
+
+import model.EmprestimoAtivo;
 
 public class NotificacaoController {
 
@@ -40,6 +40,10 @@ public class NotificacaoController {
             solicitacaoController.recusarSolicitacao(s);
             carregarNotificacoes();
         });
+
+        telaNotificacoes.setAoConfirmarDevolucao(this::confirmarDevolucao);
+
+        telaNotificacoes.setAoRecusarDevolucao(this::recusarDevolucao);
     }
 
 
@@ -61,6 +65,7 @@ public class NotificacaoController {
 
             telaNotificacoes.mostrarNotificacoes(
                     emprestimoDAO.listarAtivosPertoDoFim(cpfUsuario, DIAS_AVISO),
+                    emprestimoDAO.listarDevolucoesParaConfirmar(cpfUsuario),
                     emprestimoDAO.listarPendentesDoDono(cpfUsuario)
             );
 
@@ -76,36 +81,77 @@ public class NotificacaoController {
 
 
     // =========================================================
+    // DEVOLUÇÕES
+    // =========================================================
+
+    // O trigger do banco deixa o livro disponível de novo
+    private void confirmarDevolucao(EmprestimoAtivo devolucao) {
+
+        if (!JanelaMensagem.confirmar(
+                "Você recebeu \"" + devolucao.getTituloLivro()
+                + "\" de " + devolucao.getNomeLeitor() + "?",
+                "Confirmar devolução")) {
+            return;
+        }
+
+        try {
+
+            emprestimoDAO.registrarDevolucao(devolucao.getIsbn());
+
+            mostrarMensagem(
+                    "Devolução confirmada!\n\"" + devolucao.getTituloLivro()
+                    + "\" está disponível de novo."
+            );
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem(
+                    "Erro ao confirmar a devolução:\n" + e.getMessage()
+            );
+        }
+
+        carregarNotificacoes();
+    }
+
+
+    private void recusarDevolucao(EmprestimoAtivo devolucao) {
+
+        if (!JanelaMensagem.confirmar(
+                "Você ainda não recebeu \"" + devolucao.getTituloLivro()
+                + "\"? O livro continua emprestado para " + devolucao.getNomeLeitor() + ".",
+                "Recusar devolução")) {
+            return;
+        }
+
+        try {
+
+            emprestimoDAO.recusarDevolucao(devolucao.getIdEmprestimo());
+
+            mostrarMensagem(
+                    "Devolução recusada."
+            );
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem(
+                    "Erro ao recusar a devolução:\n" + e.getMessage()
+            );
+        }
+
+        carregarNotificacoes();
+    }
+
+
+    // =========================================================
     // MENSAGEM
     // =========================================================
 
     private void mostrarMensagem(String mensagem) {
 
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-
-        JOptionPane.showMessageDialog(
-                null,
-                mensagem
-        );
-
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
+        JanelaMensagem.mostrar(mensagem);
     }
 }

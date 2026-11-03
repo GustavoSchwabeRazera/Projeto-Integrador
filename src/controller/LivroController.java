@@ -1,10 +1,11 @@
 package controller;
 
-import java.awt.Color;
 import java.sql.SQLException;
+import java.time.Year;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
+
+import View.JanelaMensagem;
+import javax.swing.JFrame;
 
 import View.Cadastro_Livro;
 import View.Calendario;
@@ -13,6 +14,7 @@ import View.Perfil;
 import View.PesquisarLivro;
 import View.TelaAlterar;
 import View.TelaCriarConta;
+import View.TelaLivrosComigo;
 import View.TelaLogin;
 import View.TelaMeusLivros;
 import View.TelaNotificacoes;
@@ -25,6 +27,7 @@ import dao.EventoDAO;
 import dao.LivroDAO;
 import dao.UsuarioDAO;
 
+import model.Livro;
 import model.LivroTableModel;
 
 public class LivroController {
@@ -40,6 +43,7 @@ public class LivroController {
     private final TelaSolicitacoes telaSolicitacoes;
     private final TelaNotificacoes telaNotificacoes;
     private final TelaMeusLivros telaMeusLivros;
+    private final TelaLivrosComigo telaLivrosComigo;
     private final Perfil perfil;
     private final Cadastro_Livro cadastroLivro;
     private final TelaCriarConta criarConta;
@@ -51,9 +55,11 @@ public class LivroController {
     private final LoginController loginController;
     private final SolicitacaoController solicitacaoController;
     private final NotificacaoController notificacaoController;
+    private final LivrosComigoController livrosComigoController;
     private final CalendarioController calendarioController;
     private final PerfilController perfilController;
     private final HistoricoController historicoController;
+    private final AutorController autorController;
 
     private String emailUsuarioLogado;
     private String cpfUsuarioLogado;
@@ -82,6 +88,7 @@ public class LivroController {
         this.telaSolicitacoes = new TelaSolicitacoes();
         this.telaNotificacoes = new TelaNotificacoes();
         this.telaMeusLivros = new TelaMeusLivros();
+        this.telaLivrosComigo = new TelaLivrosComigo();
         this.perfil = new Perfil();
         this.calendario = new Calendario();
         this.alterarCadastro = new TelaAlterar();
@@ -89,7 +96,7 @@ public class LivroController {
         this.historico = new Historico();
 
         this.pesquisarController =
-                new PesquisarController(livroDAO, pesquisarLivro);
+                new PesquisarController(livroDAO, emprestimoDAO, usuarioDAO, pesquisarLivro);
 
         this.loginController =
                 new LoginController(usuarioDAO, telaLogin, criarConta);
@@ -103,11 +110,17 @@ public class LivroController {
         this.notificacaoController =
                 new NotificacaoController(emprestimoDAO, telaNotificacoes, solicitacaoController);
 
+        this.livrosComigoController =
+                new LivrosComigoController(emprestimoDAO, telaLivrosComigo);
+
         this.perfilController =
                 new PerfilController(usuarioDAO, perfil, alterarCadastro, telaInicial);
 
         this.historicoController =
                 new HistoricoController(new HistoricoDAO(), historico);
+
+        this.autorController =
+                new AutorController(cadastroLivro);
 
         configurarEventos();
     }
@@ -165,6 +178,9 @@ public class LivroController {
         telaInicial.getBtnSolicitacoes()
                 .addActionListener(e -> abrirSolicitacoes());
 
+        telaInicial.getBtnLivrosComigo()
+                .addActionListener(e -> abrirLivrosComigo());
+
         telaInicial.getBtnPerfil()
                 .addActionListener(e -> abrirPerfil());
 
@@ -192,6 +208,20 @@ public class LivroController {
         telaMeusLivros.getBtnNewButton()
                 .addActionListener(e -> abrirCadastroLivro());
 
+        telaMeusLivros.setAoAlterar(this::abrirAlterarLivro);
+
+        telaMeusLivros.setAoRemover(this::removerLivro);
+
+        telaMeusLivros.setAoDevolver(this::registrarDevolucao);
+
+        telaMeusLivros.setBuscarComQuem(this::buscarComQuem);
+
+
+        // --- LIVROS COMIGO ---
+
+        telaLivrosComigo.getBtnHome()
+                .addActionListener(e -> abrirHome());
+
 
         // --- SOLICITAÇÕES ---
 
@@ -204,9 +234,7 @@ public class LivroController {
         telaNotificacoes.getBtnHome()
                 .addActionListener(e -> abrirHome());
 
-        telaNotificacoes.getBtnPerfil()
-                .addActionListener(e -> abrirPerfil());
-
+       
         telaNotificacoes.setAoAbrirSolicitacao(s -> abrirSolicitacoes());
 
 
@@ -219,10 +247,13 @@ public class LivroController {
                 .addActionListener(e -> {
 
                     // Se salvou, volta para Meus Livros
-                    if (cadastroLivro.cadastrarLivro()) {
+                    if (salvarLivro()) {
                         abrirMeusLivros();
                     }
                 });
+
+        cadastroLivro.getBotaoNovoAutor()
+                .addActionListener(e -> autorController.abrirLista());
 
 
         // --- CALENDÁRIO ---
@@ -235,6 +266,9 @@ public class LivroController {
 
         calendario.getCampoNovoEvento()
                 .addActionListener(e -> calendarioController.adicionarEvento());
+
+        calendario.getBtnAlterarEvento()
+                .addActionListener(e -> calendarioController.alterarEvento());
 
         calendario.getBtnRemoverEvento()
                 .addActionListener(e -> calendarioController.removerEvento());
@@ -288,17 +322,13 @@ public class LivroController {
 
     public void voltarDoCadastro() {
 
-        esconderTodas();
-
-        perfil.setVisible(true);
+        trocarPara(perfil);
     }
 
 
     public void iniciar() {
 
-        esconderTodas();
-
-        telaLogin.setVisible(true);
+        trocarPara(telaLogin);
     }
 
 
@@ -310,12 +340,10 @@ public class LivroController {
         telaInicial.atualizarFotoPerfil(null);
         perfil.carregarFoto(null);
 
-        esconderTodas();
-
         telaLogin.getTxtNome().setText("");
         telaLogin.getTxtSenha().setText("");
 
-        telaLogin.setVisible(true);
+        trocarPara(telaLogin);
     }
 
 
@@ -336,9 +364,7 @@ public class LivroController {
             e.printStackTrace();
         }
 
-        esconderTodas();
-
-        telaInicial.setVisible(true);
+        trocarPara(telaInicial);
     }
 
 
@@ -346,13 +372,20 @@ public class LivroController {
 
         pesquisarLivro.setCpfUsuario(cpfUsuarioLogado);
 
-        esconderTodas();
         pesquisarController.pesquisar();
-        pesquisarLivro.setVisible(true);
+        trocarPara(pesquisarLivro);
     }
 
 
     private void abrirMeusLivros() {
+
+        carregarMeusLivros();
+
+        trocarPara(telaMeusLivros);
+    }
+
+
+    private void carregarMeusLivros() {
 
         try {
 
@@ -366,10 +399,14 @@ public class LivroController {
 
             mostrarMensagem("Erro ao carregar seus livros:\n" + e.getMessage());
         }
+    }
 
-        esconderTodas();
 
-        telaMeusLivros.setVisible(true);
+    private void abrirLivrosComigo() {
+
+        livrosComigoController.carregarLivros(cpfUsuarioLogado);
+
+        trocarPara(telaLivrosComigo);
     }
 
 
@@ -377,9 +414,7 @@ public class LivroController {
 
         solicitacaoController.carregarSolicitacoes(cpfUsuarioLogado);
 
-        esconderTodas();
-
-        telaSolicitacoes.setVisible(true);
+        trocarPara(telaSolicitacoes);
 
         telaSolicitacoes.toFront();
         telaSolicitacoes.requestFocus();
@@ -390,9 +425,7 @@ public class LivroController {
 
         notificacaoController.carregarNotificacoes(cpfUsuarioLogado);
 
-        esconderTodas();
-
-        telaNotificacoes.setVisible(true);
+        trocarPara(telaNotificacoes);
 
         telaNotificacoes.toFront();
         telaNotificacoes.requestFocus();
@@ -406,9 +439,7 @@ public class LivroController {
                 cpfUsuarioLogado
         );
 
-        esconderTodas();
-
-        perfil.setVisible(true);
+        trocarPara(perfil);
     }
 
 
@@ -416,17 +447,25 @@ public class LivroController {
 
         cadastroLivro.setCpfUsuario(cpfUsuarioLogado);
 
-        esconderTodas();
+        cadastroLivro.prepararCadastro();
 
-        cadastroLivro.setVisible(true);
+        trocarPara(cadastroLivro);
+    }
+
+
+    private void abrirAlterarLivro(Livro livro) {
+
+        cadastroLivro.setCpfUsuario(cpfUsuarioLogado);
+
+        cadastroLivro.prepararEdicao(livro);
+
+        trocarPara(cadastroLivro);
     }
 
 
     private void abrirCriarConta() {
 
-        esconderTodas();
-
-        criarConta.setVisible(true);
+        trocarPara(criarConta);
     }
 
 
@@ -434,9 +473,7 @@ public class LivroController {
 
         calendarioController.carregarCalendario(cpfUsuarioLogado);
 
-        esconderTodas();
-
-        calendario.setVisible(true);
+        trocarPara(calendario);
     }
 
 
@@ -446,9 +483,7 @@ public class LivroController {
             return;
         }
 
-        esconderTodas();
-
-        alterarCadastro.setVisible(true);
+        trocarPara(alterarCadastro);
     }
 
 
@@ -456,27 +491,40 @@ public class LivroController {
 
         historicoController.carregarHistorico(cpfUsuarioLogado);
 
-        esconderTodas();
-
-        historico.setVisible(true);
+        trocarPara(historico);
     }
 
 
-    private void esconderTodas() {
+    // Mostra a tela nova antes de esconder as outras: se o sistema ficar um
+    // instante sem nenhuma tela aberta, o Windows passa o foco para outro programa
+    private void trocarPara(JFrame tela) {
 
-        telaLogin.setVisible(false);
-        telaInicial.setVisible(false);
-        pesquisarLivro.setVisible(false);
-        telaSolicitacoes.setVisible(false);
-        telaNotificacoes.setVisible(false);
-        telaMeusLivros.setVisible(false);
-        perfil.setVisible(false);
-        cadastroLivro.setVisible(false);
-        criarConta.setVisible(false);
-        calendario.setVisible(false);
-        alterarCadastro.setVisible(false);
-        historico.setVisible(false);
-        
+        tela.setVisible(true);
+
+        tela.toFront();
+
+        JFrame[] telas = {
+                telaLogin,
+                telaInicial,
+                pesquisarLivro,
+                telaSolicitacoes,
+                telaNotificacoes,
+                telaMeusLivros,
+                telaLivrosComigo,
+                perfil,
+                cadastroLivro,
+                criarConta,
+                calendario,
+                alterarCadastro,
+                historico
+        };
+
+        for (JFrame outra : telas) {
+
+            if (outra != tela) {
+                outra.setVisible(false);
+            }
+        }
     }
 
 
@@ -491,9 +539,252 @@ public class LivroController {
             emailUsuarioLogado = loginController.getEmailLogado();
             cpfUsuarioLogado = loginController.getCpfLogado();
 
-            telaLogin.setVisible(false);
-
             abrirHome();
+        }
+    }
+
+
+    // =========================================================
+    // SALVAR LIVRO (CADASTRO NOVO OU ALTERAÇÃO)
+    // =========================================================
+
+    // Retorna true se o livro foi salvo
+    private boolean salvarLivro() {
+
+        String titulo = cadastroLivro.getTxtNome().getText().trim();
+
+        String editora = cadastroLivro.getTxtEditora().getText().trim();
+
+        String anoTexto = cadastroLivro.getTxtAno().getText().trim();
+
+        String isbn = cadastroLivro.getTextField().getText().trim();
+
+        Object genero = cadastroLivro.getComboBox().getSelectedItem();
+
+        boolean alterando = cadastroLivro.getLivroEmEdicao() != null;
+
+
+        if (titulo.isEmpty()) {
+
+            mostrarMensagem("Digite o título do livro.");
+
+            cadastroLivro.getTxtNome().requestFocus();
+
+            return false;
+        }
+
+
+        if (titulo.length() > 50) {
+
+            mostrarMensagem("O título deve ter no máximo 50 caracteres.");
+
+            cadastroLivro.getTxtNome().requestFocus();
+
+            return false;
+        }
+
+
+        if (editora.isEmpty()) {
+
+            mostrarMensagem("Digite a editora.");
+
+            cadastroLivro.getTxtEditora().requestFocus();
+
+            return false;
+        }
+
+
+        if (editora.length() > 50) {
+
+            mostrarMensagem("A editora deve ter no máximo 50 caracteres.");
+
+            cadastroLivro.getTxtEditora().requestFocus();
+
+            return false;
+        }
+
+
+        int ano;
+
+        try {
+
+            ano = Integer.parseInt(anoTexto);
+
+        } catch (NumberFormatException e) {
+
+            mostrarMensagem("Digite um ano de lançamento válido.");
+
+            cadastroLivro.getTxtAno().requestFocus();
+
+            return false;
+        }
+
+
+        if (ano < 1 || ano > Year.now().getValue()) {
+
+            mostrarMensagem("Digite um ano de lançamento válido.");
+
+            cadastroLivro.getTxtAno().requestFocus();
+
+            return false;
+        }
+
+
+        if (!isbn.matches("\\d{13}")) {
+
+            mostrarMensagem("O ISBN deve conter exatamente 13 números.");
+
+            cadastroLivro.getTextField().requestFocus();
+
+            return false;
+        }
+
+
+        if (genero == null) {
+
+            mostrarMensagem("Selecione o gênero.");
+
+            return false;
+        }
+
+
+        if (cadastroLivro.getAutoresSelecionados().isEmpty()) {
+
+            mostrarMensagem("Selecione pelo menos um autor.");
+
+            return false;
+        }
+
+
+        Livro livro =
+                new Livro(
+                        isbn,
+                        titulo,
+                        editora,
+                        ano,
+                        genero.toString(),
+                        cadastroLivro.getAutoresSelecionados()
+                );
+
+        livro.setFotoCapa(cadastroLivro.getFotoSelecionada());
+
+        livro.setCpfDono(cadastroLivro.getCpfUsuario());
+
+
+        try {
+
+            if (alterando) {
+
+                livroDAO.atualizar(livro);
+
+                mostrarMensagem("Livro alterado com sucesso!");
+
+            } else {
+
+                if (livroDAO.buscarPorISBN(isbn) != null) {
+
+                    mostrarMensagem("Já existe um livro cadastrado com esse ISBN.");
+
+                    cadastroLivro.getTextField().requestFocus();
+
+                    return false;
+                }
+
+                livroDAO.inserir(livro);
+
+                mostrarMensagem("Livro cadastrado com sucesso!");
+            }
+
+            return true;
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem("Erro ao salvar o livro:\n" + e.getMessage());
+
+            return false;
+        }
+    }
+
+
+    // =========================================================
+    // REMOVER LIVRO E REGISTRAR DEVOLUÇÃO
+    // =========================================================
+
+    private void removerLivro(Livro livro) {
+
+        if (!JanelaMensagem.confirmar(
+                "Tem certeza que quer remover \"" + livro.getNome() + "\"?",
+                "Remover livro")) {
+            return;
+        }
+
+        try {
+
+            livroDAO.excluir(livro.getIsbn());
+
+            carregarMeusLivros();
+
+            mostrarMensagem("Livro removido com sucesso!");
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            // Livro que já foi emprestado não pode ser apagado
+            if (e.getMessage() != null && e.getMessage().contains("foreign key")) {
+
+                mostrarMensagem("Esse livro tem empréstimos registrados e não pode ser removido.");
+
+            } else {
+
+                mostrarMensagem("Erro ao remover o livro:\n" + e.getMessage());
+            }
+        }
+    }
+
+
+    // O trigger do banco deixa o livro disponível de novo
+    private void registrarDevolucao(Livro livro) {
+
+        if (!JanelaMensagem.confirmar(
+                "Confirmar que \"" + livro.getNome() + "\" foi devolvido?",
+                "Registrar devolução")) {
+            return;
+        }
+
+        try {
+
+            emprestimoDAO.registrarDevolucao(livro.getIsbn());
+
+            carregarMeusLivros();
+
+            mostrarMensagem(
+                    "Devolução registrada! \"" + livro.getNome() + "\" está disponível de novo."
+            );
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem("Erro ao registrar a devolução:\n" + e.getMessage());
+        }
+    }
+
+
+    // Quem está com o livro (null se não encontrou)
+    private String buscarComQuem(Livro livro) {
+
+        try {
+
+            return emprestimoDAO.descreverEmprestimoAtivo(livro.getIsbn());
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            return null;
         }
     }
 
@@ -520,9 +811,7 @@ public class LivroController {
         // VOLTA PARA O PERFIL
         // ==============================
 
-        esconderTodas();
-
-        perfil.setVisible(true);
+        trocarPara(perfil);
 
 
         mostrarMensagem(
@@ -537,32 +826,7 @@ public class LivroController {
 
     private void mostrarMensagem(String mensagem) {
 
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-
-        JOptionPane.showMessageDialog(
-                null,
-                mensagem
-        );
-
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
+        JanelaMensagem.mostrar(mensagem);
     }
 
 

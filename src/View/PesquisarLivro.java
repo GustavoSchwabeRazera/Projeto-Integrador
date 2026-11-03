@@ -23,24 +23,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-import dao.EmprestimoDAO;
-import dao.UsuarioDAO;
 import model.Autor;
 import model.Livro;
 import model.LivroTableModel;
@@ -56,6 +51,10 @@ public class PesquisarLivro extends JFrame {
     private JScrollPane scrollLivros;
     private LivroTableModel livroTableModel;
     private String cpfUsuario; // usuário logado
+
+    // O PesquisarController preenche
+    private Consumer<Livro> aoSolicitar;
+    private Function<String, String[]> buscarDono;
  
     
  
@@ -287,7 +286,7 @@ public class PesquisarLivro extends JFrame {
         String telefoneDono = "-";
 
         try {
-            String[] dono = new UsuarioDAO().buscarContatoPorCpf(livro.getCpfDono());
+            String[] dono = buscarDono.apply(livro.getCpfDono());
             if (dono != null) {
                 nomeDono = dono[0];
                 emailDono = dono[1];
@@ -302,7 +301,6 @@ public class PesquisarLivro extends JFrame {
 
         String texto =
                 "<html><div style='width:360px'>"
-                + "<span style='font-size:24px; color:#0A561B'><b>" + livro.getNome() + "</b></span><br><br>"
                 + "<b>Autor(es):</b> " + autores + "<br>"
                 + "<b>Editora:</b> " + livro.getEditora() + "<br>"
                 + "<b>Ano de lançamento:</b> " + livro.getAnoLancamento() + "<br>"
@@ -331,53 +329,15 @@ public class PesquisarLivro extends JFrame {
                 ? new String[] { "Solicitar empréstimo", "Fechar" }
                 : new String[] { "Fechar" };
 
-        int escolha = mostrarJanela(
+        int escolha = JanelaMensagem.escolher(
                 lblTexto,
                 livro.getNome(),
-                JOptionPane.PLAIN_MESSAGE,
                 new ImageIcon(TelaMeusLivros.pegarImagem(livro, 260, 360)),
                 opcoes);
 
         // 0 = clicou em "Solicitar empréstimo"
         if (podeSolicitar && escolha == 0) {
-            solicitarEmprestimo(livro);
-        }
-    }
-
-    // =====================================================
-    // SOLICITA O EMPRÉSTIMO DO LIVRO
-    // =====================================================
-
-    private void solicitarEmprestimo(Livro livro) {
-
-        if (cpfUsuario == null) {
-            mensagem("Faça login para solicitar um empréstimo.");
-            return;
-        }
-
-        try {
-
-            EmprestimoDAO emprestimoDAO = new EmprestimoDAO();
-
-            if (!emprestimoDAO.livroDisponivel(livro.getIsbn())) {
-                mensagem("\"" + livro.getNome() + "\" já está emprestado no momento.");
-                return;
-            }
-
-            if (emprestimoDAO.jaSolicitou(cpfUsuario, livro.getIsbn())) {
-                mensagem("Você já solicitou o empréstimo de \"" + livro.getNome() + "\".");
-                return;
-            }
-
-            emprestimoDAO.solicitar(cpfUsuario, livro.getIsbn());
-
-            mensagem("Solicitação de empréstimo de \"" + livro.getNome() + "\" enviada!\n"
-                    + "Aguarde o dono do livro aceitar.");
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            mensagem("Erro ao solicitar empréstimo:\n" + e.getMessage());
+            aoSolicitar.accept(livro);
         }
     }
 
@@ -385,50 +345,15 @@ public class PesquisarLivro extends JFrame {
         this.cpfUsuario = cpfUsuario;
     }
 
-    // =====================================================
-    // JANELAS VERDES COM BOTÕES ARREDONDADOS (IGUAL A "MEUS LIVROS")
-    // Devolve o número do botão clicado (0, 1, ...) ou -1 se fechou no X
-    // =====================================================
-
-    private void mensagem(String texto) {
-        mostrarJanela(texto, "Mensagem", JOptionPane.INFORMATION_MESSAGE, null, "OK");
+    public String getCpfUsuario() {
+        return cpfUsuario;
     }
 
-    private int mostrarJanela(Object conteudo, String titulo, int tipo, Icon icone, String... opcoes) {
+    public void setAoSolicitar(Consumer<Livro> aoSolicitar) {
+        this.aoSolicitar = aoSolicitar;
+    }
 
-        UIManager.put("OptionPane.background", new Color(175, 244, 198));
-        UIManager.put("Panel.background", new Color(175, 244, 198));
-
-        JOptionPane painel = new JOptionPane(conteudo, tipo, JOptionPane.DEFAULT_OPTION, icone);
-
-        JButton[] botoes = new JButton[opcoes.length];
-
-        for (int i = 0; i < opcoes.length; i++) {
-            JButton botao = new TelaMeusLivros.BotaoArredondado(opcoes[i], 40);
-            botao.setBackground(new Color(114, 219, 145));
-            botao.setForeground(Color.BLACK);
-            botao.setFont(new Font("Tahoma", Font.BOLD, 15));
-            botao.setMargin(new Insets(6, 18, 6, 18));
-            botao.addActionListener(e -> painel.setValue(botao));
-            botoes[i] = botao;
-        }
-
-        painel.setOptions(botoes);
-        painel.setInitialValue(botoes[botoes.length - 1]);
-
-        JDialog janela = painel.createDialog(this, titulo);
-        janela.setVisible(true);
-        janela.dispose();
-
-        UIManager.put("OptionPane.background", null);
-        UIManager.put("Panel.background", null);
-
-        for (int i = 0; i < botoes.length; i++) {
-            if (painel.getValue() == botoes[i]) {
-                return i;
-            }
-        }
-
-        return -1;
+    public void setBuscarDono(Function<String, String[]> buscarDono) {
+        this.buscarDono = buscarDono;
     }
 }

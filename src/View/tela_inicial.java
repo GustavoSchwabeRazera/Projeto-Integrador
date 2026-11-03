@@ -27,6 +27,7 @@ public class tela_inicial extends JFrame {
     private JButton btnPesquisar;
     private JButton btnMeusLivros;
     private JButton btnSolicitacoes;
+    private JButton btnLivrosComigo;
     private JButton btnPerfil;
     private JButton btnCalendario;
     private JButton btnHistorico;
@@ -123,6 +124,12 @@ public class tela_inicial extends JFrame {
         ImageIcon solicitacoes = new ImageIcon(tela_inicial.class.getResource("/imagens/solicitacoes.png"));
         Image imgSolicitacoes = solicitacoes.getImage().getScaledInstance(295, 115, Image.SCALE_SMOOTH);
 
+        // =========================================================
+        // LIVROS COMIGO
+        // =========================================================
+        ImageIcon livrosComigo = new ImageIcon(tela_inicial.class.getResource("/imagens/livros comigo.png"));
+        Image imgLivrosComigo = livrosComigo.getImage().getScaledInstance(295, 115, Image.SCALE_SMOOTH);
+
         JLabel lblEspaco2 = new JLabel("");
         contentPane.add(lblEspaco2, "flowx,cell 3 0");
 
@@ -171,6 +178,14 @@ public class tela_inicial extends JFrame {
                         btnSolicitacoes.setFocusPainted(false);
                         btnSolicitacoes.setCursor(new Cursor(Cursor.HAND_CURSOR));
                         contentPane.add(btnSolicitacoes, "cell 5 11,alignx center");
+
+                        btnLivrosComigo = new JButton();
+                        btnLivrosComigo.setIcon(new ImageIcon(imgLivrosComigo));
+                        btnLivrosComigo.setBorderPainted(false);
+                        btnLivrosComigo.setContentAreaFilled(false);
+                        btnLivrosComigo.setFocusPainted(false);
+                        btnLivrosComigo.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                        contentPane.add(btnLivrosComigo, "cell 5 12,alignx center");
         
                 btnCalendario = new JButton("");
                 btnCalendario.setContentAreaFilled(false);
@@ -284,6 +299,10 @@ public class tela_inicial extends JFrame {
 
     public JButton getBtnSolicitacoes() {
         return btnSolicitacoes;
+    }
+
+    public JButton getBtnLivrosComigo() {
+        return btnLivrosComigo;
     }
 
     public JButton getBtnPerfil() {

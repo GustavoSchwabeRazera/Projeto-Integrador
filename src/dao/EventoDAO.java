@@ -62,6 +62,23 @@ public class EventoDAO {
     }
 
     // =========================================================
+    // ALTERAR EVENTO
+    // =========================================================
+
+    public void atualizar(int idEvento, String descricao) throws SQLException {
+
+        String sql = "UPDATE Eventos SET descricao = ? WHERE id_evento = ?";
+
+        try (PreparedStatement stmt = ConnectionFactory.getConnection().prepareStatement(sql)) {
+
+            stmt.setString(1, descricao);
+            stmt.setInt(2, idEvento);
+
+            stmt.executeUpdate();
+        }
+    }
+
+    // =========================================================
     // REMOVER EVENTO
     // =========================================================
 

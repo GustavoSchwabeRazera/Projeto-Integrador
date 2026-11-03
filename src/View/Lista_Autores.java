@@ -5,7 +5,6 @@ package View;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -13,15 +12,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import dao.AutorDAO;
-import dao.ConnectionFactory;
 import model.Autor;
 import net.miginfocom.swing.MigLayout;
 
@@ -39,9 +35,11 @@ public class Lista_Autores extends JFrame {
 
     private JButton botaoNovoAutor;
 
-    private JButton btnVoltar;
+    private JButton botaoEditar;
 
-    private Cadastro_Livro cadastroLivro;
+    private JButton botaoExcluir;
+
+    private JButton btnVoltar;
 
 
     // =========================================================
@@ -68,25 +66,10 @@ public class Lista_Autores extends JFrame {
 
 
     // =========================================================
-    // CONSTRUTOR PADRÃO
-    // =========================================================
-
-    public Lista_Autores() {
-
-        this(null);
-    }
-
-
-    // =========================================================
     // CONSTRUTOR
     // =========================================================
 
-    public Lista_Autores(
-            Cadastro_Livro cadastroLivro) {
-
-        this.cadastroLivro =
-                cadastroLivro;
-
+    public Lista_Autores() {
 
         setDefaultCloseOperation(
                 JFrame.DISPOSE_ON_CLOSE
@@ -253,100 +236,51 @@ public class Lista_Autores extends JFrame {
                 new RoundedButton(
                         "Cadastrar novo autor"
                 );
-        
-                botaoNovoAutor.addActionListener(
-                        e -> abrirCadastroAutor()
+
+        contentPane.add(
+                botaoNovoAutor,
+                "flowx,cell 1 3,growx"
+        );
+
+
+        // =====================================================
+        // BOTÕES ALTERAR E EXCLUIR
+        // =====================================================
+
+        botaoEditar =
+                new RoundedButton(
+                        "Alterar autor"
                 );
-                
-                        contentPane.add(
-                                botaoNovoAutor,
-                                "cell 1 3,growx"
-                        );
-        
-        
-                // =====================================================
-                // BOTÃO SELECIONAR
-                // =====================================================
-        
-                botaoSelecionar =
-                        new RoundedButton(
-                                "Selecionar autor(es)"
-                        );
-                
-                        botaoSelecionar.addActionListener(
-                                e -> selecionarAutores()
-                        );
-                        
-                                contentPane.add(
-                                        botaoSelecionar,
-                                        "cell 1 4,growx"
-                                );
+
+        contentPane.add(
+                botaoEditar,
+                "cell 1 3,growx"
+        );
+
+        botaoExcluir =
+                new RoundedButton(
+                        "Excluir autor"
+                );
+
+        contentPane.add(
+                botaoExcluir,
+                "cell 1 3,growx"
+        );
 
 
         // =====================================================
-        // CARREGAR AUTORES
+        // BOTÃO SELECIONAR
         // =====================================================
 
-        carregarAutoresDoBanco();
-    }
+        botaoSelecionar =
+                new RoundedButton(
+                        "Selecionar autor(es)"
+                );
 
-
-    // =========================================================
-    // ABRIR CADASTRO DE AUTOR
-    // =========================================================
-
-	    private void abrirCadastroAutor() {
-	
-	        Cadastro_Autor cadastroAutor =
-	                new Cadastro_Autor(this);
-	
-	        cadastroAutor.setVisible(true);
-	    }
-
-
-    // =========================================================
-    // CARREGAR AUTORES
-    // =========================================================
-
-    private void carregarAutoresDoBanco() {
-
-        try {
-
-            AutorDAO autorDAO =
-                    new AutorDAO(
-                            ConnectionFactory.getConnection()
-                    );
-
-            List<Autor> autores =
-                    autorDAO.listarAutores();
-
-            carregarAutores(
-                    autores
-            );
-
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Erro ao carregar os autores:\n"
-                            + e.getMessage(),
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
-    }
-
-
-    // =========================================================
-    // RECARREGAR AUTORES
-    // =========================================================
-
-    public void recarregarAutores() {
-
-        carregarAutoresDoBanco();
+        contentPane.add(
+                botaoSelecionar,
+                "cell 1 4,growx"
+        );
     }
 
 
@@ -374,49 +308,14 @@ public class Lista_Autores extends JFrame {
 
 
     // =========================================================
-    // SELECIONAR AUTORES
-    // =========================================================
-
-    private void selecionarAutores() {
-
-        List<Autor> selecionados =
-                listaAutores.getSelectedValuesList();
-
-
-        if (selecionados == null
-                || selecionados.isEmpty()) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Selecione pelo menos um autor."
-            );
-
-            return;
-        }
-
-
-        // =====================================================
-        // DEVOLVE PARA O CADASTRO DE LIVRO
-        // =====================================================
-
-        if (cadastroLivro != null) {
-
-            cadastroLivro.receberAutoresSelecionados(
-                    new ArrayList<>(
-                            selecionados
-                    )
-            );
-        }
-
-
-        // Fecha a janela
-        dispose();
-    }
-
-
-    // =========================================================
     // GETTERS
     // =========================================================
+
+    public List<Autor> getAutoresSelecionados() {
+
+        return listaAutores.getSelectedValuesList();
+    }
+
 
     public JList<Autor> getListaAutores() {
 
@@ -436,22 +335,20 @@ public class Lista_Autores extends JFrame {
     }
 
 
+    public JButton getBotaoEditar() {
+
+        return botaoEditar;
+    }
+
+
+    public JButton getBotaoExcluir() {
+
+        return botaoExcluir;
+    }
+
+
     public JButton getBtnVoltar() {
 
         return btnVoltar;
-    }
-
-
-    public Cadastro_Livro getCadastroLivro() {
-
-        return cadastroLivro;
-    }
-
-
-    public void setCadastroLivro(
-            Cadastro_Livro cadastroLivro) {
-
-        this.cadastroLivro =
-                cadastroLivro;
     }
 }

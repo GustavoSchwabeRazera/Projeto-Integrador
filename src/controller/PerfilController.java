@@ -1,11 +1,9 @@
 package controller;
 
-import java.awt.Color;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
+import View.JanelaMensagem;
 import View.Perfil;
 import View.TelaAlterar;
 import View.tela_inicial;
@@ -244,6 +242,17 @@ public class PerfilController {
         }
 
 
+        String erro =
+                Validador.validarUsuario(nome, email, telefone, dataNascimento);
+
+        if (erro != null) {
+
+            mostrarMensagem(erro);
+
+            return false;
+        }
+
+
         // ==============================
         // VALIDA SENHA
         // ==============================
@@ -287,6 +296,19 @@ public class PerfilController {
 
 
         try {
+
+            String donoDoEmail =
+                    usuarioDAO.buscarCpfPorEmail(email);
+
+            if (donoDoEmail != null && !donoDoEmail.equals(cpfAtual)) {
+
+                mostrarMensagem(
+                        "Este e-mail já está cadastrado."
+                );
+
+                return false;
+            }
+
 
             // ==============================
             // ATUALIZA NO BANCO
@@ -351,44 +373,13 @@ public class PerfilController {
     // Pede confirmação e exclui a conta. Retorna true se excluiu.
     public boolean excluirConta(String cpf) {
 
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-
-        String[] opcoes = { "Sim", "Não" };
-
-        int opcao = JOptionPane.showOptionDialog(
-                perfil,
+        boolean confirmou = JanelaMensagem.confirmar(
                 "Tem certeza que deseja excluir sua conta?\n"
                         + "Seus livros e empréstimos também serão apagados.",
-                "Excluir conta",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE,
-                null,
-                opcoes,
-                opcoes[1]
+                "Excluir conta"
         );
 
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
-
-
-        if (opcao != 0) {
+        if (!confirmou) {
             return false;
         }
 
@@ -436,31 +427,6 @@ public class PerfilController {
 
     private void mostrarMensagem(String mensagem) {
 
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-
-        JOptionPane.showMessageDialog(
-                null,
-                mensagem
-        );
-
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
+        JanelaMensagem.mostrar(mensagem);
     }
 }

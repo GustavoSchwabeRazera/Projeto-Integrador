@@ -1,11 +1,9 @@
 package controller;
 
-import java.awt.Color;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
+import View.JanelaMensagem;
 import View.Calendario;
 
 import dao.EmprestimoDAO;
@@ -107,12 +105,85 @@ public class CalendarioController {
 
             carregarCalendario();
 
+            mostrarMensagem(
+                    "Lembrete adicionado com sucesso!"
+            );
+
         } catch (SQLException e) {
 
             e.printStackTrace();
 
             mostrarMensagem(
                     "Erro ao salvar o lembrete:\n" + e.getMessage()
+            );
+        }
+    }
+
+
+    // =========================================================
+    // ALTERAR LEMBRETE
+    // =========================================================
+
+    public void alterarEvento() {
+
+        Evento evento = calendario.getEventoSelecionado();
+
+        if (evento == null) {
+
+            mostrarMensagem(
+                    "Selecione um lembrete na lista para alterar."
+            );
+
+            return;
+        }
+
+        String descricao = JanelaMensagem.pedirTexto(
+                "Digite o novo texto do lembrete:",
+                "Alterar lembrete",
+                evento.getDescricao()
+        );
+
+        // Cancelou
+        if (descricao == null) {
+            return;
+        }
+
+        descricao = descricao.trim();
+
+        if (descricao.isEmpty()) {
+
+            mostrarMensagem(
+                    "O lembrete não pode ficar vazio."
+            );
+
+            return;
+        }
+
+        if (descricao.length() > 100) {
+
+            mostrarMensagem(
+                    "O lembrete deve ter no máximo 100 caracteres."
+            );
+
+            return;
+        }
+
+        try {
+
+            eventoDAO.atualizar(evento.getIdEvento(), descricao);
+
+            carregarCalendario();
+
+            mostrarMensagem(
+                    "Lembrete alterado com sucesso!"
+            );
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem(
+                    "Erro ao alterar o lembrete:\n" + e.getMessage()
             );
         }
     }
@@ -141,6 +212,10 @@ public class CalendarioController {
 
             carregarCalendario();
 
+            mostrarMensagem(
+                    "Lembrete removido com sucesso!"
+            );
+
         } catch (SQLException e) {
 
             e.printStackTrace();
@@ -158,31 +233,6 @@ public class CalendarioController {
 
     private void mostrarMensagem(String mensagem) {
 
-        UIManager.put(
-                "OptionPane.background",
-                new Color(175, 244, 198)
-        );
-
-        UIManager.put(
-                "Panel.background",
-                new Color(175, 244, 198)
-        );
-
-
-        JOptionPane.showMessageDialog(
-                null,
-                mensagem
-        );
-
-
-        UIManager.put(
-                "OptionPane.background",
-                null
-        );
-
-        UIManager.put(
-                "Panel.background",
-                null
-        );
+        JanelaMensagem.mostrar(mensagem);
     }
 }
