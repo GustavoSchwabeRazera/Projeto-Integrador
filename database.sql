@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> origin/main
 DROP DATABASE IF EXISTS CapasVivas;
 CREATE DATABASE CapasVivas;
 USE CapasVivas;
