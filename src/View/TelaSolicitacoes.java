@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.LayoutManager;
 import java.awt.Dimension;
+import java.awt.Insets;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -34,9 +35,11 @@ import model.Solicitacao;
 public class TelaSolicitacoes extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
+	private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private JPanel contentPane;
 	private JButton btnHome;
-	private JPanel listaSolicitacoes;
+	private JPanel listaRecebidas;
+	private JPanel listaEnviadas;
 	private Consumer<Solicitacao> aoAceitar;
 	private Consumer<Solicitacao> aoRecusar;
 	private Consumer<Solicitacao> aoConversar;
@@ -180,80 +183,96 @@ public class TelaSolicitacoes extends JFrame {
 
 
         // =====================================================
-        // PAINEL DE SOLICITAÇÕES
+        // DUAS COLUNAS: RECEBIDAS E ENVIADAS
         // =====================================================
 
-        RoundedPanel painelSolicitacoes = new RoundedPanel(
-            new MigLayout(
-                "insets 0",
-                "[grow]",
-                "[grow]"
-            ),
-            40
+        JPanel colunas = new JPanel(
+            new MigLayout("insets 0", "[0:0:,grow,fill]25[0:0:,grow,fill]", "[0:0:,grow,fill]")
         );
-        painelSolicitacoes.setForeground(new Color(10, 86, 27));
-
-        painelSolicitacoes.setBackground(
-            new Color(36, 107, 45)
-        );
-
-        painelSolicitacoes.setBorder(
-            BorderFactory.createEmptyBorder(
-                30,
-                35,
-                30,
-                35
-            )
-        );
+        colunas.setOpaque(false);
 
         contentPane.add(
-            painelSolicitacoes,
+            colunas,
             "cell 0 2 5 8,grow"
         );
 
-        // Lista dos cartões (com barra de rolagem quando tiver muitos)
-        listaSolicitacoes = new JPanel(
+        listaRecebidas = new ListaRolavel(
             new MigLayout("insets 0, wrap 1", "[grow]", "[]15[]")
         );
-        listaSolicitacoes.setOpaque(false);
+        listaEnviadas = new ListaRolavel(
+            new MigLayout("insets 0, wrap 1", "[grow]", "[]15[]")
+        );
 
-        JScrollPane scroll = new JScrollPane(listaSolicitacoes);
+        colunas.add(criarColuna("Recebidas", listaRecebidas), "cell 0 0,grow");
+        colunas.add(criarColuna("Enviadas", listaEnviadas), "cell 1 0,grow");
+
+        mostrarSolicitacoes(new ArrayList<Solicitacao>(), new ArrayList<Solicitacao>());
+    }
+
+
+    // Painel verde com o título e a lista (com barra de rolagem quando tiver muitos)
+    private JPanel criarColuna(String titulo, JPanel lista) {
+
+        RoundedPanel coluna = new RoundedPanel(
+            new MigLayout("insets 0", "[0:0:,grow,fill]", "[]12[0:0:,grow,fill]"),
+            40
+        );
+        coluna.setForeground(new Color(10, 86, 27));
+        coluna.setBorder(BorderFactory.createEmptyBorder(22, 25, 22, 25));
+
+        JLabel lblTitulo = new JLabel(titulo);
+        lblTitulo.setForeground(Color.WHITE);
+        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 24));
+        coluna.add(lblTitulo, "cell 0 0,alignx center");
+
+        JScrollPane scroll = new JScrollPane(lista);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
+        coluna.add(scroll, "cell 0 1,grow");
 
-        painelSolicitacoes.add(scroll, "cell 0 0,grow");
-
-        mostrarSolicitacoes(new ArrayList<Solicitacao>());
+        return coluna;
     }
 
 
     // =====================================================
-    // MOSTRA AS SOLICITAÇÕES NA TELA
+    // MOSTRA AS SOLICITAÇÕES RECEBIDAS E AS ENVIADAS NA TELA
     // =====================================================
 
-    public void mostrarSolicitacoes(List<Solicitacao> solicitacoes) {
+    public void mostrarSolicitacoes(List<Solicitacao> recebidas, List<Solicitacao> enviadas) {
 
-        listaSolicitacoes.removeAll();
+        listaRecebidas.removeAll();
+        listaEnviadas.removeAll();
 
-        if (solicitacoes.isEmpty()) {
-
-            JLabel lblVazio = new JLabel("Nenhuma solicitação pendente.");
-            lblVazio.setForeground(Color.WHITE);
-            lblVazio.setFont(new Font("Tahoma", Font.BOLD, 22));
-            listaSolicitacoes.add(lblVazio, "alignx center,gaptop 40");
-
-        } else {
-
-            for (Solicitacao s : solicitacoes) {
-                listaSolicitacoes.add(criarCartao(s), "growx");
-            }
+        if (recebidas.isEmpty()) {
+            listaRecebidas.add(criarAvisoVazio("Nenhuma solicitação recebida."), "alignx center,gaptop 40");
+        }
+        for (Solicitacao s : recebidas) {
+            listaRecebidas.add(criarCartao(s), "growx,wmin 0");
         }
 
-        listaSolicitacoes.revalidate();
-        listaSolicitacoes.repaint();
+        if (enviadas.isEmpty()) {
+            listaEnviadas.add(criarAvisoVazio("Nenhuma solicitação enviada."), "alignx center,gaptop 40");
+        }
+        for (Solicitacao s : enviadas) {
+            listaEnviadas.add(criarCartaoEnviada(s), "growx,wmin 0");
+        }
+
+        listaRecebidas.revalidate();
+        listaRecebidas.repaint();
+        listaEnviadas.revalidate();
+        listaEnviadas.repaint();
+    }
+
+    private JLabel criarAvisoVazio(String texto) {
+
+        JLabel lblVazio = new JLabel(texto);
+        lblVazio.setForeground(Color.WHITE);
+        lblVazio.setFont(new Font("Tahoma", Font.BOLD, 20));
+
+        return lblVazio;
     }
 
 
@@ -266,7 +285,7 @@ public class TelaSolicitacoes extends JFrame {
         RoundedPanel cartao = new RoundedPanel(
             new MigLayout(
                 "insets 14 25 14 25",
-                "[]20[grow]20[]20[]20[]",
+                "[]15[0:0:,grow,fill]15[]10[]",
                 "[center]"
             ),
             35
@@ -279,7 +298,7 @@ public class TelaSolicitacoes extends JFrame {
 
         // Nome + livro
         JPanel informacoes = new JPanel(
-            new MigLayout("insets 0", "[grow]", "[]2[]")
+            new MigLayout("insets 0", "[0:0:,grow,fill]", "[]2[]2[]")
         );
         informacoes.setOpaque(false);
         cartao.add(informacoes, "cell 1 0,growx,aligny center");
@@ -287,18 +306,23 @@ public class TelaSolicitacoes extends JFrame {
         JLabel lblNome = new JLabel(
             s.getNomeSolicitante() + " quer " + s.getTituloLivro()
         );
-        lblNome.setFont(new Font("Tahoma", Font.BOLD, 21));
+        lblNome.setFont(new Font("Tahoma", Font.BOLD, 19));
         informacoes.add(lblNome, "cell 0 0");
 
-        JLabel lblDetalhes = new JLabel(
-            "Solicitação de empréstimo em "
-            + s.getDataPedido().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-            + "   •   " + s.getEmailSolicitante()
-            + "   •   " + s.getTelefoneSolicitante()
+        JLabel lblDatas = new JLabel(
+            "Pedido em " + s.getDataPedido().format(FORMATO_DATA)
+            + " • válido até " + s.getDataValidade().format(FORMATO_DATA)
         );
-        lblDetalhes.setForeground(new Color(60, 60, 60));
-        lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        informacoes.add(lblDetalhes, "cell 0 1");
+        lblDatas.setForeground(new Color(60, 60, 60));
+        lblDatas.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        informacoes.add(lblDatas, "cell 0 1");
+
+        JLabel lblContato = new JLabel(
+            s.getEmailSolicitante() + "   •   " + s.getTelefoneSolicitante()
+        );
+        lblContato.setForeground(new Color(60, 60, 60));
+        lblContato.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        informacoes.add(lblContato, "cell 0 2");
 
         // Botão conversar
         JButton btnConversar = criarBotaoIcone(IconeChat.criar(42, 0), "Conversar");
@@ -330,6 +354,52 @@ public class TelaSolicitacoes extends JFrame {
         return cartao;
     }
 
+
+    // =====================================================
+    // CARTÃO DE UM PEDIDO ENVIADO (SÓ INFORMATIVO, SEM BOTÕES)
+    // =====================================================
+
+    private JPanel criarCartaoEnviada(Solicitacao s) {
+
+        RoundedPanel cartao = new RoundedPanel(
+            new MigLayout("insets 14 25 14 25", "[]15[0:0:,grow,fill]", "[center]"),
+            35
+        );
+        cartao.setForeground(new Color(226, 240, 231));
+
+        // Foto do dono do livro
+        JLabel lblFoto = new JLabel(new ImageIcon(pegarFoto(s.getFotoDono(), 45)));
+        cartao.add(lblFoto, "cell 0 0,alignx center,aligny center");
+
+        // Livro + datas + situação
+        JPanel informacoes = new JPanel(
+            new MigLayout("insets 0", "[0:0:,grow,fill]", "[]2[]2[]")
+        );
+        informacoes.setOpaque(false);
+        cartao.add(informacoes, "cell 1 0,growx,aligny center");
+
+        JLabel lblTitulo = new JLabel(
+            "Você pediu \"" + s.getTituloLivro() + "\" para " + s.getNomeDono()
+        );
+        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 19));
+        informacoes.add(lblTitulo, "cell 0 0");
+
+        JLabel lblDatas = new JLabel(
+            "Pedido em " + s.getDataPedido().format(FORMATO_DATA)
+            + "   •   válido até " + s.getDataValidade().format(FORMATO_DATA)
+        );
+        lblDatas.setForeground(new Color(60, 60, 60));
+        lblDatas.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        informacoes.add(lblDatas, "cell 0 1");
+
+        JLabel lblSituacao = new JLabel("Aguardando resposta");
+        lblSituacao.setForeground(new Color(60, 60, 60));
+        lblSituacao.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        informacoes.add(lblSituacao, "cell 0 2");
+
+        return cartao;
+    }
+
     private JButton criarBotaoIcone(String imagem, String dica) {
 
         return criarBotaoIcone(new ImageIcon(TelaSolicitacoes.class.getResource(imagem)), dica);
@@ -340,6 +410,7 @@ public class TelaSolicitacoes extends JFrame {
         JButton botao = new JButton("");
         botao.setIcon(icone);
         botao.setToolTipText(dica);
+        botao.setMargin(new Insets(0, 0, 0, 0));
         botao.setBorderPainted(false);
         botao.setContentAreaFilled(false);
         botao.setFocusPainted(false);

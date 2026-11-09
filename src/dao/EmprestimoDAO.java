@@ -15,25 +15,24 @@ import model.EmprestimoAtivo;
 import model.RegistroHistorico;
 import model.Solicitacao;
 
-// Pedidos ficam na tabela Solicitacoes e os empréstimos aceitos na tabela Emprestimo.
-// O status do livro (disponível/indisponível) é trocado pelos triggers da tabela Emprestimo.
+
 public class EmprestimoDAO {
 
-    // Prazo padrão de um empréstimo (em dias)
+    
     private static final int DIAS_EMPRESTIMO = 14;
 
-    // Depois desse tempo sem resposta o pedido vence (em dias)
-    private static final int DIAS_VALIDADE_PEDIDO = 14;
+  
+    private static final int DIAS_VALIDADE_PEDIDO = Solicitacao.DIAS_VALIDADE;
 
-    // Pedido ainda não venceu
+   
     private static final String PEDIDO_VALIDO =
             "s.data_pedido >= CURRENT_DATE - INTERVAL '" + DIAS_VALIDADE_PEDIDO + "' DAY";
 
-    private static boolean colunaVerificada = false;
+    private static boolean colunasVerificadas = false;
 
     private final HistoricoDAO historicoDAO = new HistoricoDAO();
 
-    // Sempre devolve uma conexão aberta
+
     private Connection getConn() throws SQLException {
 
         Connection conn = ConnectionFactory.getConnection();
@@ -41,30 +40,36 @@ public class EmprestimoDAO {
         // Cria a coluna se o banco MySQL foi montado antes dela existir
         if (!colunaVerificada && !ConnectionFactory.usaPostgres()) {
 
-            try (PreparedStatement stmt = conn.prepareStatement(
-                    "SELECT 1 FROM information_schema.COLUMNS "
-                    + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Emprestimo' "
-                    + "AND COLUMN_NAME = 'devolucao_solicitada'");
-                    ResultSet rs = stmt.executeQuery()) {
+            criarColunaSeFaltar(conn, "devolucao_solicitada");
+            criarColunaSeFaltar(conn, "ultimo_aviso_prazo");
 
-                if (!rs.next()) {
-                    try (PreparedStatement alterar = conn.prepareStatement(
-                            "ALTER TABLE Emprestimo ADD COLUMN devolucao_solicitada DATE NULL")) {
-                        alterar.executeUpdate();
-                    }
-                }
-            }
-
-            colunaVerificada = true;
+            colunasVerificadas = true;
         }
 
         return conn;
     }
 
-    // =========================================================
-    // SOLICITAR EMPRÉSTIMO
-    // Fica na tabela Solicitacoes até o dono aceitar
-    // =========================================================
+    private void criarColunaSeFaltar(Connection conn, String coluna) throws SQLException {
+
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "SELECT 1 FROM information_schema.COLUMNS "
+                + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Emprestimo' "
+                + "AND COLUMN_NAME = ?")) {
+
+            stmt.setString(1, coluna);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (!rs.next()) {
+                    try (PreparedStatement alterar = conn.prepareStatement(
+                            "ALTER TABLE Emprestimo ADD COLUMN " + coluna + " DATE NULL")) {
+                        alterar.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
 
     public void solicitar(String cpfUsuario, String isbn) throws SQLException {
 
@@ -80,9 +85,6 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // VERIFICA SE O USUÁRIO JÁ PEDIU ESSE LIVRO
-    // =========================================================
 
     public boolean jaSolicitou(String cpfUsuario, String isbn) throws SQLException {
 
@@ -100,9 +102,7 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // RN01: O USUÁRIO SÓ PODE ESTAR COM 1 LIVRO EMPRESTADO POR VEZ
-    // =========================================================
+
 
     public boolean temEmprestimoAtivo(String cpfUsuario) throws SQLException {
 
@@ -119,7 +119,6 @@ public class EmprestimoDAO {
         }
     }
 
-    // A mesma regra, olhando quem fez o pedido
     public boolean solicitanteTemEmprestimoAtivo(int idSolicitacao) throws SQLException {
 
         String sql = "SELECT 1 FROM Solicitacoes s "
@@ -136,9 +135,7 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // VERIFICA SE O LIVRO ESTÁ DISPONÍVEL (NÃO EMPRESTADO)
-    // =========================================================
+
 
     public boolean livroDisponivel(String isbn) throws SQLException {
 
@@ -154,9 +151,7 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // LISTAR SOLICITAÇÕES PENDENTES DOS LIVROS DE UM USUÁRIO
-    // =========================================================
+
 
     public List<Solicitacao> listarPendentesDoDono(String cpfDono) throws SQLException {
 
@@ -194,29 +189,69 @@ public class EmprestimoDAO {
         return solicitacoes;
     }
 
-    // =========================================================
-    // EMPRÉSTIMOS ATIVOS DO USUÁRIO QUE ACABAM NOS PRÓXIMOS DIAS
-    // =========================================================
 
-    public List<AvisoPrazo> listarAtivosPertoDoFim(String cpfUsuario, int dias) throws SQLException {
+
+    public List<Solicitacao> listarPedidosEnviados(String cpfSolicitante) throws SQLException {
+
+        List<Solicitacao> pedidos = new ArrayList<>();
+
+        String sql = "SELECT s.id_solicitacao, s.data_pedido, l.ISBN, l.titulo, u.nome, u.foto "
+                + "FROM Solicitacoes s "
+                + "JOIN Livros l ON l.ISBN = s.ISBN "
+                + "JOIN Usuarios u ON u.CPF = l.CPF_dono "
+                + "WHERE s.CPF_solicitante = ? AND " + PEDIDO_VALIDO + " "
+                + "ORDER BY s.data_pedido, s.id_solicitacao";
+
+        try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
+
+            stmt.setString(1, cpfSolicitante);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Solicitacao s = new Solicitacao();
+                    s.setIdSolicitacao(rs.getInt("id_solicitacao"));
+                    s.setDataPedido(rs.getDate("data_pedido").toLocalDate());
+                    s.setIsbn(rs.getString("ISBN"));
+                    s.setTituloLivro(rs.getString("titulo"));
+                    s.setNomeDono(rs.getString("nome"));
+                    s.setFotoDono(rs.getBytes("foto"));
+                    pedidos.add(s);
+                }
+            }
+        }
+
+        return pedidos;
+    }
+
+
+    public List<AvisoPrazo> listarPrazos(String cpfUsuario) throws SQLException {
+
+        return buscarPrazos(cpfUsuario, "");
+    }
+
+    // Só os prazos que o usuário ainda não viu no aviso de hoje
+    public List<AvisoPrazo> listarPrazosNaoAvisadosHoje(String cpfUsuario) throws SQLException {
+
+        return buscarPrazos(cpfUsuario,
+                "AND (e.ultimo_aviso_prazo IS NULL OR e.ultimo_aviso_prazo < CURDATE()) ");
+    }
+
+    private List<AvisoPrazo> buscarPrazos(String cpfUsuario, String filtro) throws SQLException {
 
         List<AvisoPrazo> avisos = new ArrayList<>();
 
-        String sql = "SELECT e.id_emprestimo, e.data_entrega, e.ISBN, e.titulo_livro, u.nome "
+        String sql = "SELECT e.id_emprestimo, e.data_entrega, "
+                + "e.ISBN, e.titulo_livro, u.nome, u.foto "
                 + "FROM Emprestimo e "
                 + "JOIN Usuarios u ON u.CPF = e.CPF_dono "
                 + "WHERE e.CPF_leitor = ? AND e.data_devolucao IS NULL "
                 + "AND e.devolucao_solicitada IS NULL "
-                + "AND e.data_entrega BETWEEN ? AND ? "
+                + filtro
                 + "ORDER BY e.data_entrega, e.id_emprestimo";
-
-        LocalDate hoje = LocalDate.now();
 
         try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
 
             stmt.setString(1, cpfUsuario);
-            stmt.setDate(2, java.sql.Date.valueOf(hoje));
-            stmt.setDate(3, java.sql.Date.valueOf(hoje.plusDays(dias)));
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -226,6 +261,7 @@ public class EmprestimoDAO {
                     a.setIsbn(rs.getString("ISBN"));
                     a.setTituloLivro(rs.getString("titulo_livro"));
                     a.setNomeDono(rs.getString("nome"));
+                    a.setFotoDono(rs.getBytes("foto"));
                     avisos.add(a);
                 }
             }
@@ -234,18 +270,57 @@ public class EmprestimoDAO {
         return avisos;
     }
 
-    // =========================================================
-    // EVENTOS DO CALENDÁRIO
-    // Início e entrega dos empréstimos do usuário, tanto dos
-    // livros que ele pegou quanto dos que emprestou. Pedidos
-    // ainda não aceitos aparecem no dia em que foram feitos.
-    // =========================================================
+    
+    public void marcarPrazosAvisadosHoje(String cpfUsuario) throws SQLException {
+
+        try (PreparedStatement stmt = getConn().prepareStatement(
+                "UPDATE Emprestimo SET ultimo_aviso_prazo = CURDATE() "
+                + "WHERE CPF_leitor = ? AND data_devolucao IS NULL")) {
+            stmt.setString(1, cpfUsuario);
+            stmt.executeUpdate();
+        }
+    }
+
+
+    public List<EmprestimoAtivo> listarEmprestimosAceitos(String cpfDono) throws SQLException {
+
+        List<EmprestimoAtivo> emprestimos = new ArrayList<>();
+
+        String sql = "SELECT e.id_emprestimo, e.ISBN, e.titulo_livro, "
+                + "e.data_entrega, u.nome, u.foto "
+                + "FROM Emprestimo e "
+                + "JOIN Usuarios u ON u.CPF = e.CPF_leitor "
+                + "WHERE e.CPF_dono = ? AND e.data_devolucao IS NULL "
+                + "AND e.devolucao_solicitada IS NULL "
+                + "ORDER BY e.data_entrega, e.id_emprestimo";
+
+        try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
+
+            stmt.setString(1, cpfDono);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    EmprestimoAtivo e = new EmprestimoAtivo();
+                    e.setIdEmprestimo(rs.getInt("id_emprestimo"));
+                    e.setIsbn(rs.getString("ISBN"));
+                    e.setTituloLivro(rs.getString("titulo_livro"));
+                    e.setDataEntrega(rs.getDate("data_entrega").toLocalDate());
+                    e.setNomeLeitor(rs.getString("nome"));
+                    e.setFotoLeitor(rs.getBytes("foto"));
+                    emprestimos.add(e);
+                }
+            }
+        }
+
+        return emprestimos;
+    }
+
 
     public Map<LocalDate, List<String>> listarEventosCalendario(String cpfUsuario) throws SQLException {
 
         Map<LocalDate, List<String>> eventos = new HashMap<>();
 
-        // Pedidos pendentes (feitos ou recebidos pelo usuário)
+     
         String sqlPedidos = "SELECT s.data_pedido, s.CPF_solicitante, l.titulo, "
                 + "dono.nome AS nome_dono, leitor.nome AS nome_leitor "
                 + "FROM Solicitacoes s "
@@ -277,7 +352,7 @@ public class EmprestimoDAO {
             }
         }
 
-        // Empréstimos aceitos
+       
         String sqlEmprestimos = "SELECT e.data_emprestimo, e.data_entrega, e.data_devolucao, "
                 + "e.CPF_leitor, e.titulo_livro, dono.nome AS nome_dono, leitor.nome AS nome_leitor "
                 + "FROM Emprestimo e "
@@ -558,6 +633,44 @@ public class EmprestimoDAO {
                     e.setDevolucaoSolicitada(rs.getDate("devolucao_solicitada").toLocalDate());
                     e.setNomeLeitor(rs.getString("nome"));
                     e.setFotoLeitor(rs.getBytes("foto"));
+                    devolucoes.add(e);
+                }
+            }
+        }
+
+        return devolucoes;
+    }
+
+    // =========================================================
+    // DEVOLUÇÕES QUE O USUÁRIO INFORMOU E O DONO AINDA NÃO CONFIRMOU
+    // =========================================================
+
+    public List<EmprestimoAtivo> listarDevolucoesInformadas(String cpfLeitor) throws SQLException {
+
+        List<EmprestimoAtivo> devolucoes = new ArrayList<>();
+
+        String sql = "SELECT e.id_emprestimo, e.ISBN, e.titulo_livro, e.data_entrega, "
+                + "e.devolucao_solicitada, u.nome, u.foto "
+                + "FROM Emprestimo e "
+                + "JOIN Usuarios u ON u.CPF = e.CPF_dono "
+                + "WHERE e.CPF_leitor = ? AND e.data_devolucao IS NULL "
+                + "AND e.devolucao_solicitada IS NOT NULL "
+                + "ORDER BY e.devolucao_solicitada, e.id_emprestimo";
+
+        try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
+
+            stmt.setString(1, cpfLeitor);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    EmprestimoAtivo e = new EmprestimoAtivo();
+                    e.setIdEmprestimo(rs.getInt("id_emprestimo"));
+                    e.setIsbn(rs.getString("ISBN"));
+                    e.setTituloLivro(rs.getString("titulo_livro"));
+                    e.setDataEntrega(rs.getDate("data_entrega").toLocalDate());
+                    e.setDevolucaoSolicitada(rs.getDate("devolucao_solicitada").toLocalDate());
+                    e.setNomeDono(rs.getString("nome"));
+                    e.setFotoDono(rs.getBytes("foto"));
                     devolucoes.add(e);
                 }
             }

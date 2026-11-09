@@ -11,6 +11,7 @@ public class EmprestimoAtivo {
     private String tituloLivro;
     private byte[] fotoCapa;
     private String nomeDono;
+    private byte[] fotoDono;
     private String emailDono;
     private String telefoneDono;
     private String nomeLeitor;
@@ -65,6 +66,14 @@ public class EmprestimoAtivo {
 
     public void setNomeDono(String nomeDono) {
         this.nomeDono = nomeDono;
+    }
+
+    public byte[] getFotoDono() {
+        return fotoDono;
+    }
+
+    public void setFotoDono(byte[] fotoDono) {
+        this.fotoDono = fotoDono;
     }
 
     public String getEmailDono() {

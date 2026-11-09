@@ -1,6 +1,7 @@
 package controller;
 
 import java.sql.SQLException;
+import java.util.List;
 
 
 import View.JanelaMensagem;
@@ -8,12 +9,10 @@ import View.TelaNotificacoes;
 
 import dao.EmprestimoDAO;
 
+import model.AvisoPrazo;
 import model.EmprestimoAtivo;
 
 public class NotificacaoController {
-
-    // Avisa quando faltar até esse número de dias para o empréstimo acabar
-    private static final int DIAS_AVISO = 3;
 
     private final EmprestimoDAO emprestimoDAO;
     private final TelaNotificacoes telaNotificacoes;
@@ -24,22 +23,10 @@ public class NotificacaoController {
 
     public NotificacaoController(
             EmprestimoDAO emprestimoDAO,
-            TelaNotificacoes telaNotificacoes,
-            SolicitacaoController solicitacaoController) {
+            TelaNotificacoes telaNotificacoes) {
 
         this.emprestimoDAO = emprestimoDAO;
         this.telaNotificacoes = telaNotificacoes;
-
-        // Aceitar/recusar usam a mesma regra da tela de Solicitações
-        telaNotificacoes.setAoAceitar(s -> {
-            solicitacaoController.aceitarSolicitacao(s);
-            carregarNotificacoes();
-        });
-
-        telaNotificacoes.setAoRecusar(s -> {
-            solicitacaoController.recusarSolicitacao(s);
-            carregarNotificacoes();
-        });
 
         telaNotificacoes.setAoConfirmarDevolucao(this::confirmarDevolucao);
 
@@ -64,9 +51,14 @@ public class NotificacaoController {
         try {
 
             telaNotificacoes.mostrarNotificacoes(
-                    emprestimoDAO.listarAtivosPertoDoFim(cpfUsuario, DIAS_AVISO),
+                    // Recebidas
+                    emprestimoDAO.listarPrazos(cpfUsuario),
+                    emprestimoDAO.listarPendentesDoDono(cpfUsuario),
                     emprestimoDAO.listarDevolucoesParaConfirmar(cpfUsuario),
-                    emprestimoDAO.listarPendentesDoDono(cpfUsuario)
+                    // Enviadas
+                    emprestimoDAO.listarPedidosEnviados(cpfUsuario),
+                    emprestimoDAO.listarEmprestimosAceitos(cpfUsuario),
+                    emprestimoDAO.listarDevolucoesInformadas(cpfUsuario)
             );
 
         } catch (SQLException e) {
@@ -75,6 +67,44 @@ public class NotificacaoController {
 
             mostrarMensagem(
                     "Erro ao carregar notificações:\n" + e.getMessage()
+            );
+        }
+    }
+
+
+    // =========================================================
+    // AVISO DIÁRIO DO PRAZO DE DEVOLUÇÃO
+    // Aparece uma vez por dia, enquanto o livro não for devolvido
+    // =========================================================
+
+    public void avisarPrazosDoDia(String cpfUsuario) {
+
+        try {
+
+            List<AvisoPrazo> avisos = emprestimoDAO.listarPrazosNaoAvisadosHoje(cpfUsuario);
+
+            if (avisos.isEmpty()) {
+                return;
+            }
+
+            StringBuilder texto = new StringBuilder("Lembrete de devolução:");
+
+            for (AvisoPrazo a : avisos) {
+                texto.append("\n\n").append(a.getLembrete());
+            }
+
+            texto.append("\n\nConsulte o prazo em Livros Comigo.");
+
+            mostrarMensagem(texto.toString());
+
+            emprestimoDAO.marcarPrazosAvisadosHoje(cpfUsuario);
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+            mostrarMensagem(
+                    "Erro ao verificar os prazos de devolução:\n" + e.getMessage()
             );
         }
     }

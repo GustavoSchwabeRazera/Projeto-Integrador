@@ -113,7 +113,7 @@ public class LivroController {
                 new CalendarioController(new EventoDAO(), emprestimoDAO, calendario);
 
         this.notificacaoController =
-                new NotificacaoController(emprestimoDAO, telaNotificacoes, solicitacaoController);
+                new NotificacaoController(emprestimoDAO, telaNotificacoes);
 
         this.livrosComigoController =
                 new LivrosComigoController(emprestimoDAO, telaLivrosComigo);
@@ -253,8 +253,14 @@ public class LivroController {
         telaNotificacoes.getBtnHome()
                 .addActionListener(e -> abrirHome());
 
-       
-        telaNotificacoes.setAoAbrirSolicitacao(s -> abrirSolicitacoes());
+        telaNotificacoes.setAoAbrirTela(destino -> {
+
+            switch (destino) {
+                case SOLICITACOES -> abrirSolicitacoes();
+                case MEUS_LIVROS -> abrirMeusLivros();
+                case LIVROS_COMIGO -> abrirLivrosComigo();
+            }
+        });
 
         telaNotificacoes.setAoConversar(s -> abrirChatCom(s.getCpfSolicitante()));
 
@@ -388,6 +394,8 @@ public class LivroController {
         }
 
         trocarPara(telaInicial);
+
+        notificacaoController.avisarPrazosDoDia(cpfUsuarioLogado);
     }
 
 

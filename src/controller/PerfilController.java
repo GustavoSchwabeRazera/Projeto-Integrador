@@ -35,10 +35,6 @@ public class PerfilController {
     }
 
 
-    // =========================================================
-    // PERFIL
-    // =========================================================
-
     public void carregarPerfil(String email, String cpf) {
 
         try {
@@ -113,11 +109,6 @@ public class PerfilController {
     }
 
 
-    // =========================================================
-    // ALTERAR CADASTRO
-    // =========================================================
-
-    // Preenche a tela de alteração. Retorna true se achou os dados.
     public boolean carregarDadosAlteracao(String cpf) {
 
         try {
@@ -129,31 +120,31 @@ public class PerfilController {
 
             if (dados != null) {
 
-                // CPF
+                
                 alterarCadastro.getTxtCpf()
                         .setText(dados[0]);
 
-                // Nome
+                
                 alterarCadastro.getTxtNome()
                         .setText(dados[1]);
 
-                // E-mail
+               
                 alterarCadastro.getTxtEmail()
                         .setText(dados[2]);
 
-                // Telefone
+                
                 alterarCadastro.getTxtTelefone()
                         .setText(dados[3]);
 
-                // Data de nascimento
+            
                 alterarCadastro.getTxtDataNascimento()
                         .setText(dados[4]);
 
-                // Senha
+               
                 alterarCadastro.getTxtSenha()
                         .setText(dados[5]);
 
-                // Confirmar senha
+                
                 alterarCadastro.getTxtConfirmarSenha()
                         .setText(dados[5]);
 
@@ -179,9 +170,6 @@ public class PerfilController {
             return false;
         }
     }
-
-
-    // Salva as alterações. Retorna true se deu certo.
     public boolean atualizarCadastro(String cpfAtual) {
 
         String cpfNovo =
@@ -222,10 +210,6 @@ public class PerfilController {
                 );
 
 
-        // ==============================
-        // VALIDA CAMPOS
-        // ==============================
-
         if (cpfNovo.isEmpty()
                 || nome.isEmpty()
                 || telefone.isEmpty()
@@ -253,10 +237,6 @@ public class PerfilController {
         }
 
 
-        // ==============================
-        // VALIDA SENHA
-        // ==============================
-
         if (senha.length() > 20) {
 
             mostrarMensagem(
@@ -276,10 +256,6 @@ public class PerfilController {
             return false;
         }
 
-
-        // ==============================
-        // VALIDA CPF
-        // ==============================
 
         String cpfLimpo =
                 cpfNovo.replaceAll("\\D", "");
@@ -310,9 +286,6 @@ public class PerfilController {
             }
 
 
-            // ==============================
-            // ATUALIZA NO BANCO
-            // ==============================
 
             usuarioDAO.atualizarCadastro(
                     cpfAtual,
@@ -329,9 +302,6 @@ public class PerfilController {
             emailAtualizado = email;
 
 
-            // ==============================
-            // BUSCA DADOS ATUALIZADOS
-            // ==============================
 
             String[] dadosAtualizados =
                     usuarioDAO.buscarUsuarioPorEmail(
@@ -366,11 +336,6 @@ public class PerfilController {
     }
 
 
-    // =========================================================
-    // EXCLUIR CONTA
-    // =========================================================
-
-    // Pede confirmação e exclui a conta. Retorna true se excluiu.
     public boolean excluirConta(String cpf) {
 
         boolean confirmou = JanelaMensagem.confirmar(
@@ -407,9 +372,7 @@ public class PerfilController {
     }
 
 
-    // =========================================================
-    // GETTERS
-    // =========================================================
+  
 
     public String getCpfAtualizado() {
         return cpfAtualizado;
@@ -419,11 +382,6 @@ public class PerfilController {
     public String getEmailAtualizado() {
         return emailAtualizado;
     }
-
-
-    // =========================================================
-    // MENSAGEM
-    // =========================================================
 
     private void mostrarMensagem(String mensagem) {
 
