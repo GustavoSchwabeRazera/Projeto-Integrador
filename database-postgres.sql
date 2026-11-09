@@ -63,6 +63,7 @@ CREATE TABLE Solicitacoes
 -- Empréstimos aceitos: liga o dono do livro e quem pegou emprestado.
 -- data_devolucao fica NULL enquanto o livro está com o leitor.
 -- devolucao_solicitada = dia em que o leitor devolveu, esperando o dono confirmar.
+-- ultimo_aviso_prazo = último dia em que o leitor recebeu o aviso diário do prazo.
 CREATE TABLE Emprestimo
 (
     id_emprestimo SERIAL PRIMARY KEY,
@@ -74,6 +75,7 @@ CREATE TABLE Emprestimo
     data_entrega DATE NOT NULL,
     data_devolucao DATE NULL,
     devolucao_solicitada DATE NULL,
+    ultimo_aviso_prazo DATE NULL,
     FOREIGN KEY (ISBN) REFERENCES Livros(ISBN),
     FOREIGN KEY (CPF_dono) REFERENCES Usuarios(CPF),
     FOREIGN KEY (CPF_leitor) REFERENCES Usuarios(CPF)

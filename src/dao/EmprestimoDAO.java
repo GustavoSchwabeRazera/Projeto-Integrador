@@ -38,7 +38,7 @@ public class EmprestimoDAO {
         Connection conn = ConnectionFactory.getConnection();
 
         // Cria a coluna se o banco MySQL foi montado antes dela existir
-        if (!colunaVerificada && !ConnectionFactory.usaPostgres()) {
+        if (!colunasVerificadas && !ConnectionFactory.usaPostgres()) {
 
             criarColunaSeFaltar(conn, "devolucao_solicitada");
             criarColunaSeFaltar(conn, "ultimo_aviso_prazo");
@@ -233,7 +233,7 @@ public class EmprestimoDAO {
     public List<AvisoPrazo> listarPrazosNaoAvisadosHoje(String cpfUsuario) throws SQLException {
 
         return buscarPrazos(cpfUsuario,
-                "AND (e.ultimo_aviso_prazo IS NULL OR e.ultimo_aviso_prazo < CURDATE()) ");
+                "AND (e.ultimo_aviso_prazo IS NULL OR e.ultimo_aviso_prazo < CURRENT_DATE) ");
     }
 
     private List<AvisoPrazo> buscarPrazos(String cpfUsuario, String filtro) throws SQLException {
@@ -274,7 +274,7 @@ public class EmprestimoDAO {
     public void marcarPrazosAvisadosHoje(String cpfUsuario) throws SQLException {
 
         try (PreparedStatement stmt = getConn().prepareStatement(
-                "UPDATE Emprestimo SET ultimo_aviso_prazo = CURDATE() "
+                "UPDATE Emprestimo SET ultimo_aviso_prazo = CURRENT_DATE "
                 + "WHERE CPF_leitor = ? AND data_devolucao IS NULL")) {
             stmt.setString(1, cpfUsuario);
             stmt.executeUpdate();

@@ -62,9 +62,6 @@ public class TelaNotificacoes extends JFrame {
     private JButton btnHome;
     private JPanel listaNotificacoes;
 
-    private Consumer<Solicitacao> aoAceitar;
-    private Consumer<Solicitacao> aoRecusar;
-    private Consumer<Solicitacao> aoAbrirSolicitacao;
     private Consumer<Solicitacao> aoConversar;
     private Consumer<EmprestimoAtivo> aoConfirmarDevolucao;
     private Consumer<EmprestimoAtivo> aoRecusarDevolucao;
@@ -236,7 +233,8 @@ public class TelaNotificacoes extends JFrame {
                         Tipo.SOLICITACAO,
                         Destino.SOLICITACOES,
                         pegarFoto(s.getFotoSolicitante(), 45),
-                        s.getNomeSolicitante() + " pediu \"" + s.getTituloLivro() + "\""
+                        s.getNomeSolicitante() + " pediu \"" + s.getTituloLivro() + "\"",
+                        criarBotaoConversar(s)
                     );
                 }
                 for (EmprestimoAtivo d : devolucoesParaConfirmar) {
@@ -367,78 +365,22 @@ public class TelaNotificacoes extends JFrame {
         botao.addActionListener(e -> {
             if (aoConfirmarDevolucao != null) {
                 aoConfirmarDevolucao.accept(d);
-    // =====================================================
-    // CARTÃO DE SOLICITAÇÃO DE EMPRÉSTIMO
-    // =====================================================
+            }
+        });
 
-    private JPanel criarCartaoSolicitacao(Solicitacao s) {
+        return botao;
+    }
 
-        // 5 colunas: 0 = foto | 1 = textos | 2 = conversar | 3 = excluir | 4 = aceitar
-        RoundedPanel cartao = new RoundedPanel(
-            new MigLayout("insets 14 25 14 25", "[]20[grow]20[]10[]10[]", "[center]"), 35
-        );
-        cartao.setBackground(new Color(174, 244, 198));
-        cartao.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    private JButton criarBotaoConversar(Solicitacao s) {
 
-        // Foto de quem pediu
-        JLabel lblFoto = new JLabel(new ImageIcon(pegarFoto(s.getFotoSolicitante(), 45)));
-        cartao.add(lblFoto, "cell 0 0,alignx center,aligny center");
-
-        // Nome + livro
-        JPanel informacoes = new JPanel(new MigLayout("insets 0", "[grow]", "[]2[]"));
-        informacoes.setOpaque(false);
-        cartao.add(informacoes, "cell 1 0,growx,aligny center");
-
-        JLabel lblNome = new JLabel(s.getNomeSolicitante() + " quer " + s.getTituloLivro());
-        lblNome.setFont(new Font("Tahoma", Font.BOLD, 21));
-        informacoes.add(lblNome, "cell 0 0");
-
-        JLabel lblDetalhes = new JLabel(
-            "Solicitação de empréstimo em " + s.getDataPedido().format(FORMATO_DATA)
-        );
-        lblDetalhes.setForeground(new Color(60, 60, 60));
-        lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        informacoes.add(lblDetalhes, "cell 0 1");
-
-        // Botão conversar
-        JButton btnConversar = criarBotaoIcone(IconeChat.criar(42, 0), "Conversar");
-        btnConversar.addActionListener(e -> {
+        JButton botao = criarBotaoIcone(IconeChat.criar(42, 0), "Conversar");
+        botao.addActionListener(e -> {
             if (aoConversar != null) {
                 aoConversar.accept(s);
             }
         });
-        cartao.add(btnConversar, "cell 2 0,alignx center,aligny center");
-
-        // Botão recusar
-        JButton btnExcluir = criarBotaoIcone("/imagens/excluirdim.png", "Recusar");
-        btnExcluir.addActionListener(e -> {
-            if (aoRecusar != null) {
-                aoRecusar.accept(s);
-            }
-        });
-        cartao.add(btnExcluir, "cell 3 0,alignx center,aligny center");
 
         return botao;
-        // Botão aceitar
-        JButton btnAceitar = criarBotaoIcone("/imagens/verificadim.png", "Aceitar");
-        btnAceitar.addActionListener(e -> {
-            if (aoAceitar != null) {
-                aoAceitar.accept(s);
-            }
-        });
-        cartao.add(btnAceitar, "cell 4 0,alignx center,aligny center");
-
-        // Clicar no cartão (fora dos botões) abre a tela de Solicitações
-        aplicarListener(cartao, new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (aoAbrirSolicitacao != null) {
-                    aoAbrirSolicitacao.accept(s);
-                }
-            }
-        });
-
-        return cartao;
     }
 
     private JButton criarBotaoIcone(String imagem, String dica) {
@@ -489,19 +431,11 @@ public class TelaNotificacoes extends JFrame {
     public JButton getBtnHome()    { return btnHome; }
 
 
-    // O controller diz o que fazer quando clicar em confirmar/recusar a devolução
-    public void setAoRecusar(Consumer<Solicitacao> aoRecusar) {
-        this.aoRecusar = aoRecusar;
-    }
-
-    public void setAoAbrirSolicitacao(Consumer<Solicitacao> aoAbrirSolicitacao) {
-        this.aoAbrirSolicitacao = aoAbrirSolicitacao;
-    }
-
     public void setAoConversar(Consumer<Solicitacao> aoConversar) {
         this.aoConversar = aoConversar;
     }
 
+    // O controller diz o que fazer quando clicar em confirmar/recusar a devolução
     public void setAoConfirmarDevolucao(Consumer<EmprestimoAtivo> aoConfirmarDevolucao) {
         this.aoConfirmarDevolucao = aoConfirmarDevolucao;
     }
