@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntConsumer;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,12 @@ public class ChatController {
 
     // Só uma busca por vez
     private boolean atualizando = false;
+
+    // Conexão da busca automática, reaproveitada entre uma busca e outra
+    private volatile Connection conexaoBusca;
+
+    // Fotos já baixadas nesta sessão; quem não tem foto fica com o vetor vazio
+    private final Map<String, byte[]> fotos = new ConcurrentHashMap<>();
 
 
     public ChatController(
@@ -82,8 +90,33 @@ public class ChatController {
         cpfUsuario = null;
         contatoAberto = null;
         assinaturaContatos = "";
+        fotos.clear();
+
+        // Com uma busca em andamento, quem fecha é o fim da busca
+        if (!atualizando) {
+            fecharConexaoBusca();
+        }
 
         aoMudarNaoLidas.accept(0);
+    }
+
+
+    private void fecharConexaoBusca() {
+
+        try {
+
+            if (conexaoBusca != null) {
+                conexaoBusca.close();
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            conexaoBusca = null;
+        }
     }
 
 
@@ -129,7 +162,7 @@ public class ChatController {
 
         try {
 
-            mostrarContatos(mensagemDAO.listarContatos(cpfUsuario));
+            mostrarContatos(listarContatosComFoto(mensagemDAO, cpfUsuario));
 
         } catch (SQLException e) {
 
@@ -137,6 +170,33 @@ public class ChatController {
 
             mostrarMensagem("Erro ao carregar os contatos:\n" + e.getMessage());
         }
+    }
+
+
+    // Cada foto só é baixada uma vez por sessão
+    private List<ContatoChat> listarContatosComFoto(MensagemDAO dao, String cpf) throws SQLException {
+
+        List<ContatoChat> contatos = dao.listarContatos(cpf);
+
+        for (ContatoChat contato : contatos) {
+
+            byte[] foto = fotos.get(contato.getCpf());
+
+            if (foto == null) {
+
+                foto = dao.buscarFoto(contato.getCpf());
+
+                if (foto == null) {
+                    foto = new byte[0];
+                }
+
+                fotos.put(contato.getCpf(), foto);
+            }
+
+            contato.setFoto(foto);
+        }
+
+        return contatos;
     }
 
 
@@ -280,9 +340,13 @@ public class ChatController {
             @Override
             protected Resultado doInBackground() throws SQLException {
 
-                try (Connection conexao = ConnectionFactory.novaConexao()) {
+                if (conexaoBusca == null || conexaoBusca.isClosed()) {
+                    conexaoBusca = ConnectionFactory.novaConexao();
+                }
 
-                    MensagemDAO dao = new MensagemDAO(conexao);
+                try {
+
+                    MensagemDAO dao = new MensagemDAO(conexaoBusca);
                     Resultado resultado = new Resultado();
 
                     if (cpfAberto != null) {
@@ -298,10 +362,17 @@ public class ChatController {
                     resultado.naoLidas = dao.contarNaoLidas(cpf);
 
                     if (chatVisivel) {
-                        resultado.contatos = dao.listarContatos(cpf);
+                        resultado.contatos = listarContatosComFoto(dao, cpf);
                     }
 
                     return resultado;
+
+                } catch (SQLException e) {
+
+                    // Conexão caiu: a próxima busca abre outra
+                    fecharConexaoBusca();
+
+                    throw e;
                 }
             }
 
@@ -309,6 +380,11 @@ public class ChatController {
             protected void done() {
 
                 atualizando = false;
+
+                // Fez logoff enquanto a busca rodava
+                if (cpfUsuario == null) {
+                    fecharConexaoBusca();
+                }
 
                 try {
 

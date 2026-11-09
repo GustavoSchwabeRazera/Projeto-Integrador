@@ -235,7 +235,7 @@ public class LoginController {
             e.printStackTrace();
 
             if (e.getMessage() != null
-                    && e.getMessage().contains("Duplicate")) {
+                    && e.getMessage().toLowerCase().contains("duplicate")) {
 
                 mostrarMensagem(
                         "Este CPF já está cadastrado."

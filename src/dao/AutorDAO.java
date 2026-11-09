@@ -104,7 +104,7 @@ public class AutorDAO {
         String sql =
                 "SELECT id_autor, nome, nacionalidade " +
                 "FROM Autor " +
-                "ORDER BY nome";
+                "ORDER BY LOWER(nome)";
 
         PreparedStatement stmt = null;
         ResultSet rs = null;

@@ -22,8 +22,8 @@ public class HistoricoDAO {
 
         Connection conn = ConnectionFactory.getConnection();
 
-        // Cria a tabela se o banco foi montado antes dela existir
-        if (!tabelaVerificada) {
+        // Cria a tabela se o banco MySQL foi montado antes dela existir
+        if (!tabelaVerificada && !ConnectionFactory.usaPostgres()) {
 
             try (Statement stmt = conn.createStatement()) {
                 stmt.execute("CREATE TABLE IF NOT EXISTS Historico ("

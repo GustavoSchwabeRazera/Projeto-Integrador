@@ -17,8 +17,7 @@ public class UsuarioDAO {
                    + "(CPF, nome, telefone, email, senha, data_nascimento) "
                    + "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = ConnectionFactory.getConnection().prepareStatement(sql)) {
 
             stmt.setString(1, cpf);
             stmt.setString(2, nome);
@@ -40,7 +39,7 @@ public class UsuarioDAO {
     }
     public boolean login(String email, String senha) throws SQLException {
 
-        String sql = "SELECT * FROM Usuarios WHERE email = ? AND senha = ?";
+        String sql = "SELECT * FROM Usuarios WHERE LOWER(email) = LOWER(?) AND senha = ?";
 
         Connection conn = ConnectionFactory.getConnection();
 
@@ -58,7 +57,7 @@ public class UsuarioDAO {
     public String[] buscarUsuarioPorEmail(String email) throws SQLException {
 
         String sql = "SELECT nome, email, telefone, data_nascimento "
-                   + "FROM Usuarios WHERE email = ?";
+                   + "FROM Usuarios WHERE LOWER(email) = LOWER(?)";
 
         Connection conn = ConnectionFactory.getConnection();
 
@@ -95,8 +94,7 @@ public class UsuarioDAO {
 
         String sql = "UPDATE Usuarios SET foto = ? WHERE CPF = ?";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = ConnectionFactory.getConnection().prepareStatement(sql)) {
 
             stmt.setBytes(1, foto);
             stmt.setString(2, cpf);
@@ -109,8 +107,7 @@ public class UsuarioDAO {
 
         String sql = "SELECT foto FROM Usuarios WHERE CPF = ?";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = ConnectionFactory.getConnection().prepareStatement(sql)) {
 
             stmt.setString(1, cpf);
 
@@ -126,10 +123,9 @@ public class UsuarioDAO {
     
     public String buscarCpfPorEmail(String email) throws SQLException {
 
-        String sql = "SELECT CPF FROM Usuarios WHERE email = ?";
+        String sql = "SELECT CPF FROM Usuarios WHERE LOWER(email) = LOWER(?)";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = ConnectionFactory.getConnection().prepareStatement(sql)) {
 
             stmt.setString(1, email);
 
@@ -149,8 +145,7 @@ public class UsuarioDAO {
 
         String sql = "SELECT nome, email, telefone FROM Usuarios WHERE CPF = ?";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = ConnectionFactory.getConnection().prepareStatement(sql)) {
 
             stmt.setString(1, cpf);
 
@@ -174,8 +169,7 @@ public class UsuarioDAO {
         String sql = "SELECT CPF, nome, email, telefone, data_nascimento, senha "
                    + "FROM Usuarios WHERE CPF = ?";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = ConnectionFactory.getConnection().prepareStatement(sql)) {
 
             stmt.setString(1, cpf);
 
@@ -221,8 +215,7 @@ String sql = "UPDATE Usuarios SET "
 + "data_nascimento = ? "
 + "WHERE CPF = ?";
 
-try (Connection conn = ConnectionFactory.getConnection();
-PreparedStatement stmt = conn.prepareStatement(sql)) {
+try (PreparedStatement stmt = ConnectionFactory.getConnection().prepareStatement(sql)) {
 
 stmt.setString(1, cpfNovo);
 stmt.setString(2, nome);
@@ -260,7 +253,7 @@ if (!cpfNovo.equals(cpfAtual)) {
             "DELETE FROM Solicitacoes WHERE CPF_solicitante = ? "
                 + "OR ISBN IN (SELECT ISBN FROM Livros WHERE CPF_dono = ?)",
             // Livros que o usuário estava lendo voltam a ficar disponíveis (trigger)
-            "UPDATE Emprestimo SET data_devolucao = CURDATE() "
+            "UPDATE Emprestimo SET data_devolucao = CURRENT_DATE "
                 + "WHERE CPF_leitor = ? AND data_devolucao IS NULL",
             "DELETE FROM Emprestimo WHERE CPF_leitor = ? OR CPF_dono = ?",
             "DELETE FROM Pertence WHERE ISBN IN "
@@ -269,38 +262,37 @@ if (!cpfNovo.equals(cpfAtual)) {
             "DELETE FROM Usuarios WHERE CPF = ?"
         };
 
-        try (Connection conn = ConnectionFactory.getConnection()) {
+        Connection conn = ConnectionFactory.getConnection();
 
-            // Tudo ou nada: se um DELETE falhar, desfaz os anteriores
-            conn.setAutoCommit(false);
+        // Tudo ou nada: se um DELETE falhar, desfaz os anteriores
+        conn.setAutoCommit(false);
 
-            try {
+        try {
 
-                for (String sql : sqls) {
+            for (String sql : sqls) {
 
-                    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-                        // Todos os parâmetros são o CPF do usuário
-                        int parametros = sql.length() - sql.replace("?", "").length();
-                        for (int i = 1; i <= parametros; i++) {
-                            stmt.setString(i, cpf);
-                        }
-
-                        stmt.executeUpdate();
+                    // Todos os parâmetros são o CPF do usuário
+                    int parametros = sql.length() - sql.replace("?", "").length();
+                    for (int i = 1; i <= parametros; i++) {
+                        stmt.setString(i, cpf);
                     }
+
+                    stmt.executeUpdate();
                 }
-
-                conn.commit();
-
-            } catch (SQLException e) {
-
-                conn.rollback();
-                throw e;
-
-            } finally {
-
-                conn.setAutoCommit(true);
             }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+
+            conn.rollback();
+            throw e;
+
+        } finally {
+
+            conn.setAutoCommit(true);
         }
 
         new HistoricoDAO().excluirDoUsuario(cpf);

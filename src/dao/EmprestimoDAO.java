@@ -27,7 +27,7 @@ public class EmprestimoDAO {
 
     // Pedido ainda não venceu
     private static final String PEDIDO_VALIDO =
-            "s.data_pedido >= DATE_SUB(CURDATE(), INTERVAL " + DIAS_VALIDADE_PEDIDO + " DAY)";
+            "s.data_pedido >= CURRENT_DATE - INTERVAL '" + DIAS_VALIDADE_PEDIDO + "' DAY";
 
     private static boolean colunaVerificada = false;
 
@@ -38,8 +38,8 @@ public class EmprestimoDAO {
 
         Connection conn = ConnectionFactory.getConnection();
 
-        // Cria a coluna se o banco foi montado antes dela existir
-        if (!colunaVerificada) {
+        // Cria a coluna se o banco MySQL foi montado antes dela existir
+        if (!colunaVerificada && !ConnectionFactory.usaPostgres()) {
 
             try (PreparedStatement stmt = conn.prepareStatement(
                     "SELECT 1 FROM information_schema.COLUMNS "
@@ -69,7 +69,7 @@ public class EmprestimoDAO {
     public void solicitar(String cpfUsuario, String isbn) throws SQLException {
 
         String sql = "INSERT INTO Solicitacoes (CPF_solicitante, ISBN, data_pedido) "
-                + "VALUES (?, ?, CURDATE())";
+                + "VALUES (?, ?, CURRENT_DATE)";
 
         try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
 
@@ -521,7 +521,7 @@ public class EmprestimoDAO {
     public void solicitarDevolucao(int idEmprestimo) throws SQLException {
 
         try (PreparedStatement stmt = getConn().prepareStatement(
-                "UPDATE Emprestimo SET devolucao_solicitada = CURDATE() "
+                "UPDATE Emprestimo SET devolucao_solicitada = CURRENT_DATE "
                 + "WHERE id_emprestimo = ? AND data_devolucao IS NULL")) {
             stmt.setInt(1, idEmprestimo);
             stmt.executeUpdate();
@@ -590,7 +590,7 @@ public class EmprestimoDAO {
     public boolean registrarDevolucao(String isbn) throws SQLException {
 
         try (PreparedStatement stmt = getConn().prepareStatement(
-                "UPDATE Emprestimo SET data_devolucao = CURDATE() "
+                "UPDATE Emprestimo SET data_devolucao = CURRENT_DATE "
                 + "WHERE ISBN = ? AND data_devolucao IS NULL")) {
             stmt.setString(1, isbn);
             return stmt.executeUpdate() > 0;

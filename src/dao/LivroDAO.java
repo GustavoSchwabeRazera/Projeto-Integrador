@@ -139,7 +139,7 @@ public class LivroDAO {
         List<Livro> livros = new ArrayList<>();
 
         String sql = "SELECT ISBN, titulo, editora, data_lancamento, generos, fotoCapa, CPF_dono, status "
-                + "FROM Livros ORDER BY titulo";
+                + "FROM Livros ORDER BY LOWER(titulo)";
 
         try (PreparedStatement stmt = getConn().prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -170,7 +170,7 @@ public class LivroDAO {
         List<Livro> livros = new ArrayList<>();
 
         String sql = "SELECT ISBN, titulo, editora, data_lancamento, generos, fotoCapa, status "
-                + "FROM Livros WHERE CPF_dono = ? ORDER BY titulo";
+                + "FROM Livros WHERE CPF_dono = ? ORDER BY LOWER(titulo)";
 
         try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
 

@@ -22,7 +22,7 @@ public class MensagemDAO {
     private static final String VINCULOS =
             "(SELECT s.CPF_solicitante AS cpf_a, l.CPF_dono AS cpf_b "
             + "FROM Solicitacoes s JOIN Livros l ON l.ISBN = s.ISBN "
-            + "WHERE s.data_pedido >= DATE_SUB(CURDATE(), INTERVAL " + DIAS_VALIDADE_PEDIDO + " DAY) "
+            + "WHERE s.data_pedido >= CURRENT_DATE - INTERVAL '" + DIAS_VALIDADE_PEDIDO + "' DAY "
             + "UNION "
             + "SELECT e.CPF_leitor, e.CPF_dono FROM Emprestimo e "
             + "WHERE e.data_devolucao IS NULL) v";
@@ -53,8 +53,8 @@ public class MensagemDAO {
                 ? conexaoPropria
                 : ConnectionFactory.getConnection();
 
-        // Cria a tabela se o banco foi montado antes dela existir
-        if (!tabelaVerificada) {
+        // Cria a tabela se o banco MySQL foi montado antes dela existir
+        if (!tabelaVerificada && !ConnectionFactory.usaPostgres()) {
 
             try (PreparedStatement stmt = conn.prepareStatement(
                     "CREATE TABLE IF NOT EXISTS Mensagens ("
@@ -106,18 +106,20 @@ public class MensagemDAO {
 
     // =========================================================
     // CONTATOS DO USUÁRIO, COM AS MENSAGENS NÃO LIDAS DE CADA UM
+    // Sem as fotos, porque esta busca se repete a cada poucos
+    // segundos: a foto de cada contato vem de buscarFoto
     // =========================================================
 
     public List<ContatoChat> listarContatos(String cpfUsuario) throws SQLException {
 
         List<ContatoChat> contatos = new ArrayList<>();
 
-        String sql = "SELECT u.CPF, u.nome, u.foto, "
+        String sql = "SELECT u.CPF, u.nome, "
                 + "(SELECT COUNT(*) FROM Mensagens m "
                 + "WHERE m.CPF_remetente = u.CPF AND m.CPF_destinatario = ? AND m.lida = FALSE) AS nao_lidas "
                 + "FROM Usuarios u "
                 + "WHERE u.CPF <> ? AND u.CPF IN (" + CONTATOS + ") "
-                + "ORDER BY u.nome";
+                + "ORDER BY LOWER(u.nome)";
 
         try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
 
@@ -131,7 +133,6 @@ public class MensagemDAO {
                     ContatoChat c = new ContatoChat();
                     c.setCpf(rs.getString("CPF"));
                     c.setNome(rs.getString("nome"));
-                    c.setFoto(rs.getBytes("foto"));
                     c.setNaoLidas(rs.getInt("nao_lidas"));
                     contatos.add(c);
                 }
@@ -139,6 +140,21 @@ public class MensagemDAO {
         }
 
         return contatos;
+    }
+
+
+    // Devolve null se o usuário não tiver foto
+    public byte[] buscarFoto(String cpf) throws SQLException {
+
+        try (PreparedStatement stmt = getConn().prepareStatement(
+                "SELECT foto FROM Usuarios WHERE CPF = ?")) {
+
+            stmt.setString(1, cpf);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? rs.getBytes("foto") : null;
+            }
+        }
     }
 
     // =========================================================
