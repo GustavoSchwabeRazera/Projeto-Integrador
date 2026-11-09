@@ -10,9 +10,10 @@ import java.awt.Dimension;
 import java.awt.Cursor;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.io.ByteArrayInputStream;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -31,12 +32,31 @@ import net.miginfocom.swing.MigLayout;
 
 import model.AvisoPrazo;
 import model.EmprestimoAtivo;
+import model.Solicitacao;
 
 public class TelaNotificacoes extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    // Tela aberta ao clicar em uma notificação
+    public enum Destino { SOLICITACOES, MEUS_LIVROS, LIVROS_COMIGO }
+
+    // Cada tipo de notificação tem sua etiqueta colorida
+    private enum Tipo {
+        SOLICITACAO("Solicitação", new Color(33, 99, 178)),
+        EMPRESTIMO("Empréstimo", new Color(30, 125, 60)),
+        PRAZO("Prazo", new Color(176, 96, 0)),
+        ATRASO("Atrasado", new Color(176, 32, 32)),
+        DEVOLUCAO("Devolução", new Color(106, 61, 160));
+
+        private final String nome;
+        private final Color cor;
+
+        Tipo(String nome, Color cor) {
+            this.nome = nome;
+            this.cor = cor;
+        }
+    }
 
     private JPanel contentPane;
     private JButton btnHome;
@@ -44,6 +64,7 @@ public class TelaNotificacoes extends JFrame {
 
     private Consumer<EmprestimoAtivo> aoConfirmarDevolucao;
     private Consumer<EmprestimoAtivo> aoRecusarDevolucao;
+    private Consumer<Destino> aoAbrirTela;
 
     /** Painel com cantos arredondados. */
     private static class RoundedPanel extends JPanel {
@@ -125,7 +146,7 @@ public class TelaNotificacoes extends JFrame {
 
         // PAINEL DE NOTIFICAÇÕES
         RoundedPanel painelNotificacoes = new RoundedPanel(
-            new MigLayout("insets 0", "[grow]", "[grow]"), 40
+            new MigLayout("insets 0", "[0:0:,grow,fill]", "[0:0:,grow,fill]"), 40
         );
         painelNotificacoes.setForeground(new Color(10, 86, 27));
         painelNotificacoes.setBackground(new Color(36, 107, 45));
@@ -133,10 +154,9 @@ public class TelaNotificacoes extends JFrame {
         contentPane.add(painelNotificacoes, "cell 0 3 5 8,grow");
 
         // Lista dos cartões (com barra de rolagem quando tiver muitos)
-        listaNotificacoes = new JPanel(
+        listaNotificacoes = new ListaRolavel(
             new MigLayout("insets 0, wrap 1", "[grow]", "[]15[]")
         );
-        listaNotificacoes.setOpaque(false);
 
         JScrollPane scroll = new JScrollPane(listaNotificacoes);
         scroll.setOpaque(false);
@@ -149,6 +169,9 @@ public class TelaNotificacoes extends JFrame {
 
         mostrarNotificacoes(
             new ArrayList<AvisoPrazo>(),
+            new ArrayList<Solicitacao>(),
+            new ArrayList<EmprestimoAtivo>(),
+            new ArrayList<Solicitacao>(),
             new ArrayList<EmprestimoAtivo>(),
             new ArrayList<EmprestimoAtivo>()
         );
@@ -157,17 +180,26 @@ public class TelaNotificacoes extends JFrame {
 
     // =====================================================
     // MOSTRA AS NOTIFICAÇÕES RECEBIDAS E AS ENVIADAS NA TELA
+    // Só a frase: datas e prazos ficam nas telas Livros Comigo
+    // e Solicitações, abertas ao clicar na notificação
     // =====================================================
 
     public void mostrarNotificacoes(
             List<AvisoPrazo> avisos,
+            List<Solicitacao> pedidosRecebidos,
             List<EmprestimoAtivo> devolucoesParaConfirmar,
+            List<Solicitacao> pedidosEnviados,
+            List<EmprestimoAtivo> emprestimosAceitos,
             List<EmprestimoAtivo> devolucoesInformadas) {
 
         listaNotificacoes.removeAll();
 
-        boolean temRecebidas = !avisos.isEmpty() || !devolucoesParaConfirmar.isEmpty();
-        boolean temEnviadas = !devolucoesInformadas.isEmpty();
+        boolean temRecebidas = !avisos.isEmpty()
+                || !pedidosRecebidos.isEmpty()
+                || !devolucoesParaConfirmar.isEmpty();
+        boolean temEnviadas = !pedidosEnviados.isEmpty()
+                || !emprestimosAceitos.isEmpty()
+                || !devolucoesInformadas.isEmpty();
 
         if (!temRecebidas && !temEnviadas) {
 
@@ -182,25 +214,64 @@ public class TelaNotificacoes extends JFrame {
                 listaNotificacoes.add(criarTituloSecao("Recebidas"));
 
                 for (AvisoPrazo a : avisos) {
-                    listaNotificacoes.add(criarCartaoAviso(a), "growx");
+                    adicionarCartao(
+                        a.isAtrasado() ? Tipo.ATRASO : Tipo.PRAZO,
+                        Destino.LIVROS_COMIGO,
+                        pegarIconeCalendario(),
+                        a.getLembrete()
+                    );
+                    adicionarCartao(
+                        Tipo.EMPRESTIMO,
+                        Destino.LIVROS_COMIGO,
+                        pegarFoto(a.getFotoDono(), 45),
+                        a.getNomeDono() + " emprestou \"" + a.getTituloLivro() + "\" para você"
+                    );
+                }
+                for (Solicitacao s : pedidosRecebidos) {
+                    adicionarCartao(
+                        Tipo.SOLICITACAO,
+                        Destino.SOLICITACOES,
+                        pegarFoto(s.getFotoSolicitante(), 45),
+                        s.getNomeSolicitante() + " pediu \"" + s.getTituloLivro() + "\""
+                    );
                 }
                 for (EmprestimoAtivo d : devolucoesParaConfirmar) {
-                    listaNotificacoes.add(criarCartaoDevolucao(d), "growx");
+                    adicionarCartao(
+                        Tipo.DEVOLUCAO,
+                        Destino.MEUS_LIVROS,
+                        pegarFoto(d.getFotoLeitor(), 45),
+                        d.getNomeLeitor() + " devolveu \"" + d.getTituloLivro() + "\"",
+                        criarBotaoRecusar(d),
+                        criarBotaoConfirmar(d)
+                    );
                 }
             }
 
             if (temEnviadas) {
                 listaNotificacoes.add(criarTituloSecao("Enviadas"), temRecebidas ? "gaptop 15" : "");
 
+                for (Solicitacao s : pedidosEnviados) {
+                    adicionarCartao(
+                        Tipo.SOLICITACAO,
+                        Destino.SOLICITACOES,
+                        pegarFoto(s.getFotoDono(), 45),
+                        "Você pediu \"" + s.getTituloLivro() + "\" para " + s.getNomeDono()
+                    );
+                }
+                for (EmprestimoAtivo e : emprestimosAceitos) {
+                    adicionarCartao(
+                        Tipo.EMPRESTIMO,
+                        Destino.MEUS_LIVROS,
+                        pegarFoto(e.getFotoLeitor(), 45),
+                        "Você emprestou \"" + e.getTituloLivro() + "\" para " + e.getNomeLeitor()
+                    );
+                }
                 for (EmprestimoAtivo d : devolucoesInformadas) {
-                    listaNotificacoes.add(
-                        criarCartaoEnviada(
-                            d.getFotoDono(),
-                            "Você avisou " + d.getNomeDono() + " que devolveu \"" + d.getTituloLivro() + "\"",
-                            "Aviso enviado em " + d.getDevolucaoSolicitada().format(FORMATO_DATA)
-                            + "   •   aguardando confirmação"
-                        ),
-                        "growx"
+                    adicionarCartao(
+                        Tipo.DEVOLUCAO,
+                        Destino.LIVROS_COMIGO,
+                        pegarFoto(d.getFotoDono(), 45),
+                        "Você avisou " + d.getNomeDono() + " que devolveu \"" + d.getTituloLivro() + "\""
                     );
                 }
             }
@@ -221,143 +292,81 @@ public class TelaNotificacoes extends JFrame {
 
 
     // =====================================================
-    // CARTÃO DE AVISO: EMPRÉSTIMO PERTO DE ACABAR
+    // BARRA DE UMA NOTIFICAÇÃO
+    // Etiqueta colorida do tipo + foto + frase + botões (se tiver).
+    // Clicar na barra abre a tela ligada à notificação.
     // =====================================================
 
-    private JPanel criarCartaoAviso(AvisoPrazo a) {
+    private void adicionarCartao(Tipo tipo, Destino destino, Image icone, String frase, JButton... botoes) {
 
         RoundedPanel cartao = new RoundedPanel(
-            new MigLayout("insets 14 25 14 25", "[]20[grow]", "[center]"), 35
+            new MigLayout("insets 12 20 12 20", "[]15[]15[0:0:,grow,fill]15[]10[]", "[center]"), 35
         );
-        cartao.setBackground(new Color(255, 236, 179));
+        cartao.setBackground(new Color(226, 240, 231));
+        cartao.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Ícone do calendário
-        ImageIcon calendario = new ImageIcon(TelaNotificacoes.class.getResource("/imagens/calendario.png"));
-        JLabel lblIcone = new JLabel(
-            new ImageIcon(calendario.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH))
-        );
-        cartao.add(lblIcone, "cell 0 0,alignx center,aligny center");
+        cartao.add(criarEtiqueta(tipo), "cell 0 0,w 130!,aligny center");
 
-        // Livro + prazo
-        JPanel informacoes = new JPanel(new MigLayout("insets 0", "[grow]", "[]2[]"));
-        informacoes.setOpaque(false);
-        cartao.add(informacoes, "cell 1 0,growx,aligny center");
+        JLabel lblIcone = new JLabel(new ImageIcon(icone));
+        cartao.add(lblIcone, "cell 1 0,alignx center,aligny center");
 
-        JLabel lblTitulo = new JLabel(
-            "Devolva \"" + a.getTituloLivro() + "\" " + textoPrazo(a.getDiasRestantes())
-        );
-        lblTitulo.setForeground(new Color(120, 60, 0));
-        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 21));
-        informacoes.add(lblTitulo, "cell 0 0");
+        JLabel lblFrase = new JLabel(frase);
+        lblFrase.setFont(new Font("Tahoma", Font.BOLD, 21));
+        cartao.add(lblFrase, "cell 2 0,aligny center");
 
-        JLabel lblDetalhes = new JLabel(
-            "Empréstimo de " + a.getNomeDono()
-            + "   •   termina em " + a.getDataTermino().format(FORMATO_DATA)
-        );
-        lblDetalhes.setForeground(new Color(60, 60, 60));
-        lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        informacoes.add(lblDetalhes, "cell 0 1");
+        for (int i = 0; i < botoes.length; i++) {
+            cartao.add(botoes[i], "cell " + (3 + i) + " 0,alignx center,aligny center");
+        }
 
-        return cartao;
+        cartao.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (aoAbrirTela != null) {
+                    aoAbrirTela.accept(destino);
+                }
+            }
+        });
+
+        listaNotificacoes.add(cartao, "growx,wmin 0");
     }
 
-    private String textoPrazo(long dias) {
+    private JPanel criarEtiqueta(Tipo tipo) {
 
-        if (dias <= 0) {
-            return "hoje!";
-        }
-        if (dias == 1) {
-            return "até amanhã";
-        }
-        return "em " + dias + " dias";
+        RoundedPanel etiqueta = new RoundedPanel(
+            new MigLayout("insets 6 8 6 8, align center center"), 22
+        );
+        etiqueta.setBackground(tipo.cor);
+
+        JLabel lblTipo = new JLabel(tipo.nome);
+        lblTipo.setForeground(Color.WHITE);
+        lblTipo.setFont(new Font("Tahoma", Font.BOLD, 15));
+        etiqueta.add(lblTipo);
+
+        return etiqueta;
     }
 
+    private JButton criarBotaoRecusar(EmprestimoAtivo d) {
 
-    // =====================================================
-    // CARTÃO DE DEVOLUÇÃO ESPERANDO O DONO CONFIRMAR
-    // =====================================================
-
-    private JPanel criarCartaoDevolucao(EmprestimoAtivo d) {
-
-        // 4 colunas: 0 = foto | 1 = textos | 2 = recusar | 3 = confirmar
-        RoundedPanel cartao = new RoundedPanel(
-            new MigLayout("insets 14 25 14 25", "[]20[grow]20[]10[]", "[center]"), 35
-        );
-        cartao.setBackground(new Color(174, 244, 198));
-
-        // Foto de quem devolveu
-        JLabel lblFoto = new JLabel(new ImageIcon(pegarFoto(d.getFotoLeitor(), 45)));
-        cartao.add(lblFoto, "cell 0 0,alignx center,aligny center");
-
-        // Nome + livro
-        JPanel informacoes = new JPanel(new MigLayout("insets 0", "[grow]", "[]2[]"));
-        informacoes.setOpaque(false);
-        cartao.add(informacoes, "cell 1 0,growx,aligny center");
-
-        JLabel lblNome = new JLabel(d.getNomeLeitor() + " devolveu " + d.getTituloLivro());
-        lblNome.setFont(new Font("Tahoma", Font.BOLD, 21));
-        informacoes.add(lblNome, "cell 0 0");
-
-        JLabel lblDetalhes = new JLabel(
-            "Devolução informada em " + d.getDevolucaoSolicitada().format(FORMATO_DATA)
-            + "   •   confirme se você recebeu o livro"
-        );
-        lblDetalhes.setForeground(new Color(60, 60, 60));
-        lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        informacoes.add(lblDetalhes, "cell 0 1");
-
-        // Botão recusar
-        JButton btnRecusar = criarBotaoIcone("/imagens/excluirdim.png", "Não recebi");
-        btnRecusar.addActionListener(e -> {
+        JButton botao = criarBotaoIcone("/imagens/excluirdim.png", "Não recebi");
+        botao.addActionListener(e -> {
             if (aoRecusarDevolucao != null) {
                 aoRecusarDevolucao.accept(d);
             }
         });
-        cartao.add(btnRecusar, "cell 2 0,alignx center,aligny center");
 
-        // Botão confirmar
-        JButton btnConfirmar = criarBotaoIcone("/imagens/verificadim.png", "Confirmar devolução");
-        btnConfirmar.addActionListener(e -> {
+        return botao;
+    }
+
+    private JButton criarBotaoConfirmar(EmprestimoAtivo d) {
+
+        JButton botao = criarBotaoIcone("/imagens/verificadim.png", "Confirmar devolução");
+        botao.addActionListener(e -> {
             if (aoConfirmarDevolucao != null) {
                 aoConfirmarDevolucao.accept(d);
             }
         });
-        cartao.add(btnConfirmar, "cell 3 0,alignx center,aligny center");
 
-        return cartao;
-    }
-
-
-    // =====================================================
-    // CARTÃO DE NOTIFICAÇÃO ENVIADA (SÓ INFORMATIVO, SEM BOTÕES)
-    // =====================================================
-
-    private JPanel criarCartaoEnviada(byte[] fotoDestinatario, String titulo, String detalhes) {
-
-        RoundedPanel cartao = new RoundedPanel(
-            new MigLayout("insets 14 25 14 25", "[]20[grow]", "[center]"), 35
-        );
-        cartao.setBackground(new Color(226, 240, 231));
-
-        // Foto de quem recebeu
-        JLabel lblFoto = new JLabel(new ImageIcon(pegarFoto(fotoDestinatario, 45)));
-        cartao.add(lblFoto, "cell 0 0,alignx center,aligny center");
-
-        // O que foi enviado + situação
-        JPanel informacoes = new JPanel(new MigLayout("insets 0", "[grow]", "[]2[]"));
-        informacoes.setOpaque(false);
-        cartao.add(informacoes, "cell 1 0,growx,aligny center");
-
-        JLabel lblTitulo = new JLabel(titulo);
-        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 21));
-        informacoes.add(lblTitulo, "cell 0 0");
-
-        JLabel lblDetalhes = new JLabel(detalhes);
-        lblDetalhes.setForeground(new Color(60, 60, 60));
-        lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        informacoes.add(lblDetalhes, "cell 0 1");
-
-        return cartao;
+        return botao;
     }
 
     private JButton criarBotaoIcone(String imagem, String dica) {
@@ -371,6 +380,13 @@ public class TelaNotificacoes extends JFrame {
         botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         return botao;
+    }
+
+    private Image pegarIconeCalendario() {
+
+        return new ImageIcon(TelaNotificacoes.class.getResource("/imagens/calendario.png"))
+                .getImage()
+                .getScaledInstance(45, 45, Image.SCALE_SMOOTH);
     }
 
     // Foto do usuário (ou a imagem padrão se ele não tiver)
@@ -403,5 +419,10 @@ public class TelaNotificacoes extends JFrame {
 
     public void setAoRecusarDevolucao(Consumer<EmprestimoAtivo> aoRecusarDevolucao) {
         this.aoRecusarDevolucao = aoRecusarDevolucao;
+    }
+
+    // O controller diz como abrir a tela ligada à notificação clicada
+    public void setAoAbrirTela(Consumer<Destino> aoAbrirTela) {
+        this.aoAbrirTela = aoAbrirTela;
     }
 }

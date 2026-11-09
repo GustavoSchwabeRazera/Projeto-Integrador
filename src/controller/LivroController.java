@@ -234,6 +234,15 @@ public class LivroController {
         telaNotificacoes.getBtnHome()
                 .addActionListener(e -> abrirHome());
 
+        telaNotificacoes.setAoAbrirTela(destino -> {
+
+            switch (destino) {
+                case SOLICITACOES -> abrirSolicitacoes();
+                case MEUS_LIVROS -> abrirMeusLivros();
+                case LIVROS_COMIGO -> abrirLivrosComigo();
+            }
+        });
+
 
         // --- CADASTRO DE LIVROS ---
 
@@ -362,6 +371,8 @@ public class LivroController {
         }
 
         trocarPara(telaInicial);
+
+        notificacaoController.avisarPrazosDoDia(cpfUsuarioLogado);
     }
 
 
