@@ -15,17 +15,16 @@ import model.EmprestimoAtivo;
 import model.RegistroHistorico;
 import model.Solicitacao;
 
-// Pedidos ficam na tabela Solicitacoes e os empréstimos aceitos na tabela Emprestimo.
-// O status do livro (disponível/indisponível) é trocado pelos triggers da tabela Emprestimo.
+
 public class EmprestimoDAO {
 
-    // Prazo padrão de um empréstimo (em dias)
+    
     private static final int DIAS_EMPRESTIMO = 14;
 
-    // Depois desse tempo sem resposta o pedido vence (em dias)
+  
     private static final int DIAS_VALIDADE_PEDIDO = Solicitacao.DIAS_VALIDADE;
 
-    // Pedido ainda não venceu
+   
     private static final String PEDIDO_VALIDO =
             "s.data_pedido >= DATE_SUB(CURDATE(), INTERVAL " + DIAS_VALIDADE_PEDIDO + " DAY)";
 
@@ -33,12 +32,12 @@ public class EmprestimoDAO {
 
     private final HistoricoDAO historicoDAO = new HistoricoDAO();
 
-    // Sempre devolve uma conexão aberta
+
     private Connection getConn() throws SQLException {
 
         Connection conn = ConnectionFactory.getConnection();
 
-        // Cria as colunas se o banco foi montado antes delas existirem
+        
         if (!colunasVerificadas) {
 
             criarColunaSeFaltar(conn, "devolucao_solicitada");
@@ -71,10 +70,6 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // SOLICITAR EMPRÉSTIMO
-    // Fica na tabela Solicitacoes até o dono aceitar
-    // =========================================================
 
     public void solicitar(String cpfUsuario, String isbn) throws SQLException {
 
@@ -90,9 +85,6 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // VERIFICA SE O USUÁRIO JÁ PEDIU ESSE LIVRO
-    // =========================================================
 
     public boolean jaSolicitou(String cpfUsuario, String isbn) throws SQLException {
 
@@ -110,9 +102,7 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // RN01: O USUÁRIO SÓ PODE ESTAR COM 1 LIVRO EMPRESTADO POR VEZ
-    // =========================================================
+
 
     public boolean temEmprestimoAtivo(String cpfUsuario) throws SQLException {
 
@@ -129,7 +119,6 @@ public class EmprestimoDAO {
         }
     }
 
-    // A mesma regra, olhando quem fez o pedido
     public boolean solicitanteTemEmprestimoAtivo(int idSolicitacao) throws SQLException {
 
         String sql = "SELECT 1 FROM Solicitacoes s "
@@ -146,9 +135,7 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // VERIFICA SE O LIVRO ESTÁ DISPONÍVEL (NÃO EMPRESTADO)
-    // =========================================================
+
 
     public boolean livroDisponivel(String isbn) throws SQLException {
 
@@ -164,9 +151,7 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // LISTAR SOLICITAÇÕES PENDENTES DOS LIVROS DE UM USUÁRIO
-    // =========================================================
+
 
     public List<Solicitacao> listarPendentesDoDono(String cpfDono) throws SQLException {
 
@@ -203,9 +188,7 @@ public class EmprestimoDAO {
         return solicitacoes;
     }
 
-    // =========================================================
-    // PEDIDOS QUE O USUÁRIO FEZ E AINDA ESTÃO SEM RESPOSTA
-    // =========================================================
+
 
     public List<Solicitacao> listarPedidosEnviados(String cpfSolicitante) throws SQLException {
 
@@ -239,11 +222,6 @@ public class EmprestimoDAO {
         return pedidos;
     }
 
-    // =========================================================
-    // PRAZOS DE DEVOLUÇÃO DOS LIVROS QUE ESTÃO COM O USUÁRIO
-    // Vale do dia em que o pedido foi aceito até a devolução,
-    // inclusive se estiver atrasado
-    // =========================================================
 
     public List<AvisoPrazo> listarPrazos(String cpfUsuario) throws SQLException {
 
@@ -291,7 +269,7 @@ public class EmprestimoDAO {
         return avisos;
     }
 
-    // Guarda que o aviso de hoje já apareceu, para não repetir no mesmo dia
+    
     public void marcarPrazosAvisadosHoje(String cpfUsuario) throws SQLException {
 
         try (PreparedStatement stmt = getConn().prepareStatement(
@@ -302,10 +280,6 @@ public class EmprestimoDAO {
         }
     }
 
-    // =========================================================
-    // LIVROS DO USUÁRIO QUE ELE ACEITOU EMPRESTAR
-    // E AINDA ESTÃO COM O LEITOR
-    // =========================================================
 
     public List<EmprestimoAtivo> listarEmprestimosAceitos(String cpfDono) throws SQLException {
 
@@ -340,18 +314,12 @@ public class EmprestimoDAO {
         return emprestimos;
     }
 
-    // =========================================================
-    // EVENTOS DO CALENDÁRIO
-    // Início e entrega dos empréstimos do usuário, tanto dos
-    // livros que ele pegou quanto dos que emprestou. Pedidos
-    // ainda não aceitos aparecem no dia em que foram feitos.
-    // =========================================================
 
     public Map<LocalDate, List<String>> listarEventosCalendario(String cpfUsuario) throws SQLException {
 
         Map<LocalDate, List<String>> eventos = new HashMap<>();
 
-        // Pedidos pendentes (feitos ou recebidos pelo usuário)
+     
         String sqlPedidos = "SELECT s.data_pedido, s.CPF_solicitante, l.titulo, "
                 + "dono.nome AS nome_dono, leitor.nome AS nome_leitor "
                 + "FROM Solicitacoes s "
@@ -383,7 +351,7 @@ public class EmprestimoDAO {
             }
         }
 
-        // Empréstimos aceitos
+       
         String sqlEmprestimos = "SELECT e.data_emprestimo, e.data_entrega, e.data_devolucao, "
                 + "e.CPF_leitor, e.titulo_livro, dono.nome AS nome_dono, leitor.nome AS nome_leitor "
                 + "FROM Emprestimo e "
