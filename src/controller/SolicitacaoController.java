@@ -15,7 +15,7 @@ public class SolicitacaoController {
     private final EmprestimoDAO emprestimoDAO;
     private final TelaSolicitacoes telaSolicitacoes;
 
-    // Dono dos livros cujas solicitações estão na tela
+    // Usuário cujas solicitações (recebidas e enviadas) estão na tela
     private String cpfUsuario;
 
 
@@ -49,7 +49,10 @@ public class SolicitacaoController {
         try {
 
             telaSolicitacoes.mostrarSolicitacoes(
-                    emprestimoDAO.listarPendentesDoDono(cpfUsuario)
+                    // Recebidas: pedidos para os livros do usuário
+                    emprestimoDAO.listarPendentesDoDono(cpfUsuario),
+                    // Enviadas: pedidos que o usuário fez
+                    emprestimoDAO.listarPedidosEnviados(cpfUsuario)
             );
 
         } catch (SQLException e) {

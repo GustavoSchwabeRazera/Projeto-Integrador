@@ -24,22 +24,10 @@ public class NotificacaoController {
 
     public NotificacaoController(
             EmprestimoDAO emprestimoDAO,
-            TelaNotificacoes telaNotificacoes,
-            SolicitacaoController solicitacaoController) {
+            TelaNotificacoes telaNotificacoes) {
 
         this.emprestimoDAO = emprestimoDAO;
         this.telaNotificacoes = telaNotificacoes;
-
-        // Aceitar/recusar usam a mesma regra da tela de Solicitações
-        telaNotificacoes.setAoAceitar(s -> {
-            solicitacaoController.aceitarSolicitacao(s);
-            carregarNotificacoes();
-        });
-
-        telaNotificacoes.setAoRecusar(s -> {
-            solicitacaoController.recusarSolicitacao(s);
-            carregarNotificacoes();
-        });
 
         telaNotificacoes.setAoConfirmarDevolucao(this::confirmarDevolucao);
 
@@ -64,9 +52,11 @@ public class NotificacaoController {
         try {
 
             telaNotificacoes.mostrarNotificacoes(
+                    // Recebidas
                     emprestimoDAO.listarAtivosPertoDoFim(cpfUsuario, DIAS_AVISO),
                     emprestimoDAO.listarDevolucoesParaConfirmar(cpfUsuario),
-                    emprestimoDAO.listarPendentesDoDono(cpfUsuario)
+                    // Enviadas
+                    emprestimoDAO.listarDevolucoesInformadas(cpfUsuario)
             );
 
         } catch (SQLException e) {

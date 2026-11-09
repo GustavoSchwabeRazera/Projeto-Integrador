@@ -23,7 +23,7 @@ public class EmprestimoDAO {
     private static final int DIAS_EMPRESTIMO = 14;
 
     // Depois desse tempo sem resposta o pedido vence (em dias)
-    private static final int DIAS_VALIDADE_PEDIDO = 14;
+    private static final int DIAS_VALIDADE_PEDIDO = Solicitacao.DIAS_VALIDADE;
 
     // Pedido ainda não venceu
     private static final String PEDIDO_VALIDO =
@@ -191,6 +191,42 @@ public class EmprestimoDAO {
         }
 
         return solicitacoes;
+    }
+
+    // =========================================================
+    // PEDIDOS QUE O USUÁRIO FEZ E AINDA ESTÃO SEM RESPOSTA
+    // =========================================================
+
+    public List<Solicitacao> listarPedidosEnviados(String cpfSolicitante) throws SQLException {
+
+        List<Solicitacao> pedidos = new ArrayList<>();
+
+        String sql = "SELECT s.id_solicitacao, s.data_pedido, l.ISBN, l.titulo, u.nome, u.foto "
+                + "FROM Solicitacoes s "
+                + "JOIN Livros l ON l.ISBN = s.ISBN "
+                + "JOIN Usuarios u ON u.CPF = l.CPF_dono "
+                + "WHERE s.CPF_solicitante = ? AND " + PEDIDO_VALIDO + " "
+                + "ORDER BY s.data_pedido, s.id_solicitacao";
+
+        try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
+
+            stmt.setString(1, cpfSolicitante);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Solicitacao s = new Solicitacao();
+                    s.setIdSolicitacao(rs.getInt("id_solicitacao"));
+                    s.setDataPedido(rs.getDate("data_pedido").toLocalDate());
+                    s.setIsbn(rs.getString("ISBN"));
+                    s.setTituloLivro(rs.getString("titulo"));
+                    s.setNomeDono(rs.getString("nome"));
+                    s.setFotoDono(rs.getBytes("foto"));
+                    pedidos.add(s);
+                }
+            }
+        }
+
+        return pedidos;
     }
 
     // =========================================================
@@ -557,6 +593,44 @@ public class EmprestimoDAO {
                     e.setDevolucaoSolicitada(rs.getDate("devolucao_solicitada").toLocalDate());
                     e.setNomeLeitor(rs.getString("nome"));
                     e.setFotoLeitor(rs.getBytes("foto"));
+                    devolucoes.add(e);
+                }
+            }
+        }
+
+        return devolucoes;
+    }
+
+    // =========================================================
+    // DEVOLUÇÕES QUE O USUÁRIO INFORMOU E O DONO AINDA NÃO CONFIRMOU
+    // =========================================================
+
+    public List<EmprestimoAtivo> listarDevolucoesInformadas(String cpfLeitor) throws SQLException {
+
+        List<EmprestimoAtivo> devolucoes = new ArrayList<>();
+
+        String sql = "SELECT e.id_emprestimo, e.ISBN, e.titulo_livro, e.data_entrega, "
+                + "e.devolucao_solicitada, u.nome, u.foto "
+                + "FROM Emprestimo e "
+                + "JOIN Usuarios u ON u.CPF = e.CPF_dono "
+                + "WHERE e.CPF_leitor = ? AND e.data_devolucao IS NULL "
+                + "AND e.devolucao_solicitada IS NOT NULL "
+                + "ORDER BY e.devolucao_solicitada, e.id_emprestimo";
+
+        try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
+
+            stmt.setString(1, cpfLeitor);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    EmprestimoAtivo e = new EmprestimoAtivo();
+                    e.setIdEmprestimo(rs.getInt("id_emprestimo"));
+                    e.setIsbn(rs.getString("ISBN"));
+                    e.setTituloLivro(rs.getString("titulo_livro"));
+                    e.setDataEntrega(rs.getDate("data_entrega").toLocalDate());
+                    e.setDevolucaoSolicitada(rs.getDate("devolucao_solicitada").toLocalDate());
+                    e.setNomeDono(rs.getString("nome"));
+                    e.setFotoDono(rs.getBytes("foto"));
                     devolucoes.add(e);
                 }
             }

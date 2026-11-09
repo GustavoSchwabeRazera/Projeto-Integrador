@@ -34,6 +34,7 @@ import model.Solicitacao;
 public class TelaSolicitacoes extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
+	private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private JPanel contentPane;
 	private JButton btnHome;
 	private JPanel listaSolicitacoes;
@@ -225,19 +226,19 @@ public class TelaSolicitacoes extends JFrame {
 
         painelSolicitacoes.add(scroll, "cell 0 0,grow");
 
-        mostrarSolicitacoes(new ArrayList<Solicitacao>());
+        mostrarSolicitacoes(new ArrayList<Solicitacao>(), new ArrayList<Solicitacao>());
     }
 
 
     // =====================================================
-    // MOSTRA AS SOLICITAÇÕES NA TELA
+    // MOSTRA AS SOLICITAÇÕES RECEBIDAS E AS ENVIADAS NA TELA
     // =====================================================
 
-    public void mostrarSolicitacoes(List<Solicitacao> solicitacoes) {
+    public void mostrarSolicitacoes(List<Solicitacao> recebidas, List<Solicitacao> enviadas) {
 
         listaSolicitacoes.removeAll();
 
-        if (solicitacoes.isEmpty()) {
+        if (recebidas.isEmpty() && enviadas.isEmpty()) {
 
             JLabel lblVazio = new JLabel("Nenhuma solicitação pendente.");
             lblVazio.setForeground(Color.WHITE);
@@ -246,13 +247,34 @@ public class TelaSolicitacoes extends JFrame {
 
         } else {
 
-            for (Solicitacao s : solicitacoes) {
-                listaSolicitacoes.add(criarCartao(s), "growx");
+            if (!recebidas.isEmpty()) {
+                listaSolicitacoes.add(criarTituloSecao("Recebidas"));
+
+                for (Solicitacao s : recebidas) {
+                    listaSolicitacoes.add(criarCartao(s), "growx");
+                }
+            }
+
+            if (!enviadas.isEmpty()) {
+                listaSolicitacoes.add(criarTituloSecao("Enviadas"), recebidas.isEmpty() ? "" : "gaptop 15");
+
+                for (Solicitacao s : enviadas) {
+                    listaSolicitacoes.add(criarCartaoEnviada(s), "growx");
+                }
             }
         }
 
         listaSolicitacoes.revalidate();
         listaSolicitacoes.repaint();
+    }
+
+    private JLabel criarTituloSecao(String texto) {
+
+        JLabel lblTitulo = new JLabel(texto);
+        lblTitulo.setForeground(Color.WHITE);
+        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 22));
+
+        return lblTitulo;
     }
 
 
@@ -290,8 +312,8 @@ public class TelaSolicitacoes extends JFrame {
         informacoes.add(lblNome, "cell 0 0");
 
         JLabel lblDetalhes = new JLabel(
-            "Solicitação de empréstimo em "
-            + s.getDataPedido().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+            "Solicitação de empréstimo em " + s.getDataPedido().format(FORMATO_DATA)
+            + "   •   válida até " + s.getDataValidade().format(FORMATO_DATA)
             + "   •   " + s.getEmailSolicitante()
             + "   •   " + s.getTelefoneSolicitante()
         );
@@ -316,6 +338,48 @@ public class TelaSolicitacoes extends JFrame {
             }
         });
         cartao.add(btnAceitar, "cell 3 0,alignx center,aligny center");
+
+        return cartao;
+    }
+
+
+    // =====================================================
+    // CARTÃO DE UM PEDIDO ENVIADO (SÓ INFORMATIVO, SEM BOTÕES)
+    // =====================================================
+
+    private JPanel criarCartaoEnviada(Solicitacao s) {
+
+        RoundedPanel cartao = new RoundedPanel(
+            new MigLayout("insets 14 25 14 25", "[]20[grow]", "[center]"),
+            35
+        );
+        cartao.setForeground(new Color(226, 240, 231));
+
+        // Foto do dono do livro
+        JLabel lblFoto = new JLabel(new ImageIcon(pegarFoto(s.getFotoDono(), 45)));
+        cartao.add(lblFoto, "cell 0 0,alignx center,aligny center");
+
+        // Livro + datas + situação
+        JPanel informacoes = new JPanel(
+            new MigLayout("insets 0", "[grow]", "[]2[]")
+        );
+        informacoes.setOpaque(false);
+        cartao.add(informacoes, "cell 1 0,growx,aligny center");
+
+        JLabel lblTitulo = new JLabel(
+            "Você pediu \"" + s.getTituloLivro() + "\" para " + s.getNomeDono()
+        );
+        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 21));
+        informacoes.add(lblTitulo, "cell 0 0");
+
+        JLabel lblDetalhes = new JLabel(
+            "Pedido enviado em " + s.getDataPedido().format(FORMATO_DATA)
+            + "   •   válido até " + s.getDataValidade().format(FORMATO_DATA)
+            + "   •   aguardando resposta"
+        );
+        lblDetalhes.setForeground(new Color(60, 60, 60));
+        lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        informacoes.add(lblDetalhes, "cell 0 1");
 
         return cartao;
     }

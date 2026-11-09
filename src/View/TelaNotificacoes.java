@@ -8,14 +8,8 @@ import java.awt.RenderingHints;
 import java.awt.LayoutManager;
 import java.awt.Dimension;
 import java.awt.Cursor;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Color;
 import java.awt.Font;
-
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import java.io.ByteArrayInputStream;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +18,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -38,7 +31,6 @@ import net.miginfocom.swing.MigLayout;
 
 import model.AvisoPrazo;
 import model.EmprestimoAtivo;
-import model.Solicitacao;
 
 public class TelaNotificacoes extends JFrame {
 
@@ -50,9 +42,6 @@ public class TelaNotificacoes extends JFrame {
     private JButton btnHome;
     private JPanel listaNotificacoes;
 
-    private Consumer<Solicitacao> aoAceitar;
-    private Consumer<Solicitacao> aoRecusar;
-    private Consumer<Solicitacao> aoAbrirSolicitacao;
     private Consumer<EmprestimoAtivo> aoConfirmarDevolucao;
     private Consumer<EmprestimoAtivo> aoRecusarDevolucao;
 
@@ -161,23 +150,26 @@ public class TelaNotificacoes extends JFrame {
         mostrarNotificacoes(
             new ArrayList<AvisoPrazo>(),
             new ArrayList<EmprestimoAtivo>(),
-            new ArrayList<Solicitacao>()
+            new ArrayList<EmprestimoAtivo>()
         );
     }
 
 
     // =====================================================
-    // MOSTRA OS AVISOS DE PRAZO, AS DEVOLUÇÕES E AS SOLICITAÇÕES NA TELA
+    // MOSTRA AS NOTIFICAÇÕES RECEBIDAS E AS ENVIADAS NA TELA
     // =====================================================
 
     public void mostrarNotificacoes(
             List<AvisoPrazo> avisos,
-            List<EmprestimoAtivo> devolucoes,
-            List<Solicitacao> solicitacoes) {
+            List<EmprestimoAtivo> devolucoesParaConfirmar,
+            List<EmprestimoAtivo> devolucoesInformadas) {
 
         listaNotificacoes.removeAll();
 
-        if (avisos.isEmpty() && devolucoes.isEmpty() && solicitacoes.isEmpty()) {
+        boolean temRecebidas = !avisos.isEmpty() || !devolucoesParaConfirmar.isEmpty();
+        boolean temEnviadas = !devolucoesInformadas.isEmpty();
+
+        if (!temRecebidas && !temEnviadas) {
 
             JLabel lblVazio = new JLabel("Nenhuma notificação.");
             lblVazio.setForeground(Color.WHITE);
@@ -186,30 +178,30 @@ public class TelaNotificacoes extends JFrame {
 
         } else {
 
-            if (!avisos.isEmpty()) {
-                listaNotificacoes.add(criarTituloSecao("Empréstimos perto do fim"));
+            if (temRecebidas) {
+                listaNotificacoes.add(criarTituloSecao("Recebidas"));
+
                 for (AvisoPrazo a : avisos) {
                     listaNotificacoes.add(criarCartaoAviso(a), "growx");
                 }
-            }
-
-            if (!devolucoes.isEmpty()) {
-                listaNotificacoes.add(
-                    criarTituloSecao("Devoluções para confirmar"),
-                    avisos.isEmpty() ? "" : "gaptop 15"
-                );
-                for (EmprestimoAtivo d : devolucoes) {
+                for (EmprestimoAtivo d : devolucoesParaConfirmar) {
                     listaNotificacoes.add(criarCartaoDevolucao(d), "growx");
                 }
             }
 
-            if (!solicitacoes.isEmpty()) {
-                listaNotificacoes.add(
-                    criarTituloSecao("Solicitações de empréstimo"),
-                    avisos.isEmpty() && devolucoes.isEmpty() ? "" : "gaptop 15"
-                );
-                for (Solicitacao s : solicitacoes) {
-                    listaNotificacoes.add(criarCartaoSolicitacao(s), "growx");
+            if (temEnviadas) {
+                listaNotificacoes.add(criarTituloSecao("Enviadas"), temRecebidas ? "gaptop 15" : "");
+
+                for (EmprestimoAtivo d : devolucoesInformadas) {
+                    listaNotificacoes.add(
+                        criarCartaoEnviada(
+                            d.getFotoDono(),
+                            "Você avisou " + d.getNomeDono() + " que devolveu \"" + d.getTituloLivro() + "\"",
+                            "Aviso enviado em " + d.getDevolucaoSolicitada().format(FORMATO_DATA)
+                            + "   •   aguardando confirmação"
+                        ),
+                        "growx"
+                    );
                 }
             }
         }
@@ -337,65 +329,33 @@ public class TelaNotificacoes extends JFrame {
 
 
     // =====================================================
-    // CARTÃO DE SOLICITAÇÃO DE EMPRÉSTIMO
+    // CARTÃO DE NOTIFICAÇÃO ENVIADA (SÓ INFORMATIVO, SEM BOTÕES)
     // =====================================================
 
-    private JPanel criarCartaoSolicitacao(Solicitacao s) {
+    private JPanel criarCartaoEnviada(byte[] fotoDestinatario, String titulo, String detalhes) {
 
-        // 4 colunas: 0 = foto | 1 = textos | 2 = excluir | 3 = aceitar
         RoundedPanel cartao = new RoundedPanel(
-            new MigLayout("insets 14 25 14 25", "[]20[grow]20[]10[]", "[center]"), 35
+            new MigLayout("insets 14 25 14 25", "[]20[grow]", "[center]"), 35
         );
-        cartao.setBackground(new Color(174, 244, 198));
-        cartao.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        cartao.setBackground(new Color(226, 240, 231));
 
-        // Foto de quem pediu
-        JLabel lblFoto = new JLabel(new ImageIcon(pegarFoto(s.getFotoSolicitante(), 45)));
+        // Foto de quem recebeu
+        JLabel lblFoto = new JLabel(new ImageIcon(pegarFoto(fotoDestinatario, 45)));
         cartao.add(lblFoto, "cell 0 0,alignx center,aligny center");
 
-        // Nome + livro
+        // O que foi enviado + situação
         JPanel informacoes = new JPanel(new MigLayout("insets 0", "[grow]", "[]2[]"));
         informacoes.setOpaque(false);
         cartao.add(informacoes, "cell 1 0,growx,aligny center");
 
-        JLabel lblNome = new JLabel(s.getNomeSolicitante() + " quer " + s.getTituloLivro());
-        lblNome.setFont(new Font("Tahoma", Font.BOLD, 21));
-        informacoes.add(lblNome, "cell 0 0");
+        JLabel lblTitulo = new JLabel(titulo);
+        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 21));
+        informacoes.add(lblTitulo, "cell 0 0");
 
-        JLabel lblDetalhes = new JLabel(
-            "Solicitação de empréstimo em " + s.getDataPedido().format(FORMATO_DATA)
-        );
+        JLabel lblDetalhes = new JLabel(detalhes);
         lblDetalhes.setForeground(new Color(60, 60, 60));
         lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
         informacoes.add(lblDetalhes, "cell 0 1");
-
-        // Botão recusar
-        JButton btnExcluir = criarBotaoIcone("/imagens/excluirdim.png", "Recusar");
-        btnExcluir.addActionListener(e -> {
-            if (aoRecusar != null) {
-                aoRecusar.accept(s);
-            }
-        });
-        cartao.add(btnExcluir, "cell 2 0,alignx center,aligny center");
-
-        // Botão aceitar
-        JButton btnAceitar = criarBotaoIcone("/imagens/verificadim.png", "Aceitar");
-        btnAceitar.addActionListener(e -> {
-            if (aoAceitar != null) {
-                aoAceitar.accept(s);
-            }
-        });
-        cartao.add(btnAceitar, "cell 3 0,alignx center,aligny center");
-
-        // Clicar no cartão (fora dos botões) abre a tela de Solicitações
-        aplicarListener(cartao, new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (aoAbrirSolicitacao != null) {
-                    aoAbrirSolicitacao.accept(s);
-                }
-            }
-        });
 
         return cartao;
     }
@@ -433,37 +393,10 @@ public class TelaNotificacoes extends JFrame {
         return imagem.getScaledInstance(tamanho, tamanho, Image.SCALE_SMOOTH);
     }
 
-    /** Aplica o listener no container e em todos os filhos, exceto botões. */
-    private void aplicarListener(Container container, MouseListener listener) {
-        container.addMouseListener(listener);
-        for (Component comp : container.getComponents()) {
-            if (comp instanceof AbstractButton) {
-                continue;
-            }
-            if (comp instanceof Container) {
-                aplicarListener((Container) comp, listener);
-            } else {
-                comp.addMouseListener(listener);
-            }
-        }
-    }
-
     public JButton getBtnHome()    { return btnHome; }
-    
 
-    // O controller diz o que fazer quando clicar em aceitar/recusar/no cartão
-    public void setAoAceitar(Consumer<Solicitacao> aoAceitar) {
-        this.aoAceitar = aoAceitar;
-    }
 
-    public void setAoRecusar(Consumer<Solicitacao> aoRecusar) {
-        this.aoRecusar = aoRecusar;
-    }
-
-    public void setAoAbrirSolicitacao(Consumer<Solicitacao> aoAbrirSolicitacao) {
-        this.aoAbrirSolicitacao = aoAbrirSolicitacao;
-    }
-
+    // O controller diz o que fazer quando clicar em confirmar/recusar a devolução
     public void setAoConfirmarDevolucao(Consumer<EmprestimoAtivo> aoConfirmarDevolucao) {
         this.aoConfirmarDevolucao = aoConfirmarDevolucao;
     }
