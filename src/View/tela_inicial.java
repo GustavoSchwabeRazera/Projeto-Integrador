@@ -33,6 +33,8 @@ public class tela_inicial extends JFrame {
     private JButton btnHistorico;
     private JButton btnNotificacao;   // <-- agora é ATRIBUTO da classe
     private JButton btnLogo;
+    private JButton btnChat;
+    private int naoLidasChat = 0;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -187,6 +189,16 @@ public class tela_inicial extends JFrame {
                         btnLivrosComigo.setCursor(new Cursor(Cursor.HAND_CURSOR));
                         contentPane.add(btnLivrosComigo, "cell 5 12,alignx center");
         
+                btnChat = new JButton("");
+                btnChat.setContentAreaFilled(false);
+                btnChat.setBorderPainted(false);
+                btnChat.setFocusPainted(false);
+                btnChat.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnChat.setToolTipText("Chat");
+                btnChat.setIcon(IconeChat.criar(75, 0));
+                // Na mesma linha do sino: uma linha nova empurraria os botões para fora da tela
+                contentPane.add(btnChat, "cell 7 15,alignx right");
+
                 btnCalendario = new JButton("");
                 btnCalendario.setContentAreaFilled(false);
                 btnCalendario.setBorderPainted(false);
@@ -285,9 +297,22 @@ public class tela_inicial extends JFrame {
         
         
     }
+    // Mostra no balão do chat quantas mensagens estão sem ler
+    public void atualizarNaoLidasChat(int naoLidas) {
+
+        if (naoLidas != naoLidasChat) {
+            naoLidasChat = naoLidas;
+            btnChat.setIcon(IconeChat.criar(75, naoLidas));
+        }
+    }
+
     // =========================================================
     // GETTERS
     // =========================================================
+
+    public JButton getBtnChat() {
+        return btnChat;
+    }
 
     public JButton getBtnPesquisar() {
         return btnPesquisar;

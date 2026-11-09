@@ -13,6 +13,7 @@ import View.Historico;
 import View.Perfil;
 import View.PesquisarLivro;
 import View.TelaAlterar;
+import View.TelaChat;
 import View.TelaCriarConta;
 import View.TelaLivrosComigo;
 import View.TelaLogin;
@@ -25,6 +26,7 @@ import dao.EmprestimoDAO;
 import dao.HistoricoDAO;
 import dao.EventoDAO;
 import dao.LivroDAO;
+import dao.MensagemDAO;
 import dao.UsuarioDAO;
 
 import model.Livro;
@@ -50,6 +52,7 @@ public class LivroController {
     private final Calendario calendario;
     private final TelaAlterar alterarCadastro;
     private final Historico historico;
+    private final TelaChat telaChat;
 
     private final PesquisarController pesquisarController;
     private final LoginController loginController;
@@ -60,6 +63,7 @@ public class LivroController {
     private final PerfilController perfilController;
     private final HistoricoController historicoController;
     private final AutorController autorController;
+    private final ChatController chatController;
 
     private String emailUsuarioLogado;
     private String cpfUsuarioLogado;
@@ -94,6 +98,7 @@ public class LivroController {
         this.alterarCadastro = new TelaAlterar();
         this.usuarioDAO = new UsuarioDAO();
         this.historico = new Historico();
+        this.telaChat = new TelaChat();
 
         this.pesquisarController =
                 new PesquisarController(livroDAO, emprestimoDAO, usuarioDAO, pesquisarLivro);
@@ -121,6 +126,9 @@ public class LivroController {
 
         this.autorController =
                 new AutorController(cadastroLivro);
+
+        this.chatController =
+                new ChatController(new MensagemDAO(), telaChat, telaInicial::atualizarNaoLidasChat);
 
         configurarEventos();
     }
@@ -193,6 +201,15 @@ public class LivroController {
         telaInicial.getBtnNotificacao()
                 .addActionListener(e -> abrirNotificacoes());
 
+        telaInicial.getBtnChat()
+                .addActionListener(e -> abrirChat());
+
+
+        // --- CHAT ---
+
+        telaChat.getBtnHome()
+                .addActionListener(e -> abrirHome());
+
 
         // --- PESQUISA ---
 
@@ -228,6 +245,8 @@ public class LivroController {
         telaSolicitacoes.getBtnHome()
                 .addActionListener(e -> abrirHome());
 
+        telaSolicitacoes.setAoConversar(s -> abrirChatCom(s.getCpfSolicitante()));
+
 
         // --- NOTIFICAÇÕES ---
 
@@ -236,6 +255,8 @@ public class LivroController {
 
        
         telaNotificacoes.setAoAbrirSolicitacao(s -> abrirSolicitacoes());
+
+        telaNotificacoes.setAoConversar(s -> abrirChatCom(s.getCpfSolicitante()));
 
 
         // --- CADASTRO DE LIVROS ---
@@ -333,6 +354,8 @@ public class LivroController {
 
 
     public void logoff() {
+
+        chatController.parar();
 
         emailUsuarioLogado = null;
         cpfUsuarioLogado = null;
@@ -432,6 +455,24 @@ public class LivroController {
     }
 
 
+    // A tela aparece antes de carregar: a conversa precisa do tamanho
+    // final da tela para rolar até a última mensagem
+    private void abrirChat() {
+
+        trocarPara(telaChat);
+
+        chatController.carregarChat();
+    }
+
+
+    private void abrirChatCom(String cpfContato) {
+
+        trocarPara(telaChat);
+
+        chatController.carregarChatCom(cpfContato);
+    }
+
+
     private void abrirPerfil() {
 
         perfilController.carregarPerfil(
@@ -516,7 +557,8 @@ public class LivroController {
                 criarConta,
                 calendario,
                 alterarCadastro,
-                historico
+                historico,
+                telaChat
         };
 
         for (JFrame outra : telas) {
@@ -538,6 +580,8 @@ public class LivroController {
 
             emailUsuarioLogado = loginController.getEmailLogado();
             cpfUsuarioLogado = loginController.getCpfLogado();
+
+            chatController.iniciar(cpfUsuarioLogado);
 
             abrirHome();
         }

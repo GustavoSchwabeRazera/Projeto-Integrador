@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-=======
-
-
-
-
->>>>>>> origin/main
 DROP DATABASE IF EXISTS CapasVivas;
 CREATE DATABASE CapasVivas;
 USE CapasVivas;
@@ -144,8 +137,24 @@ CREATE TABLE Historico
     data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Mensagens do chat entre usuários.
+-- lida = FALSE até o destinatário abrir a conversa.
+CREATE TABLE Mensagens
+(
+    id_mensagem INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    CPF_remetente VARCHAR(11) NOT NULL,
+    CPF_destinatario VARCHAR(11) NOT NULL,
+    texto VARCHAR(500) NOT NULL,
+    data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    lida BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (CPF_remetente) REFERENCES Usuarios(CPF)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (CPF_destinatario) REFERENCES Usuarios(CPF)
+        ON UPDATE CASCADE ON DELETE CASCADE
+);
+
 -- INSERÇÃO DE USUÁRIOS
-INSERT INTO Usuarios 
+INSERT INTO Usuarios
 (CPF, nome, telefone, email, data_nascimento, senha, foto)
 VALUES
 ('12345678911', 'guilherme', '47999999999', 'gui@gmail.com', '2008-09-12', '123456', LOAD_FILE('/ProjetoFinal/src/imagens/FotoPerfil.png')),

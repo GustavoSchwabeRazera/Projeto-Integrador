@@ -8,6 +8,7 @@ public class Solicitacao {
     private int idSolicitacao;
     private String isbn;
     private String tituloLivro;
+    private String cpfSolicitante;
     private String nomeSolicitante;
     private String emailSolicitante;
     private String telefoneSolicitante;
@@ -36,6 +37,14 @@ public class Solicitacao {
 
     public void setTituloLivro(String tituloLivro) {
         this.tituloLivro = tituloLivro;
+    }
+
+    public String getCpfSolicitante() {
+        return cpfSolicitante;
+    }
+
+    public void setCpfSolicitante(String cpfSolicitante) {
+        this.cpfSolicitante = cpfSolicitante;
     }
 
     public String getNomeSolicitante() {

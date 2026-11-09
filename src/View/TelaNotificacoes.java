@@ -53,6 +53,7 @@ public class TelaNotificacoes extends JFrame {
     private Consumer<Solicitacao> aoAceitar;
     private Consumer<Solicitacao> aoRecusar;
     private Consumer<Solicitacao> aoAbrirSolicitacao;
+    private Consumer<Solicitacao> aoConversar;
     private Consumer<EmprestimoAtivo> aoConfirmarDevolucao;
     private Consumer<EmprestimoAtivo> aoRecusarDevolucao;
 
@@ -342,9 +343,9 @@ public class TelaNotificacoes extends JFrame {
 
     private JPanel criarCartaoSolicitacao(Solicitacao s) {
 
-        // 4 colunas: 0 = foto | 1 = textos | 2 = excluir | 3 = aceitar
+        // 5 colunas: 0 = foto | 1 = textos | 2 = conversar | 3 = excluir | 4 = aceitar
         RoundedPanel cartao = new RoundedPanel(
-            new MigLayout("insets 14 25 14 25", "[]20[grow]20[]10[]", "[center]"), 35
+            new MigLayout("insets 14 25 14 25", "[]20[grow]20[]10[]10[]", "[center]"), 35
         );
         cartao.setBackground(new Color(174, 244, 198));
         cartao.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -369,6 +370,15 @@ public class TelaNotificacoes extends JFrame {
         lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
         informacoes.add(lblDetalhes, "cell 0 1");
 
+        // Botão conversar
+        JButton btnConversar = criarBotaoIcone(IconeChat.criar(42, 0), "Conversar");
+        btnConversar.addActionListener(e -> {
+            if (aoConversar != null) {
+                aoConversar.accept(s);
+            }
+        });
+        cartao.add(btnConversar, "cell 2 0,alignx center,aligny center");
+
         // Botão recusar
         JButton btnExcluir = criarBotaoIcone("/imagens/excluirdim.png", "Recusar");
         btnExcluir.addActionListener(e -> {
@@ -376,7 +386,7 @@ public class TelaNotificacoes extends JFrame {
                 aoRecusar.accept(s);
             }
         });
-        cartao.add(btnExcluir, "cell 2 0,alignx center,aligny center");
+        cartao.add(btnExcluir, "cell 3 0,alignx center,aligny center");
 
         // Botão aceitar
         JButton btnAceitar = criarBotaoIcone("/imagens/verificadim.png", "Aceitar");
@@ -385,7 +395,7 @@ public class TelaNotificacoes extends JFrame {
                 aoAceitar.accept(s);
             }
         });
-        cartao.add(btnAceitar, "cell 3 0,alignx center,aligny center");
+        cartao.add(btnAceitar, "cell 4 0,alignx center,aligny center");
 
         // Clicar no cartão (fora dos botões) abre a tela de Solicitações
         aplicarListener(cartao, new MouseAdapter() {
@@ -402,8 +412,13 @@ public class TelaNotificacoes extends JFrame {
 
     private JButton criarBotaoIcone(String imagem, String dica) {
 
+        return criarBotaoIcone(new ImageIcon(TelaNotificacoes.class.getResource(imagem)), dica);
+    }
+
+    private JButton criarBotaoIcone(ImageIcon icone, String dica) {
+
         JButton botao = new JButton("");
-        botao.setIcon(new ImageIcon(TelaNotificacoes.class.getResource(imagem)));
+        botao.setIcon(icone);
         botao.setToolTipText(dica);
         botao.setBorderPainted(false);
         botao.setContentAreaFilled(false);
@@ -462,6 +477,10 @@ public class TelaNotificacoes extends JFrame {
 
     public void setAoAbrirSolicitacao(Consumer<Solicitacao> aoAbrirSolicitacao) {
         this.aoAbrirSolicitacao = aoAbrirSolicitacao;
+    }
+
+    public void setAoConversar(Consumer<Solicitacao> aoConversar) {
+        this.aoConversar = aoConversar;
     }
 
     public void setAoConfirmarDevolucao(Consumer<EmprestimoAtivo> aoConfirmarDevolucao) {

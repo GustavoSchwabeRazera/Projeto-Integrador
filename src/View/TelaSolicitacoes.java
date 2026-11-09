@@ -39,6 +39,7 @@ public class TelaSolicitacoes extends JFrame {
 	private JPanel listaSolicitacoes;
 	private Consumer<Solicitacao> aoAceitar;
 	private Consumer<Solicitacao> aoRecusar;
+	private Consumer<Solicitacao> aoConversar;
 	private JLabel lblNewLabel;
 
     /**
@@ -265,7 +266,7 @@ public class TelaSolicitacoes extends JFrame {
         RoundedPanel cartao = new RoundedPanel(
             new MigLayout(
                 "insets 14 25 14 25",
-                "[]20[grow]20[]20[]",
+                "[]20[grow]20[]20[]20[]",
                 "[center]"
             ),
             35
@@ -299,6 +300,15 @@ public class TelaSolicitacoes extends JFrame {
         lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
         informacoes.add(lblDetalhes, "cell 0 1");
 
+        // Botão conversar
+        JButton btnConversar = criarBotaoIcone(IconeChat.criar(42, 0), "Conversar");
+        btnConversar.addActionListener(e -> {
+            if (aoConversar != null) {
+                aoConversar.accept(s);
+            }
+        });
+        cartao.add(btnConversar, "cell 2 0,alignx center,aligny center");
+
         // Botão recusar
         JButton btnExcluir = criarBotaoIcone("/imagens/excluirdim.png", "Recusar");
         btnExcluir.addActionListener(e -> {
@@ -306,7 +316,7 @@ public class TelaSolicitacoes extends JFrame {
                 aoRecusar.accept(s);
             }
         });
-        cartao.add(btnExcluir, "cell 2 0,alignx center,aligny center");
+        cartao.add(btnExcluir, "cell 3 0,alignx center,aligny center");
 
         // Botão aceitar
         JButton btnAceitar = criarBotaoIcone("/imagens/verificadim.png", "Aceitar");
@@ -315,15 +325,20 @@ public class TelaSolicitacoes extends JFrame {
                 aoAceitar.accept(s);
             }
         });
-        cartao.add(btnAceitar, "cell 3 0,alignx center,aligny center");
+        cartao.add(btnAceitar, "cell 4 0,alignx center,aligny center");
 
         return cartao;
     }
 
     private JButton criarBotaoIcone(String imagem, String dica) {
 
+        return criarBotaoIcone(new ImageIcon(TelaSolicitacoes.class.getResource(imagem)), dica);
+    }
+
+    private JButton criarBotaoIcone(ImageIcon icone, String dica) {
+
         JButton botao = new JButton("");
-        botao.setIcon(new ImageIcon(TelaSolicitacoes.class.getResource(imagem)));
+        botao.setIcon(icone);
         botao.setToolTipText(dica);
         botao.setBorderPainted(false);
         botao.setContentAreaFilled(false);
@@ -364,6 +379,10 @@ public class TelaSolicitacoes extends JFrame {
 
     public void setAoRecusar(Consumer<Solicitacao> aoRecusar) {
         this.aoRecusar = aoRecusar;
+    }
+
+    public void setAoConversar(Consumer<Solicitacao> aoConversar) {
+        this.aoConversar = aoConversar;
     }
 
 }

@@ -162,7 +162,7 @@ public class EmprestimoDAO {
 
         List<Solicitacao> solicitacoes = new ArrayList<>();
 
-        String sql = "SELECT s.id_solicitacao, s.data_pedido, l.ISBN, l.titulo, "
+        String sql = "SELECT s.id_solicitacao, s.CPF_solicitante, s.data_pedido, l.ISBN, l.titulo, "
                 + "u.nome, u.email, u.telefone, u.foto "
                 + "FROM Solicitacoes s "
                 + "JOIN Livros l ON l.ISBN = s.ISBN "
@@ -178,6 +178,7 @@ public class EmprestimoDAO {
                 while (rs.next()) {
                     Solicitacao s = new Solicitacao();
                     s.setIdSolicitacao(rs.getInt("id_solicitacao"));
+                    s.setCpfSolicitante(rs.getString("CPF_solicitante"));
                     s.setDataPedido(rs.getDate("data_pedido").toLocalDate());
                     s.setIsbn(rs.getString("ISBN"));
                     s.setTituloLivro(rs.getString("titulo"));
