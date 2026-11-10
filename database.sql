@@ -49,12 +49,16 @@ CREATE TABLE Pertence
 
 -- Pedidos de empréstimo esperando o dono aceitar ou recusar.
 -- O pedido vence 14 dias depois de feito.
+-- data_retirada / data_retorno = dias que o leitor escolheu para pegar
+-- e devolver o livro (viram as datas do empréstimo quando o dono aceita).
 CREATE TABLE Solicitacoes
 (
     id_solicitacao INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     CPF_solicitante VARCHAR(11) NOT NULL,
     ISBN VARCHAR(13) NOT NULL,
     data_pedido DATE NOT NULL,
+    data_retirada DATE NULL,
+    data_retorno DATE NULL,
     FOREIGN KEY (CPF_solicitante) REFERENCES Usuarios(CPF),
     FOREIGN KEY (ISBN) REFERENCES Livros(ISBN)
 );
@@ -195,9 +199,9 @@ VALUES
 
 -- INSERÇÃO DE SOLICITAÇÕES
 INSERT INTO Solicitacoes
-(CPF_solicitante, ISBN, data_pedido)
+(CPF_solicitante, ISBN, data_pedido, data_retirada, data_retorno)
 VALUES
-('12345678911', '9788532530788', '2026-09-01');
+('12345678911', '9788532530788', '2026-09-01', '2026-09-05', '2026-09-19');
 
 -- CONSULTA FINAL
 SELECT * FROM Usuarios;

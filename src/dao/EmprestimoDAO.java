@@ -19,7 +19,8 @@ import model.Solicitacao;
 public class EmprestimoDAO {
 
     
-    private static final int DIAS_EMPRESTIMO = 14;
+    // Prazo usado nos pedidos antigos, feitos sem escolher as datas
+    public static final int DIAS_EMPRESTIMO = 14;
 
   
     private static final int DIAS_VALIDADE_PEDIDO = Solicitacao.DIAS_VALIDADE;
@@ -37,11 +38,13 @@ public class EmprestimoDAO {
 
         Connection conn = ConnectionFactory.getConnection();
 
-        // Cria a coluna se o banco MySQL foi montado antes dela existir
-        if (!colunasVerificadas && !ConnectionFactory.usaPostgres()) {
+        // Cria as colunas se o banco foi montado antes delas existirem
+        if (!colunasVerificadas) {
 
-            criarColunaSeFaltar(conn, "devolucao_solicitada");
-            criarColunaSeFaltar(conn, "ultimo_aviso_prazo");
+            criarColunaSeFaltar(conn, "Emprestimo", "devolucao_solicitada");
+            criarColunaSeFaltar(conn, "Emprestimo", "ultimo_aviso_prazo");
+            criarColunaSeFaltar(conn, "Solicitacoes", "data_retirada");
+            criarColunaSeFaltar(conn, "Solicitacoes", "data_retorno");
 
             colunasVerificadas = true;
         }
@@ -49,20 +52,30 @@ public class EmprestimoDAO {
         return conn;
     }
 
-    private void criarColunaSeFaltar(Connection conn, String coluna) throws SQLException {
+    private void criarColunaSeFaltar(Connection conn, String tabela, String coluna) throws SQLException {
+
+        // O PostgreSQL já sabe pular a coluna que existe
+        if (ConnectionFactory.usaPostgres()) {
+            try (PreparedStatement alterar = conn.prepareStatement(
+                    "ALTER TABLE " + tabela + " ADD COLUMN IF NOT EXISTS " + coluna + " DATE NULL")) {
+                alterar.executeUpdate();
+            }
+            return;
+        }
 
         try (PreparedStatement stmt = conn.prepareStatement(
                 "SELECT 1 FROM information_schema.COLUMNS "
-                + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Emprestimo' "
+                + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? "
                 + "AND COLUMN_NAME = ?")) {
 
-            stmt.setString(1, coluna);
+            stmt.setString(1, tabela);
+            stmt.setString(2, coluna);
 
             try (ResultSet rs = stmt.executeQuery()) {
 
                 if (!rs.next()) {
                     try (PreparedStatement alterar = conn.prepareStatement(
-                            "ALTER TABLE Emprestimo ADD COLUMN " + coluna + " DATE NULL")) {
+                            "ALTER TABLE " + tabela + " ADD COLUMN " + coluna + " DATE NULL")) {
                         alterar.executeUpdate();
                     }
                 }
@@ -70,16 +83,34 @@ public class EmprestimoDAO {
         }
     }
 
+    // Datas de retirada e devolução do pedido (podem ser null em pedidos antigos)
+    private void lerPeriodo(ResultSet rs, Solicitacao s) throws SQLException {
 
-    public void solicitar(String cpfUsuario, String isbn) throws SQLException {
+        java.sql.Date retirada = rs.getDate("data_retirada");
+        java.sql.Date retorno = rs.getDate("data_retorno");
 
-        String sql = "INSERT INTO Solicitacoes (CPF_solicitante, ISBN, data_pedido) "
-                + "VALUES (?, ?, CURRENT_DATE)";
+        if (retirada != null) {
+            s.setDataRetirada(retirada.toLocalDate());
+        }
+        if (retorno != null) {
+            s.setDataRetorno(retorno.toLocalDate());
+        }
+    }
+
+
+    public void solicitar(String cpfUsuario, String isbn,
+            LocalDate dataRetirada, LocalDate dataRetorno) throws SQLException {
+
+        String sql = "INSERT INTO Solicitacoes "
+                + "(CPF_solicitante, ISBN, data_pedido, data_retirada, data_retorno) "
+                + "VALUES (?, ?, CURRENT_DATE, ?, ?)";
 
         try (PreparedStatement stmt = getConn().prepareStatement(sql)) {
 
             stmt.setString(1, cpfUsuario);
             stmt.setString(2, isbn);
+            stmt.setDate(3, java.sql.Date.valueOf(dataRetirada));
+            stmt.setDate(4, java.sql.Date.valueOf(dataRetorno));
 
             stmt.executeUpdate();
         }
@@ -157,7 +188,8 @@ public class EmprestimoDAO {
 
         List<Solicitacao> solicitacoes = new ArrayList<>();
 
-        String sql = "SELECT s.id_solicitacao, s.CPF_solicitante, s.data_pedido, l.ISBN, l.titulo, "
+        String sql = "SELECT s.id_solicitacao, s.CPF_solicitante, s.data_pedido, "
+                + "s.data_retirada, s.data_retorno, l.ISBN, l.titulo, "
                 + "u.nome, u.email, u.telefone, u.foto "
                 + "FROM Solicitacoes s "
                 + "JOIN Livros l ON l.ISBN = s.ISBN "
@@ -181,6 +213,7 @@ public class EmprestimoDAO {
                     s.setEmailSolicitante(rs.getString("email"));
                     s.setTelefoneSolicitante(rs.getString("telefone"));
                     s.setFotoSolicitante(rs.getBytes("foto"));
+                    lerPeriodo(rs, s);
                     solicitacoes.add(s);
                 }
             }
@@ -195,7 +228,8 @@ public class EmprestimoDAO {
 
         List<Solicitacao> pedidos = new ArrayList<>();
 
-        String sql = "SELECT s.id_solicitacao, s.data_pedido, l.ISBN, l.titulo, u.nome, u.foto "
+        String sql = "SELECT s.id_solicitacao, s.data_pedido, s.data_retirada, s.data_retorno, "
+                + "l.ISBN, l.titulo, u.nome, u.foto "
                 + "FROM Solicitacoes s "
                 + "JOIN Livros l ON l.ISBN = s.ISBN "
                 + "JOIN Usuarios u ON u.CPF = l.CPF_dono "
@@ -215,6 +249,7 @@ public class EmprestimoDAO {
                     s.setTituloLivro(rs.getString("titulo"));
                     s.setNomeDono(rs.getString("nome"));
                     s.setFotoDono(rs.getBytes("foto"));
+                    lerPeriodo(rs, s);
                     pedidos.add(s);
                 }
             }
@@ -321,7 +356,8 @@ public class EmprestimoDAO {
         Map<LocalDate, List<String>> eventos = new HashMap<>();
 
      
-        String sqlPedidos = "SELECT s.data_pedido, s.CPF_solicitante, l.titulo, "
+        String sqlPedidos = "SELECT s.data_pedido, s.data_retirada, s.data_retorno, "
+                + "s.CPF_solicitante, l.titulo, "
                 + "dono.nome AS nome_dono, leitor.nome AS nome_leitor "
                 + "FROM Solicitacoes s "
                 + "JOIN Livros l ON l.ISBN = s.ISBN "
@@ -339,14 +375,34 @@ public class EmprestimoDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     LocalDate data = rs.getDate("data_pedido").toLocalDate();
+                    java.sql.Date retirada = rs.getDate("data_retirada");
+                    java.sql.Date retorno = rs.getDate("data_retorno");
                     String titulo = rs.getString("titulo");
 
                     if (cpfUsuario.equals(rs.getString("CPF_solicitante"))) {
+                        String dono = rs.getString("nome_dono");
                         adicionarEvento(eventos, data, "Pediu \"" + titulo + "\" para "
-                                + rs.getString("nome_dono") + " (aguardando)");
+                                + dono + " (aguardando)");
+                        if (retirada != null) {
+                            adicionarEvento(eventos, retirada.toLocalDate(), "Retirar \"" + titulo
+                                    + "\" com " + dono + " (aguardando)");
+                        }
+                        if (retorno != null) {
+                            adicionarEvento(eventos, retorno.toLocalDate(), "Devolver \"" + titulo
+                                    + "\" para " + dono + " (aguardando)");
+                        }
                     } else {
-                        adicionarEvento(eventos, data, rs.getString("nome_leitor") + " pediu \""
+                        String leitor = rs.getString("nome_leitor");
+                        adicionarEvento(eventos, data, leitor + " pediu \""
                                 + titulo + "\" (aguardando você)");
+                        if (retirada != null) {
+                            adicionarEvento(eventos, retirada.toLocalDate(), "Entregar \"" + titulo
+                                    + "\" para " + leitor + " (aguardando você)");
+                        }
+                        if (retorno != null) {
+                            adicionarEvento(eventos, retorno.toLocalDate(), "Receber \"" + titulo
+                                    + "\" de " + leitor + " (aguardando você)");
+                        }
                     }
                 }
             }
@@ -360,6 +416,8 @@ public class EmprestimoDAO {
                 + "JOIN Usuarios leitor ON leitor.CPF = e.CPF_leitor "
                 + "WHERE e.CPF_leitor = ? OR e.CPF_dono = ? "
                 + "ORDER BY e.data_emprestimo, e.id_emprestimo";
+
+        LocalDate hoje = LocalDate.now();
 
         try (PreparedStatement stmt = getConn().prepareStatement(sqlEmprestimos)) {
 
@@ -376,7 +434,9 @@ public class EmprestimoDAO {
                     if (cpfUsuario.equals(rs.getString("CPF_leitor"))) {
                         // Livro que o usuário pegou emprestado
                         String dono = rs.getString("nome_dono");
-                        adicionarEvento(eventos, inicio, "Pegou \"" + titulo + "\" de " + dono);
+                        adicionarEvento(eventos, inicio, inicio.isAfter(hoje)
+                                ? "Retirar \"" + titulo + "\" com " + dono
+                                : "Pegou \"" + titulo + "\" de " + dono);
 
                         if (devolucao == null) {
                             adicionarEvento(eventos, entrega, "Devolver \"" + titulo + "\" para " + dono);
@@ -387,7 +447,9 @@ public class EmprestimoDAO {
                     } else {
                         // Livro do usuário emprestado para outra pessoa
                         String leitor = rs.getString("nome_leitor");
-                        adicionarEvento(eventos, inicio, "Emprestou \"" + titulo + "\" para " + leitor);
+                        adicionarEvento(eventos, inicio, inicio.isAfter(hoje)
+                                ? "Entregar \"" + titulo + "\" para " + leitor
+                                : "Emprestou \"" + titulo + "\" para " + leitor);
 
                         if (devolucao == null) {
                             adicionarEvento(eventos, entrega, "Receber \"" + titulo + "\" de " + leitor);
@@ -413,9 +475,8 @@ public class EmprestimoDAO {
     // e apaga os pedidos desse livro, inclusive o aceito
     // =========================================================
 
-    public void aceitar(Solicitacao solicitacao) throws SQLException {
-
-        LocalDate hoje = LocalDate.now();
+    public void aceitar(Solicitacao solicitacao, LocalDate dataRetirada, LocalDate dataRetorno)
+            throws SQLException {
 
         String cpfDono = null;
         String nomeDono = null;
@@ -462,8 +523,8 @@ public class EmprestimoDAO {
                 stmt.setString(2, titulo);
                 stmt.setString(3, cpfDono);
                 stmt.setString(4, cpfLeitor);
-                stmt.setDate(5, java.sql.Date.valueOf(hoje));
-                stmt.setDate(6, java.sql.Date.valueOf(hoje.plusDays(DIAS_EMPRESTIMO)));
+                stmt.setDate(5, java.sql.Date.valueOf(dataRetirada));
+                stmt.setDate(6, java.sql.Date.valueOf(dataRetorno));
                 stmt.executeUpdate();
             }
 

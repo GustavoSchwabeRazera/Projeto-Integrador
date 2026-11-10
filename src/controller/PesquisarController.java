@@ -1,6 +1,8 @@
 package controller;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -12,8 +14,11 @@ import dao.LivroDAO;
 import dao.UsuarioDAO;
 
 import model.Livro;
+import model.Solicitacao;
 
 public class PesquisarController {
+
+    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final LivroDAO livroDAO;
     private final EmprestimoDAO emprestimoDAO;
@@ -149,11 +154,20 @@ public class PesquisarController {
                 return;
             }
 
-            emprestimoDAO.solicitar(cpfUsuario, livro.getIsbn());
+            LocalDate[] periodo = pedirPeriodo(livro);
+
+            // Cancelou
+            if (periodo == null) {
+                return;
+            }
+
+            emprestimoDAO.solicitar(cpfUsuario, livro.getIsbn(), periodo[0], periodo[1]);
 
             mostrarMensagem(
                     "Solicitação de empréstimo de \"" + livro.getNome() + "\" enviada!\n"
-                    + "Aguarde o dono do livro aceitar."
+                    + "Retirada: " + periodo[0].format(FORMATO_DATA) + "\n"
+                    + "Devolução: " + periodo[1].format(FORMATO_DATA) + "\n"
+                    + "As datas já estão no seu calendário. Aguarde o dono do livro aceitar."
             );
 
         } catch (SQLException e) {
@@ -164,6 +178,81 @@ public class PesquisarController {
                     "Erro ao solicitar empréstimo:\n" + e.getMessage()
             );
         }
+    }
+
+
+    // =========================================================
+    // DIAS DE RETIRADA E DEVOLUÇÃO
+    // Pergunta de novo até as datas estarem certas.
+    // Devolve { retirada, devolução } ou null se cancelou
+    // =========================================================
+
+    private LocalDate[] pedirPeriodo(Livro livro) {
+
+        LocalDate hoje = LocalDate.now();
+        LocalDate ultimaRetirada = hoje.plusDays(Solicitacao.MAX_DIAS_ATE_RETIRADA);
+
+        LocalDate retirada = hoje;
+        LocalDate retorno = hoje.plusDays(EmprestimoDAO.DIAS_EMPRESTIMO);
+
+        while (true) {
+
+            LocalDate[] periodo = JanelaMensagem.pedirPeriodo(
+                    "Escolha quando vai pegar \"" + livro.getNome() + "\" e quando vai devolver ao dono.\n"
+                    + "A retirada pode ser até " + ultimaRetirada.format(FORMATO_DATA)
+                    + " e o empréstimo dura no máximo "
+                    + Solicitacao.MAX_DIAS_EMPRESTIMO + " dias.",
+                    "Datas do empréstimo",
+                    retirada,
+                    retorno,
+                    hoje,
+                    ultimaRetirada,
+                    Solicitacao.MAX_DIAS_EMPRESTIMO);
+
+            if (periodo == null) {
+                return null;
+            }
+
+            retirada = periodo[0];
+            retorno = periodo[1];
+
+            String erro = validarPeriodo(retirada, retorno, hoje, ultimaRetirada);
+
+            if (erro == null) {
+                return periodo;
+            }
+
+            mostrarMensagem(erro);
+        }
+    }
+
+    private String validarPeriodo(LocalDate retirada, LocalDate retorno,
+            LocalDate hoje, LocalDate ultimaRetirada) {
+
+        if (retirada == null || retorno == null) {
+            return "Escolha as duas datas (dd/mm/aaaa).";
+        }
+
+        if (retirada.isBefore(hoje)) {
+            return "O dia de retirada não pode ser antes de hoje.";
+        }
+
+        if (retirada.isAfter(ultimaRetirada)) {
+            return "O dia de retirada deve ser até " + ultimaRetirada.format(FORMATO_DATA) + ".";
+        }
+
+        if (!retorno.isAfter(retirada)) {
+            return "O dia de devolução deve ser depois do dia de retirada.";
+        }
+
+        if (retorno.isAfter(retirada.plusDays(Solicitacao.MAX_DIAS_EMPRESTIMO))) {
+            return "O empréstimo pode durar no máximo "
+                    + Solicitacao.MAX_DIAS_EMPRESTIMO + " dias.\n"
+                    + "Devolva até " + retirada.plusDays(Solicitacao.MAX_DIAS_EMPRESTIMO)
+                            .format(FORMATO_DATA) + ".";
+        }
+
+        return null;
     }
 
 

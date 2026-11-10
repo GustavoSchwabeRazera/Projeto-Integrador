@@ -25,7 +25,6 @@ import javax.swing.JScrollPane;
 import javax.imageio.ImageIO;
 import java.awt.Cursor;
 import java.io.ByteArrayInputStream;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -35,7 +34,6 @@ import model.Solicitacao;
 public class TelaSolicitacoes extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
-	private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private JPanel contentPane;
 	private JButton btnHome;
 	private JPanel listaRecebidas;
@@ -309,13 +307,7 @@ public class TelaSolicitacoes extends JFrame {
         lblNome.setFont(new Font("Tahoma", Font.BOLD, 19));
         informacoes.add(lblNome, "cell 0 0");
 
-        JLabel lblDatas = new JLabel(
-            "Pedido em " + s.getDataPedido().format(FORMATO_DATA)
-            + " • válido até " + s.getDataValidade().format(FORMATO_DATA)
-        );
-        lblDatas.setForeground(new Color(60, 60, 60));
-        lblDatas.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        informacoes.add(lblDatas, "cell 0 1");
+        adicionarPeriodo(informacoes, s, "cell 0 1");
 
         JLabel lblContato = new JLabel(
             s.getEmailSolicitante() + "   •   " + s.getTelefoneSolicitante()
@@ -355,6 +347,22 @@ public class TelaSolicitacoes extends JFrame {
     }
 
 
+    // Linha com os dias de retirada e devolução escolhidos no pedido
+    private void adicionarPeriodo(JPanel informacoes, Solicitacao s, String posicao) {
+
+        String periodo = s.getTextoPeriodo();
+
+        if (periodo == null) {
+            return;
+        }
+
+        JLabel lblPeriodo = new JLabel(periodo);
+        lblPeriodo.setForeground(new Color(19, 74, 38));
+        lblPeriodo.setFont(new Font("Tahoma", Font.BOLD, 15));
+        informacoes.add(lblPeriodo, posicao);
+    }
+
+
     // =====================================================
     // CARTÃO DE UM PEDIDO ENVIADO (SÓ INFORMATIVO, SEM BOTÕES)
     // =====================================================
@@ -384,13 +392,7 @@ public class TelaSolicitacoes extends JFrame {
         lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 19));
         informacoes.add(lblTitulo, "cell 0 0");
 
-        JLabel lblDatas = new JLabel(
-            "Pedido em " + s.getDataPedido().format(FORMATO_DATA)
-            + "   •   válido até " + s.getDataValidade().format(FORMATO_DATA)
-        );
-        lblDatas.setForeground(new Color(60, 60, 60));
-        lblDatas.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        informacoes.add(lblDatas, "cell 0 1");
+        adicionarPeriodo(informacoes, s, "cell 0 1");
 
         JLabel lblSituacao = new JLabel("Aguardando resposta");
         lblSituacao.setForeground(new Color(60, 60, 60));

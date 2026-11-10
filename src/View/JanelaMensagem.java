@@ -15,8 +15,12 @@ import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -29,6 +33,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
+
+import com.toedter.calendar.JDateChooser;
 
 // Janela de mensagem do sistema (sucesso, erro, aviso e confirmação).
 // Os métodos só retornam depois que o usuário responde, e as outras telas
@@ -328,5 +334,103 @@ public class JanelaMensagem extends JFrame {
         EventQueue.invokeLater(campo::requestFocusInWindow);
 
         return janela.abrir() == 0 ? campo.getText() : null;
+    }
+
+
+    // =========================================================
+    // PEDE O DIA DE RETIRADA E O DIA DE DEVOLUÇÃO
+    // Devolve { retirada, devolução } ou null se cancelou.
+    // Uma data digitada errada volta como null dentro do vetor.
+    // =========================================================
+
+    public static LocalDate[] pedirPeriodo(
+            String pergunta,
+            String titulo,
+            LocalDate retiradaInicial,
+            LocalDate retornoInicial,
+            LocalDate primeiraRetirada,
+            LocalDate ultimaRetirada,
+            int maxDiasEmprestimo) {
+
+        JDateChooser campoRetirada = criarCampoData(retiradaInicial);
+        campoRetirada.setMinSelectableDate(paraDate(primeiraRetirada));
+        campoRetirada.setMaxSelectableDate(paraDate(ultimaRetirada));
+
+        JDateChooser campoRetorno = criarCampoData(retornoInicial);
+
+        // A devolução só pode ser depois da retirada e dentro do prazo máximo
+        Runnable limitarRetorno = () -> {
+            LocalDate retirada = paraLocalDate(campoRetirada.getDate());
+            if (retirada == null) {
+                retirada = primeiraRetirada;
+            }
+            campoRetorno.setMinSelectableDate(paraDate(retirada.plusDays(1)));
+            campoRetorno.setMaxSelectableDate(paraDate(retirada.plusDays(maxDiasEmprestimo)));
+        };
+        limitarRetorno.run();
+        campoRetirada.addPropertyChangeListener("date", e -> limitarRetorno.run());
+
+        JLabel lblPergunta = new JLabel("<html><div style='width:" + LARGURA_TEXTO + "px'>"
+                + pergunta.replace("\n", "<br>") + "</div></html>");
+        lblPergunta.setFont(new Font("Tahoma", Font.PLAIN, 16));
+
+        JPanel campos = new JPanel(new java.awt.GridLayout(2, 2, 10, 10));
+        campos.setOpaque(false);
+        campos.add(criarRotulo("Dia de retirada:"));
+        campos.add(campoRetirada);
+        campos.add(criarRotulo("Dia de devolução ao dono:"));
+        campos.add(campoRetorno);
+
+        JPanel painel = new JPanel(new BorderLayout(0, 15));
+        painel.setOpaque(false);
+        painel.add(lblPergunta, BorderLayout.NORTH);
+        painel.add(campos, BorderLayout.CENTER);
+
+        JanelaMensagem janela = new JanelaMensagem(
+                painel,
+                titulo,
+                VERDE_ESCURO,
+                null,
+                0,
+                "Enviar pedido", "Cancelar"
+        );
+
+        if (janela.abrir() != 0) {
+            return null;
+        }
+
+        return new LocalDate[] {
+                paraLocalDate(campoRetirada.getDate()),
+                paraLocalDate(campoRetorno.getDate())
+        };
+    }
+
+    private static JDateChooser criarCampoData(LocalDate valorInicial) {
+
+        JDateChooser campo = new JDateChooser(paraDate(valorInicial), "dd/MM/yyyy");
+        campo.setLocale(new Locale("pt", "BR"));
+        campo.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        campo.setPreferredSize(new Dimension(180, 36));
+
+        return campo;
+    }
+
+    private static JLabel criarRotulo(String texto) {
+
+        JLabel rotulo = new JLabel(texto);
+        rotulo.setFont(new Font("Tahoma", Font.BOLD, 16));
+        rotulo.setForeground(VERDE_ESCURO);
+
+        return rotulo;
+    }
+
+    private static Date paraDate(LocalDate data) {
+
+        return data == null ? null : Date.from(data.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    private static LocalDate paraLocalDate(Date data) {
+
+        return data == null ? null : data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }

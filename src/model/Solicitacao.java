@@ -8,6 +8,12 @@ public class Solicitacao {
     // Depois desse tempo sem resposta o pedido vence (em dias)
     public static final int DIAS_VALIDADE = 14;
 
+    // Até quantos dias a partir de hoje o leitor pode marcar a retirada
+    public static final int MAX_DIAS_ATE_RETIRADA = 14;
+
+    // Tempo máximo entre a retirada e a devolução (em dias)
+    public static final int MAX_DIAS_EMPRESTIMO = 30;
+
     private int idSolicitacao;
     private String isbn;
     private String tituloLivro;
@@ -19,6 +25,10 @@ public class Solicitacao {
     private String nomeDono;
     private byte[] fotoDono;
     private LocalDate dataPedido;
+    // Dias escolhidos pelo leitor para pegar o livro e devolver ao dono
+    // (null em pedidos feitos antes de existir essa escolha)
+    private LocalDate dataRetirada;
+    private LocalDate dataRetorno;
 
     public int getIdSolicitacao() {
         return idSolicitacao;
@@ -111,5 +121,32 @@ public class Solicitacao {
 
     public void setDataPedido(LocalDate dataPedido) {
         this.dataPedido = dataPedido;
+    }
+
+    public LocalDate getDataRetirada() {
+        return dataRetirada;
+    }
+
+    public void setDataRetirada(LocalDate dataRetirada) {
+        this.dataRetirada = dataRetirada;
+    }
+
+    public LocalDate getDataRetorno() {
+        return dataRetorno;
+    }
+
+    public void setDataRetorno(LocalDate dataRetorno) {
+        this.dataRetorno = dataRetorno;
+    }
+
+    // Ex.: "Retirada 12/11/2026  •  devolução 26/11/2026" (null se não tem datas)
+    public String getTextoPeriodo() {
+        if (dataRetirada == null || dataRetorno == null) {
+            return null;
+        }
+        java.time.format.DateTimeFormatter formato =
+                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return "Retirada " + dataRetirada.format(formato)
+                + "   •   devolução " + dataRetorno.format(formato);
     }
 }

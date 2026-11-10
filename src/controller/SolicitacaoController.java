@@ -1,6 +1,9 @@
 package controller;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 
 import View.JanelaMensagem;
@@ -11,6 +14,8 @@ import dao.EmprestimoDAO;
 import model.Solicitacao;
 
 public class SolicitacaoController {
+
+    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final EmprestimoDAO emprestimoDAO;
     private final TelaSolicitacoes telaSolicitacoes;
@@ -89,15 +94,39 @@ public class SolicitacaoController {
                 return;
             }
 
+            LocalDate hoje = LocalDate.now();
+            LocalDate retirada = solicitacao.getDataRetirada();
+            LocalDate retorno = solicitacao.getDataRetorno();
+            String aviso = "";
+
+            if (retirada == null || retorno == null) {
+                // Pedido antigo, feito antes de escolher as datas
+                retirada = hoje;
+                retorno = hoje.plusDays(EmprestimoDAO.DIAS_EMPRESTIMO);
+
+            } else if (retirada.isBefore(hoje)) {
+                // O dia de retirada já passou: começa hoje e mantém a mesma duração
+                long dias = ChronoUnit.DAYS.between(retirada, retorno);
+                retirada = hoje;
+                retorno = hoje.plusDays(dias);
+                aviso = "\n(O dia de retirada escolhido já passou, então as datas foram adiadas.)";
+            }
+
             if (!confirmar("Emprestar \"" + solicitacao.getTituloLivro()
-                    + "\" para " + solicitacao.getNomeSolicitante() + "?")) {
+                    + "\" para " + solicitacao.getNomeSolicitante() + "?\n"
+                    + "Retirada: " + retirada.format(FORMATO_DATA) + "\n"
+                    + "Devolução: " + retorno.format(FORMATO_DATA)
+                    + aviso)) {
                 return;
             }
 
-            emprestimoDAO.aceitar(solicitacao);
+            emprestimoDAO.aceitar(solicitacao, retirada, retorno);
 
             mostrarMensagem(
                     "Solicitação aceita!\n"
+                    + "Entregue o livro em " + retirada.format(FORMATO_DATA)
+                    + " e receba de volta em " + retorno.format(FORMATO_DATA) + ".\n"
+                    + "As datas já estão no seu calendário.\n"
                     + "Combine a entrega com " + solicitacao.getNomeSolicitante()
                     + ":\n" + solicitacao.getEmailSolicitante()
                     + "  |  " + solicitacao.getTelefoneSolicitante()

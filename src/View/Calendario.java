@@ -375,6 +375,9 @@ public class Calendario extends JFrame {
             } else if (texto.startsWith("Devolver") || texto.startsWith("Receber")) {
                 lbl.setForeground(VERMELHO);
                 lbl.setFont(lbl.getFont().deriveFont(Font.BOLD));
+            } else if (texto.startsWith("Retirar") || texto.startsWith("Entregar")) {
+                lbl.setForeground(VERDE_ESCURO);
+                lbl.setFont(lbl.getFont().deriveFont(Font.BOLD));
             } else if (texto.startsWith("Nenhum")) {
                 lbl.setForeground(Color.GRAY);
             } else {
