@@ -223,19 +223,6 @@ public class PesquisarLivro extends JFrame {
         scrollLivros.setBorder(BorderFactory.createLineBorder(new Color(10, 86, 27), 2));
         scrollLivros.setVisible(false); // só aparece depois de pesquisar
         contentPane.add(scrollLivros, "cell 0 4 5 3,grow");
- 
-        // ===== LOCALIZAÇÃO =====
-        JButton btnLocalizacao = new JButton("Gaspar");
-        btnLocalizacao.setFont(new Font("Tahoma", Font.BOLD, 36));
-        btnLocalizacao.setBorderPainted(false);
-        btnLocalizacao.setContentAreaFilled(false);
-        btnLocalizacao.setIcon(new ImageIcon(PesquisarLivro.class.getResource("/imagens/LogoLocalizacao.png")));
-        btnLocalizacao.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Ação da localização
-            }
-        });
-        contentPane.add(btnLocalizacao, "cell 0 8 5 1,alignx left,aligny bottom");
     }
  
     // ===== GETTERS =====

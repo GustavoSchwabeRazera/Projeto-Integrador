@@ -409,8 +409,13 @@ public class JanelaMensagem extends JFrame {
 
         JDateChooser campo = new JDateChooser(paraDate(valorInicial), "dd/MM/yyyy");
         campo.setLocale(new Locale("pt", "BR"));
+        // setLocale troca o formato pelo padrão do idioma: volta para dd/MM/yyyy
+        campo.setDateFormatString("dd/MM/yyyy");
         campo.setFont(new Font("Tahoma", Font.PLAIN, 16));
         campo.setPreferredSize(new Dimension(180, 36));
+
+        // Mesmas cores da tela Calendário
+        EstiloCalendario.aplicar(campo);
 
         return campo;
     }

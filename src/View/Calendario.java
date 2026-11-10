@@ -27,7 +27,6 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -51,10 +50,10 @@ public class Calendario extends JFrame {
     // PALETA DE CORES (mesma identidade visual do sistema)
     // =====================================================
     private static final Color VERDE_FUNDO   = Cores.FUNDO; // fundo geral
-    private static final Color VERDE_ESCURO  = new Color(19, 74, 38);    // textos/título
-    private static final Color VERDE_PAINEL  = new Color(25, 90, 45);    // painel do calendário
-    private static final Color VERDE_BOTAO   = new Color(114, 219, 145); // dia selecionado
-    private static final Color DOURADO       = new Color(240, 196, 80);  // dia com empréstimo
+    private static final Color VERDE_ESCURO  = EstiloCalendario.VERDE_ESCURO; // textos/título
+    private static final Color VERDE_PAINEL  = EstiloCalendario.VERDE_PAINEL; // painel do calendário
+    private static final Color VERDE_BOTAO   = EstiloCalendario.VERDE_BOTAO;  // dia selecionado
+    private static final Color DOURADO       = EstiloCalendario.DOURADO;      // dia com empréstimo
     private static final Color VERMELHO      = new Color(170, 50, 50);   // devoluções
 
     private static final Locale PT_BR = new Locale("pt", "BR");
@@ -286,22 +285,11 @@ public class Calendario extends JFrame {
 
     private void estilizarCalendario() {
 
-        calendario.setFont(new Font("Tahoma", Font.BOLD, 18));
-        calendario.setForeground(VERDE_ESCURO);
-        calendario.setBackground(VERDE_PAINEL);
-        calendario.setDecorationBackgroundColor(VERDE_PAINEL);
-        calendario.setDecorationBordersVisible(false);
-        calendario.setWeekdayForeground(Color.WHITE);
-        calendario.setSundayForeground(DOURADO);
+        // mesmas cores do campo de data usado no pedido de empréstimo
+        EstiloCalendario.aplicar(calendario, 18);
 
         JDayChooser dias = calendario.getDayChooser();
-        dias.setDayBordersVisible(false);
-        dias.getDayPanel().setBackground(Color.WHITE);
         dias.setAlwaysFireDayProperty(true);
-
-        // fundo dos dias e cor do dia selecionado (a biblioteca não tem setter para isso)
-        mudarCorDoDayChooser(dias, "oldDayBackgroundColor", Color.WHITE);
-        mudarCorDoDayChooser(dias, "selectedColor", VERDE_BOTAO);
 
         // marca em dourado os dias com empréstimo/devolução
         dias.addDateEvaluator(new IDateEvaluator() {
@@ -317,16 +305,6 @@ public class Calendario extends JFrame {
             public Color getInvalidBackroundColor() { return null; }
             public String getInvalidTooltip() { return null; }
         });
-
-        // mês e ano
-        calendario.getMonthChooser().setFont(new Font("Tahoma", Font.BOLD, 18));
-        JComboBox<?> comboMes = (JComboBox<?>) calendario.getMonthChooser().getComboBox();
-        comboMes.setFont(new Font("Tahoma", Font.BOLD, 18));
-        comboMes.setBackground(Color.WHITE);
-        comboMes.setForeground(VERDE_ESCURO);
-
-        calendario.getYearChooser().setFont(new Font("Tahoma", Font.BOLD, 18));
-        calendario.getYearChooser().setForeground(VERDE_ESCURO);
     }
 
     private void estilizarBotao(JButton botao, Color fundo, Color texto) {
@@ -337,15 +315,6 @@ public class Calendario extends JFrame {
         botao.setBorderPainted(false);
     }
 
-    private void mudarCorDoDayChooser(JDayChooser dias, String campo, Color cor) {
-        try {
-            java.lang.reflect.Field f = JDayChooser.class.getDeclaredField(campo);
-            f.setAccessible(true);
-            f.set(dias, cor);
-        } catch (Exception e) {
-            // segue com a cor padrão
-        }
-    }
 
     // Deixa cada linha da lista com espaço e cor conforme o tipo
     private static class RenderizadorEvento extends DefaultListCellRenderer {

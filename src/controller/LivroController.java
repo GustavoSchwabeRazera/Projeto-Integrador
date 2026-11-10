@@ -313,7 +313,15 @@ public class LivroController {
                 .addActionListener(e -> abrirHome());
 
         perfil.getBtnSair()
-                .addActionListener(e -> logoff());
+                .addActionListener(e -> {
+
+                    // Pergunta antes de sair da conta
+                    if (JanelaMensagem.confirmar(
+                            "Tem certeza que deseja sair da sua conta?",
+                            "Sair")) {
+                        logoff();
+                    }
+                });
 
         perfil.getBtnAlterarCadastro()
                 .addActionListener(e -> abrirAlterarCadastro());

@@ -39,8 +39,6 @@ public class Main {
 
         controller.iniciar();
     }
-
- 
     private static void usarLogoComoIcone() {
 
         URL url = Main.class.getResource("/imagens/icone.png");
