@@ -433,7 +433,7 @@ public class Perfil extends JFrame {
 		contentPane = new JPanel();
 
 		contentPane.setBackground(
-				new Color(175, 244, 198)
+				Cores.FUNDO
 		);
 
 		contentPane.setBorder(

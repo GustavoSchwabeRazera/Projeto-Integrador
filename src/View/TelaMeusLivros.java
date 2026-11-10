@@ -128,7 +128,7 @@ public class TelaMeusLivros extends JFrame {
 
 		contentPane = new JPanel();
 
-		contentPane.setBackground(new Color(175, 244, 198));
+		contentPane.setBackground(Cores.FUNDO);
 
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 

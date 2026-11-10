@@ -119,7 +119,7 @@ public class TelaSolicitacoes extends JFrame {
         setBounds(100, 100, 1920, 1080);
 
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(175, 244, 198));
+        contentPane.setBackground(Cores.FUNDO);
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
         setContentPane(contentPane);

@@ -85,7 +85,7 @@ public class Cadastro_Livro extends JFrame {
 
     public Cadastro_Livro() {
 
-        setBackground(new Color(128, 255, 0));
+        setBackground(Cores.FUNDO);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -99,7 +99,7 @@ public class Cadastro_Livro extends JFrame {
 
         contentPane = new JPanel();
 
-        contentPane.setBackground(new Color(175, 244, 198));
+        contentPane.setBackground(Cores.FUNDO);
 
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 

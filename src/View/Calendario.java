@@ -50,7 +50,7 @@ public class Calendario extends JFrame {
     // =====================================================
     // PALETA DE CORES (mesma identidade visual do sistema)
     // =====================================================
-    private static final Color VERDE_FUNDO   = new Color(175, 244, 198); // fundo geral
+    private static final Color VERDE_FUNDO   = Cores.FUNDO; // fundo geral
     private static final Color VERDE_ESCURO  = new Color(19, 74, 38);    // textos/título
     private static final Color VERDE_PAINEL  = new Color(25, 90, 45);    // painel do calendário
     private static final Color VERDE_BOTAO   = new Color(114, 219, 145); // dia selecionado

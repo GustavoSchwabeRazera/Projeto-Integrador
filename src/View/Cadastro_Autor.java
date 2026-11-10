@@ -60,7 +60,7 @@ public static void main(String[] args) {
 public Cadastro_Autor() {
 
     setBackground(
-            new Color(128, 255, 0)
+            Cores.FUNDO
     );
 
     setDefaultCloseOperation(
@@ -84,7 +84,7 @@ public Cadastro_Autor() {
             new JPanel();
 
     contentPane.setBackground(
-            new Color(175, 244, 198)
+            Cores.FUNDO
     );
 
     contentPane.setBorder(

@@ -95,7 +95,7 @@ public class Lista_Autores extends JFrame {
                 new JPanel();
 
         contentPane.setBackground(
-                new Color(175, 244, 198)
+                Cores.FUNDO
         );
 
         contentPane.setBorder(

@@ -122,7 +122,7 @@ public class TelaAlterar extends JFrame {
         // ======================================
 
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(175, 244, 198));
+        contentPane.setBackground(Cores.FUNDO);
         contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         setContentPane(contentPane);
         contentPane.setLayout(new MigLayout("", "[231.00][1461.00px][242.00]", "[][925px]"));

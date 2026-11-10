@@ -38,7 +38,7 @@ public class Historico extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private static final Color VERDE_ESCURO = new Color(10, 86, 27);
-	private static final Color VERDE_CLARO = new Color(175, 244, 198);
+	private static final Color VERDE_CLARO = Cores.FUNDO;
 	private static final DateTimeFormatter FORMATO_DATA =
 			DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
 

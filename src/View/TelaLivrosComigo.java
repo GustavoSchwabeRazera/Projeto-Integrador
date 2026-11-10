@@ -82,7 +82,7 @@ public class TelaLivrosComigo extends JFrame {
         setBounds(100, 100, 1920, 1080);
 
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(175, 244, 198));
+        contentPane.setBackground(Cores.FUNDO);
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
 
@@ -179,7 +179,7 @@ public class TelaLivrosComigo extends JFrame {
         RoundedPanel cartao = new RoundedPanel(
             new MigLayout("insets 14 25 14 25", "[]20[grow]20[]", "[center]"), 35
         );
-        cartao.setBackground(new Color(174, 244, 198));
+        cartao.setBackground(Cores.FUNDO);
 
         // Capa do livro
         Livro livro = new Livro();

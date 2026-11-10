@@ -57,7 +57,7 @@ public class tela_inicial extends JFrame {
 
         contentPane = new JPanel();
         contentPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        contentPane.setBackground(new Color(175, 244, 198));
+        contentPane.setBackground(Cores.FUNDO);
         contentPane.setBorder(new EmptyBorder(5, 0, 5, 5));
         setContentPane(contentPane);
 

@@ -112,7 +112,7 @@ public class TelaCriarConta extends JFrame {
         // ======================================
 
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(175, 244, 198));
+        contentPane.setBackground(Cores.FUNDO);
         contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         setContentPane(contentPane);
         contentPane.setLayout(new MigLayout("fill, insets 0", "[grow]", "[grow]"));

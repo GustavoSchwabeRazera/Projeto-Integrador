@@ -66,7 +66,7 @@ public class PesquisarLivro extends JFrame {
  
         // ===== PAINEL PRINCIPAL =====
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(175, 244, 198));
+        contentPane.setBackground(Cores.FUNDO);
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
  
@@ -153,7 +153,7 @@ public class PesquisarLivro extends JFrame {
         tabelaLivros.setToolTipText("Clique em um livro para ver as informações");
 
         // Cores verdes iguais ao resto do projeto
-        tabelaLivros.setBackground(new Color(175, 244, 198));
+        tabelaLivros.setBackground(Cores.FUNDO);
         tabelaLivros.setForeground(new Color(30, 30, 30));
         tabelaLivros.setGridColor(new Color(24, 125, 45));
         tabelaLivros.setSelectionBackground(new Color(114, 219, 145));
@@ -180,7 +180,7 @@ public class PesquisarLivro extends JFrame {
                     setForeground(new Color(30, 30, 30));
                     if (!isSelected) {
                         // Linhas alternadas em dois tons de verde
-                        setBackground(row % 2 == 0 ? new Color(175, 244, 198) : new Color(204, 250, 219));
+                        setBackground(row % 2 == 0 ? Cores.FUNDO : new Color(204, 250, 219));
                     }
                 }
                 return this;
@@ -219,7 +219,7 @@ public class PesquisarLivro extends JFrame {
         });
 
         scrollLivros = new JScrollPane(tabelaLivros);
-        scrollLivros.getViewport().setBackground(new Color(175, 244, 198));
+        scrollLivros.getViewport().setBackground(Cores.FUNDO);
         scrollLivros.setBorder(BorderFactory.createLineBorder(new Color(10, 86, 27), 2));
         scrollLivros.setVisible(false); // só aparece depois de pesquisar
         contentPane.add(scrollLivros, "cell 0 4 5 3,grow");

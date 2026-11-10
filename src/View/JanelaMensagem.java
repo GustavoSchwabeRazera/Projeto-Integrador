@@ -43,7 +43,7 @@ public class JanelaMensagem extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Color VERDE_FUNDO = new Color(175, 244, 198);
+    private static final Color VERDE_FUNDO = Cores.FUNDO;
     private static final Color VERDE_ESCURO = new Color(10, 86, 27);
     private static final Color VERDE_BOTAO = new Color(114, 219, 145);
     private static final Color VERMELHO = new Color(140, 20, 20);

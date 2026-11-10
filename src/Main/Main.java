@@ -31,8 +31,6 @@ public class Main {
 			e.printStackTrace();
 		}
 
-    	
-    	
         LivroTableModel model = new LivroTableModel();
 
         Cadastro_Livro view = new Cadastro_Livro();
