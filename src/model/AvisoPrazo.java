@@ -3,7 +3,6 @@ package model;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-// Prazo de devolução de um livro que está com o usuário
 public class AvisoPrazo {
 
     private int idEmprestimo;
@@ -13,7 +12,6 @@ public class AvisoPrazo {
     private byte[] fotoDono;
     private LocalDate dataTermino;
 
-    // Quantos dias faltam para devolver (0 = hoje, negativo = atrasado)
     public long getDiasRestantes() {
         return ChronoUnit.DAYS.between(LocalDate.now(), dataTermino);
     }
@@ -22,7 +20,6 @@ public class AvisoPrazo {
         return getDiasRestantes() < 0;
     }
 
-    // Frase do lembrete diário: muda todo dia conforme os dias que faltam
     public String getLembrete() {
 
         long dias = getDiasRestantes();

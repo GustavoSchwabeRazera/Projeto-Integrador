@@ -3,7 +3,6 @@ package model;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-// Empréstimo que ainda não terminou: livro com o leitor ou devolução esperando o dono confirmar
 public class EmprestimoAtivo {
 
     private int idEmprestimo;
@@ -17,9 +16,8 @@ public class EmprestimoAtivo {
     private String nomeLeitor;
     private byte[] fotoLeitor;
     private LocalDate dataEntrega;
-    private LocalDate devolucaoSolicitada; // null enquanto o leitor não devolveu
+    private LocalDate devolucaoSolicitada;
 
-    // Quantos dias faltam para devolver (negativo = atrasado)
     public long getDiasRestantes() {
         return ChronoUnit.DAYS.between(LocalDate.now(), dataEntrega);
     }

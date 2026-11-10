@@ -2,7 +2,6 @@ package model;
 
 import java.time.LocalDateTime;
 
-// Mensagem do chat enviada de um usuário para outro
 public class Mensagem {
 
     private int idMensagem;

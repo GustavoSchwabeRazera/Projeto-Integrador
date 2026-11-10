@@ -2,16 +2,16 @@ package model;
 
 import java.time.LocalDate;
 
-// Pedido de empréstimo feito por um usuário para um livro de outro usuário
+
 public class Solicitacao {
 
-    // Depois desse tempo sem resposta o pedido vence (em dias)
+   
     public static final int DIAS_VALIDADE = 14;
 
-    // Até quantos dias a partir de hoje o leitor pode marcar a retirada
+    
     public static final int MAX_DIAS_ATE_RETIRADA = 14;
 
-    // Tempo máximo entre a retirada e a devolução (em dias)
+
     public static final int MAX_DIAS_EMPRESTIMO = 30;
 
     private int idSolicitacao;
@@ -25,8 +25,6 @@ public class Solicitacao {
     private String nomeDono;
     private byte[] fotoDono;
     private LocalDate dataPedido;
-    // Dias escolhidos pelo leitor para pegar o livro e devolver ao dono
-    // (null em pedidos feitos antes de existir essa escolha)
     private LocalDate dataRetirada;
     private LocalDate dataRetorno;
 
@@ -110,7 +108,6 @@ public class Solicitacao {
         this.fotoDono = fotoDono;
     }
 
-    // Último dia em que o pedido ainda pode ser respondido
     public LocalDate getDataValidade() {
         return dataPedido.plusDays(DIAS_VALIDADE);
     }
@@ -139,7 +136,6 @@ public class Solicitacao {
         this.dataRetorno = dataRetorno;
     }
 
-    // Ex.: "Retirada 12/11/2026  •  devolução 26/11/2026" (null se não tem datas)
     public String getTextoPeriodo() {
         if (dataRetirada == null || dataRetorno == null) {
             return null;

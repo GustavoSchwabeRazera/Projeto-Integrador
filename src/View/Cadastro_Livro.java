@@ -51,28 +51,21 @@ public class Cadastro_Livro extends JFrame {
 
     private JLabel lblTituloTela;
 
-    // Livro que está sendo alterado (null quando é um cadastro novo)
+   
     private Livro livroEmEdicao;
 
-    // Foto da capa escolhida (em bytes)
     private byte[] fotoSelecionada;
 
-    // CPF de quem está logado (o controller preenche)
+  
     private String cpfUsuario;
 
-    // =====================================================
-    // BOTÃO HOME / VOLTAR
-    // =====================================================
 
     private JButton btnVoltar;
 
-    // Guarda os autores selecionados
     private List<Autor> autoresSelecionados = new ArrayList<>();
 
 
-    // =====================================================
-    // MAIN
-    // =====================================================
+
 
     public static void main(String[] args) {
 
@@ -90,11 +83,6 @@ public class Cadastro_Livro extends JFrame {
         });
     }
 
-
-    // =====================================================
-    // CONSTRUTOR
-    // =====================================================
-
     public Cadastro_Livro() {
 
         setBackground(new Color(128, 255, 0));
@@ -108,9 +96,6 @@ public class Cadastro_Livro extends JFrame {
         setLocationRelativeTo(null);
 
 
-        // =================================================
-        // CONTENT PANE
-        // =================================================
 
         contentPane = new JPanel();
 
@@ -129,9 +114,6 @@ public class Cadastro_Livro extends JFrame {
         );
 
 
-        // =================================================
-        // BOTÃO VOLTAR
-        // =================================================
 
         btnVoltar = new JButton("");
 
@@ -152,9 +134,6 @@ public class Cadastro_Livro extends JFrame {
         contentPane.add(btnVoltar, "cell 0 0,alignx left,aligny top");
 
 
-        // =================================================
-        // LOGO
-        // =================================================
 
         ImageIcon logoOriginal =
                 new ImageIcon(
@@ -170,10 +149,6 @@ public class Cadastro_Livro extends JFrame {
                         );
 
 
-        // =================================================
-        // TÍTULO DA TELA
-        // =================================================
-
         lblTituloTela = new JLabel("Cadastro de Livros:");
 
         lblTituloTela.setForeground(new Color(10, 86, 27));
@@ -183,9 +158,6 @@ public class Cadastro_Livro extends JFrame {
         contentPane.add(lblTituloTela, "cell 2 1,alignx center,aligny bottom");
 
 
-        // =================================================
-        // PAINEL PRINCIPAL
-        // =================================================
 
         JPanel panel = new ImagePanel();
 
@@ -205,10 +177,6 @@ public class Cadastro_Livro extends JFrame {
                 )
         );
 
-
-        // =================================================
-        // TÍTULO DO LIVRO
-        // =================================================
 
         JLabel lblTitulo = new JLabel("TÍTULO DO LIVRO:");
 
@@ -234,9 +202,6 @@ public class Cadastro_Livro extends JFrame {
         panel.add(txtNome, "cell 2 2,growx,h 42!");
 
 
-        // =================================================
-        // EDITORA
-        // =================================================
 
         JLabel lblEditora = new JLabel("EDITORA:");
 
@@ -262,9 +227,6 @@ public class Cadastro_Livro extends JFrame {
         panel.add(txtEditora, "cell 2 5,growx,height 42!");
 
 
-        // =================================================
-        // ANO
-        // =================================================
 
         JLabel lblAno = new JLabel("ANO DE LANÇAMENTO:");
 
@@ -290,9 +252,6 @@ public class Cadastro_Livro extends JFrame {
         panel.add(txtAno, "cell 2 8,growx,h 42!");
 
 
-        // =================================================
-        // AUTOR
-        // =================================================
 
         JLabel lblAutor = new JLabel("AUTOR:");
 
@@ -305,20 +264,12 @@ public class Cadastro_Livro extends JFrame {
         panel.add(lblAutor, "cell 2 10,growx");
 
 
-        // =================================================
-        // BOTÃO SELECIONAR AUTORES
-        // =================================================
 
         botaoNovoAutor = new RoundedButton("Selecionar autor(es)");
 
         panel.add(botaoNovoAutor, "cell 2 11,growx,height 45!");
 
-        // O clique do botão é tratado no LivroController
 
-
-        // =================================================
-        // GÊNERO
-        // =================================================
 
         JLabel lblGenero = new JLabel("GÊNERO:");
 
@@ -348,9 +299,6 @@ public class Cadastro_Livro extends JFrame {
         panel.add(comboBox, "cell 2 15,growx,height 42!");
 
 
-        // =================================================
-        // ISBN
-        // =================================================
 
         JLabel lblISBN = new JLabel("ISBN:");
 
@@ -374,9 +322,6 @@ public class Cadastro_Livro extends JFrame {
         panel.add(textField, "cell 2 18,growx,height 42!");
 
 
-        // =================================================
-        // FOTO DA CAPA
-        // =================================================
 
         botaoFoto = new RoundedButton("Adicionar foto da capa");
 
@@ -385,9 +330,6 @@ public class Cadastro_Livro extends JFrame {
         botaoFoto.addActionListener(e -> escolherFoto());
 
 
-        // =================================================
-        // BOTÃO CADASTRAR
-        // =================================================
 
         botaoCadastrar = new JButton("");
 
@@ -401,13 +343,10 @@ public class Cadastro_Livro extends JFrame {
 
         panel.add(botaoCadastrar, "cell 2 20");
 
-        // O clique do botão cadastrar é tratado no LivroController
+
     }
 
 
-    // =====================================================
-    // ESCOLHER FOTO DA CAPA
-    // =====================================================
 
     private void escolherFoto() {
 
@@ -433,7 +372,7 @@ public class Cadastro_Livro extends JFrame {
                     return;
                 }
 
-                // Diminui a foto para 270x340 (fica pequena e cabe no banco)
+              
                 BufferedImage pequena =
                         new BufferedImage(270, 340, BufferedImage.TYPE_INT_RGB);
 
@@ -460,7 +399,6 @@ public class Cadastro_Livro extends JFrame {
     }
 
 
-    // Mostra uma miniatura no botão
     private void mostrarMiniatura() {
 
         Image mini = new ImageIcon(fotoSelecionada)
@@ -472,9 +410,6 @@ public class Cadastro_Livro extends JFrame {
     }
 
 
-    // =====================================================
-    // RECEBER AUTORES
-    // =====================================================
 
     public void receberAutoresSelecionados(List<Autor> autores) {
 
@@ -498,9 +433,6 @@ public class Cadastro_Livro extends JFrame {
     }
 
 
-    // =====================================================
-    // PREPARA A TELA PARA CADASTRAR OU ALTERAR
-    // =====================================================
 
     public void prepararCadastro() {
 
@@ -528,7 +460,6 @@ public class Cadastro_Livro extends JFrame {
 
         txtAno.setText(String.valueOf(livro.getAnoLancamento()));
 
-        // O ISBN identifica o livro e não pode ser alterado
         textField.setText(livro.getIsbn());
 
         textField.setEditable(false);
@@ -597,19 +528,12 @@ public class Cadastro_Livro extends JFrame {
     }
 
 
-    // =====================================================
-    // MENSAGEM
-    // =====================================================
 
     private void mostrarMensagem(String mensagem) {
 
         JanelaMensagem.mostrar(mensagem);
     }
 
-
-    // =====================================================
-    // GETTERS E SETTERS
-    // =====================================================
 
     public void setCpfUsuario(String cpfUsuario) {
 

@@ -2,7 +2,7 @@ package model;
 
 import java.time.LocalDate;
 
-// Lembrete que o usuário anota num dia do calendário
+
 public class Evento {
 
     private int idEvento;

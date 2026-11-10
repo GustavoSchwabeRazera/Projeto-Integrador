@@ -11,10 +11,9 @@ public class Livro {
     private int anoLancamento;
     private String genero;
     private List<Autor> autores;
-    private byte[] fotoCapa;   // foto da capa do livro
-    private String cpfDono;    // CPF de quem cadastrou
-    private boolean disponivel = true; // FALSE enquanto está emprestado
-
+    private byte[] fotoCapa;  
+    private String cpfDono;    
+    private boolean disponivel = true; 
     public Livro() {
         autores = new ArrayList<Autor>();
     }

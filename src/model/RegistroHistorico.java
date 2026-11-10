@@ -2,10 +2,9 @@ package model;
 
 import java.time.LocalDateTime;
 
-// Um empréstimo que aparece na tela de Histórico
+
 public class RegistroHistorico {
 
-    // Tipos de ação guardados na coluna "tipo"
     public static final String EMPRESTIMO_CONCEDIDO = "EMPRESTIMO_CONCEDIDO"; // o usuário emprestou
     public static final String EMPRESTIMO_RECEBIDO = "EMPRESTIMO_RECEBIDO";   // o usuário pegou emprestado
 
@@ -13,10 +12,10 @@ public class RegistroHistorico {
     private String tipo;
     private String isbn;
     private String tituloLivro;
-    private String detalhe; // nome da outra pessoa do empréstimo
+    private String detalhe; 
     private LocalDateTime dataHora;
 
-    // Texto principal do cartão
+   
     public String getDescricao() {
 
         switch (tipo) {

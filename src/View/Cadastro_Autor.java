@@ -37,9 +37,6 @@ private JButton botaoCadastrar;
 private JLabel titulo;
 
 
-// =========================================================
-// MAIN
-// =========================================================
 
 public static void main(String[] args) {
 
@@ -59,12 +56,6 @@ public static void main(String[] args) {
     });
 }
 
-
-
-
-// =========================================================
-// CONSTRUTOR PADRÃO
-// =========================================================
 
 public Cadastro_Autor() {
 
@@ -88,9 +79,6 @@ public Cadastro_Autor() {
     setLocationRelativeTo(null);
 
 
-    // =====================================================
-    // PAINEL
-    // =====================================================
 
     contentPane =
             new JPanel();
@@ -121,9 +109,6 @@ public Cadastro_Autor() {
     );
 
 
-    // =====================================================
-    // LOGO
-    // =====================================================
 
     JLabel logo =
             new JLabel("");
@@ -155,9 +140,6 @@ public Cadastro_Autor() {
     );
 
 
-    // =====================================================
-    // TÍTULO
-    // =====================================================
 
     titulo =
             new JLabel(
@@ -182,9 +164,6 @@ public Cadastro_Autor() {
     );
 
 
-    // =====================================================
-    // PAINEL
-    // =====================================================
 
     JPanel panel =
             new ImagePanel();
@@ -203,11 +182,6 @@ public Cadastro_Autor() {
                     "[73.00][][][28.00][][][][24.00][][][][grow][][27.00][][][][31.00][35.00][][31.00][][][][][][grow]"
             )
     );
-
-
-    // =====================================================
-    // NOME
-    // =====================================================
 
     JLabel lblNome =
             new JLabel(
@@ -260,9 +234,6 @@ public Cadastro_Autor() {
     );
 
 
-    // =====================================================
-    // NACIONALIDADE
-    // =====================================================
 
     JLabel lblNacionalidade =
             new JLabel(
@@ -291,9 +262,6 @@ public Cadastro_Autor() {
     );
 
 
-    // =====================================================
-    // PAÍSES
-    // =====================================================
 
     comboBox =
             new JComboBox<>();
@@ -344,9 +312,6 @@ public Cadastro_Autor() {
     );
 
 
-    // =====================================================
-    // BOTÃO CADASTRAR
-    // =====================================================
 
     botaoCadastrar =
             new JButton("");
@@ -369,11 +334,6 @@ public Cadastro_Autor() {
     );
 }
 
-
-// =========================================================
-// PREPARA A TELA PARA ALTERAR UM AUTOR
-// =========================================================
-
 public void prepararEdicao(Autor autor) {
 
     titulo.setText(
@@ -384,7 +344,6 @@ public void prepararEdicao(Autor autor) {
             autor.getNome()
     );
 
-    // Nacionalidade antiga pode não estar na lista de países
     comboBox.removeItem(
             autor.getNacionalidade()
     );
@@ -397,10 +356,6 @@ public void prepararEdicao(Autor autor) {
     comboBox.setSelectedIndex(0);
 }
 
-
-// =========================================================
-// GETTERS
-// =========================================================
 
 public JTextField getTxtNome() {
 

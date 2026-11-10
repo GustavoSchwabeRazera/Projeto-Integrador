@@ -15,10 +15,6 @@ public class UsuarioTableModel extends AbstractTableModel{
 	public UsuarioTableModel(ArrayList<Usuario> lista) {
 		this.lista = lista;
 	}
-	/**
-	 * Retorna o nome da Coluna consultando a String do vetor "colunas"
-	 * no índice "indice"
-	 */
 	@Override
 	public String getColumnName(int indice) {
 		return colunas[indice]; 
