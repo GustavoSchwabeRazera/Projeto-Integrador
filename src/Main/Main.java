@@ -28,7 +28,6 @@ public class Main {
 		try {
 			connection = ConnectionFactory.getConnection();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -43,8 +42,7 @@ public class Main {
         controller.iniciar();
     }
 
-    // Troca o ícone do Java pela logo do sistema na barra de título e na barra
-    // de tarefas de TODAS as janelas (telas e caixas de mensagem) quando abrirem
+ 
     private static void usarLogoComoIcone() {
 
         URL url = Main.class.getResource("/imagens/icone.png");
