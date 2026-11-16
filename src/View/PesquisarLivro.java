@@ -3,11 +3,8 @@ package View;
 import java.awt.EventQueue;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
  
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -102,40 +99,11 @@ public class PesquisarLivro extends JFrame {
         textField.setColumns(10);
         // Enter no campo faz o mesmo que clicar em Pesquisar
         textField.addActionListener(e -> btnPesquisar.doClick());
-        contentPane.add(textField, "flowx,cell 0 3 5 1,alignx center,width 500!,height 42!");
+        contentPane.add(textField, "flowx,cell 0 3 5 1,alignx center,width 500!,height 50!");
  
-        // ===== BOTÃO PESQUISAR (menor, ao lado da caixa) =====
-        ImageIcon pesquisar = new ImageIcon(PesquisarLivro.class.getResource("/imagens/pesquisar.png"));
-        Image imagemPesquisar = pesquisar.getImage().getScaledInstance(180, 65, Image.SCALE_SMOOTH);
- 
-        btnPesquisar = new JButton("");
-        btnPesquisar.setBorderPainted(false);
-        btnPesquisar.setContentAreaFilled(false);
-        btnPesquisar.setFocusPainted(false);
-        btnPesquisar.setIcon(new ImageIcon(imagemPesquisar));
-        btnPesquisar.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Ação do botão pesquisar
-            }
-        });
-        contentPane.add(btnPesquisar, "cell 0 3,width 190!,height 75!");
- 
-        // Redimensiona a imagem junto com o botão
-        btnPesquisar.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                int largura = btnPesquisar.getWidth();
-                int altura = btnPesquisar.getHeight();
-                if (largura > 0 && altura > 0) {
-                    Image novaImagem = pesquisar.getImage().getScaledInstance(
-                        Math.max(1, largura - 10),
-                        Math.max(1, altura - 10),
-                        Image.SCALE_SMOOTH
-                    );
-                    btnPesquisar.setIcon(new ImageIcon(novaImagem));
-                }
-            }
-        });
+        // ===== BOTÃO PESQUISAR (ao lado da caixa, igual ao Cadastrar livro) =====
+        btnPesquisar = new BotaoVerde("Pesquisar", 200, 50);
+        contentPane.add(btnPesquisar, "cell 0 3,gapleft 12,width 200!,height 50!");
  
         // ===== LOGO (mesma posição de Meus Livros e Solicitações) =====
         JLabel lblLogo = new JLabel("");

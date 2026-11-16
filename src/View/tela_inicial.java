@@ -53,6 +53,7 @@ public class tela_inicial extends JFrame {
     private JButton btnNotificacao;
     private JButton btnLogo;
     private JButton btnChat;
+    private JButton btnSair;
     private int naoLidasChat = 0;
 
     public static void main(String[] args) {
@@ -164,11 +165,11 @@ public class tela_inicial extends JFrame {
     }
 
     // =========================================================
-    // RODAPÉ: histórico
+    // RODAPÉ: histórico à esquerda, sair à direita
     // =========================================================
     private JPanel criarRodape() {
 
-        JPanel rodape = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        JPanel rodape = new JPanel(new BorderLayout());
         rodape.setOpaque(false);
 
         btnHistorico = botaoIcone(new IconeLista(26, VERDE_ESCURO), null);
@@ -177,7 +178,14 @@ public class tela_inicial extends JFrame {
         btnHistorico.setFont(new Font(FONTE, Font.BOLD, 20));
         btnHistorico.setForeground(VERDE_ESCURO);
         // O dispose() que estava aqui foi REMOVIDO: quem controla a navegação é o Controller.
-        rodape.add(btnHistorico);
+        rodape.add(btnHistorico, BorderLayout.WEST);
+
+        btnSair = botaoIcone(new IconeSair(26, VERDE_ESCURO), "Sair da conta");
+        btnSair.setText("Sair");
+        btnSair.setIconTextGap(10);
+        btnSair.setFont(new Font(FONTE, Font.BOLD, 20));
+        btnSair.setForeground(VERDE_ESCURO);
+        rodape.add(btnSair, BorderLayout.EAST);
 
         return rodape;
     }
@@ -304,8 +312,8 @@ public class tela_inicial extends JFrame {
 
         private static final long serialVersionUID = 1L;
 
-        private static final Color COR = new Color(34, 139, 58);
-        private static final Color COR_HOVER = new Color(24, 112, 44);
+        private static final Color COR = Cores.VERDE;
+        private static final Color COR_HOVER = Cores.VERDE_HOVER;
         private static final Color SOMBRA = new Color(0, 60, 20, 45);
         private static final Color DESCRICAO = new Color(225, 245, 230);
         private static final int ARCO = 28;
@@ -416,9 +424,66 @@ public class tela_inicial extends JFrame {
         }
     }
 
+    // Ícone de sair: porta aberta com uma seta apontando para fora
+    private static class IconeSair implements Icon {
+
+        private final int tamanho;
+        private final Color cor;
+
+        IconeSair(int tamanho, Color cor) {
+            this.tamanho = tamanho;
+            this.cor = cor;
+        }
+
+        @Override
+        public void paintIcon(java.awt.Component c, Graphics g, int x, int y) {
+
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(cor);
+
+            float espessura = tamanho / 9f;
+            g2.setStroke(new BasicStroke(espessura, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+            int m = Math.round(espessura);
+            int t = tamanho - m;
+
+            // Porta: um "C" quadrado aberto para a direita
+            int porta = tamanho * 11 / 20;
+            g2.drawPolyline(
+                    new int[] { x + porta, x + m, x + m, x + porta },
+                    new int[] { y + m, y + m, y + t, y + t },
+                    4);
+
+            // Seta saindo pela abertura
+            int meio = y + tamanho / 2;
+            int ponta = x + t;
+            int aba = tamanho / 4;
+            g2.drawLine(x + tamanho * 7 / 20, meio, ponta, meio);
+            g2.drawLine(ponta - aba, meio - aba, ponta, meio);
+            g2.drawLine(ponta - aba, meio + aba, ponta, meio);
+
+            g2.dispose();
+        }
+
+        @Override
+        public int getIconWidth() {
+            return tamanho;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return tamanho;
+        }
+    }
+
     // =========================================================
     // GETTERS
     // =========================================================
+
+    public JButton getBtnSair() {
+        return btnSair;
+    }
 
     public JButton getBtnChat() {
         return btnChat;

@@ -204,6 +204,9 @@ public class LivroController {
         telaInicial.getBtnChat()
                 .addActionListener(e -> abrirChat());
 
+        telaInicial.getBtnSair()
+                .addActionListener(e -> confirmarSair());
+
 
         // --- CHAT ---
 
@@ -313,15 +316,7 @@ public class LivroController {
                 .addActionListener(e -> abrirHome());
 
         perfil.getBtnSair()
-                .addActionListener(e -> {
-
-                    // Pergunta antes de sair da conta
-                    if (JanelaMensagem.confirmar(
-                            "Tem certeza que deseja sair da sua conta?",
-                            "Sair")) {
-                        logoff();
-                    }
-                });
+                .addActionListener(e -> confirmarSair());
 
         perfil.getBtnAlterarCadastro()
                 .addActionListener(e -> abrirAlterarCadastro());
@@ -364,6 +359,17 @@ public class LivroController {
     public void iniciar() {
 
         trocarPara(telaLogin);
+    }
+
+
+    // Pergunta antes de sair da conta (usado na tela inicial e no perfil)
+    private void confirmarSair() {
+
+        if (JanelaMensagem.confirmar(
+                "Tem certeza que deseja sair da sua conta?",
+                "Sair")) {
+            logoff();
+        }
     }
 
 

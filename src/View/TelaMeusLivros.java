@@ -208,24 +208,12 @@ public class TelaMeusLivros extends JFrame {
 
 		painelLivros.add(scroll, "cell 0 0 6 1,grow");
 
-		ImageIcon cadastrarIcon = new ImageIcon(
-		        TelaMeusLivros.class.getResource("/imagens/BotaoCadastrar.png")
-		);
-
-		Image imagemCadastrar = cadastrarIcon.getImage()
-		        .getScaledInstance(250, 100, Image.SCALE_SMOOTH);
-
-		btnNewButton = new JButton("");
-
-		btnNewButton.setContentAreaFilled(false);
-		btnNewButton.setBorderPainted(false);
-		btnNewButton.setFocusPainted(false);
-
-		btnNewButton.setIcon(new ImageIcon(imagemCadastrar));
+		// Mesmo botão do Pesquisar
+		btnNewButton = new BotaoVerde("Cadastrar livro", 200, 50);
 
 		painelLivros.add(
 		        btnNewButton,
-		        "cell 0 1 6 1,alignx center,aligny center"
+		        "cell 0 1 6 1,alignx center,aligny center,width 200!,height 50!"
 		);
 
 		JLabel lblNewLabel = new JLabel("");
