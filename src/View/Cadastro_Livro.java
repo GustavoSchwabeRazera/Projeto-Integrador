@@ -373,13 +373,15 @@ public class Cadastro_Livro extends JFrame {
                 }
 
               
+                // Deixa a foto em 270x340 cortando pelo centro o que sobrar,
+                // em vez de esticar (esticar deformava fotos com outra proporção)
                 BufferedImage pequena =
                         new BufferedImage(270, 340, BufferedImage.TYPE_INT_RGB);
 
                 Graphics2D g = pequena.createGraphics();
                 g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                         RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                g.drawImage(original, 0, 0, 270, 340, null);
+                g.drawImage(TelaMeusLivros.cortarParaCaber(original, 270, 340), 0, 0, null);
                 g.dispose();
 
                 // Converte para bytes (JPG) para salvar no banco
@@ -401,9 +403,10 @@ public class Cadastro_Livro extends JFrame {
 
     private void mostrarMiniatura() {
 
-        Image mini = new ImageIcon(fotoSelecionada)
-                .getImage()
-                .getScaledInstance(40, 50, Image.SCALE_SMOOTH);
+        // Corta em vez de esticar, igual às capas da lista
+        Livro livroFoto = new Livro();
+        livroFoto.setFotoCapa(fotoSelecionada);
+        Image mini = TelaMeusLivros.pegarImagem(livroFoto, 40, 50);
 
         botaoFoto.setIcon(new ImageIcon(mini));
         botaoFoto.setText("Foto selecionada (clique para trocar)");

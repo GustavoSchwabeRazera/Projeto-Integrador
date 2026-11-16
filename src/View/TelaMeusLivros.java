@@ -616,7 +616,33 @@ public class TelaMeusLivros extends JFrame {
 			return capaSemFoto(largura, altura);
 		}
 
-		return imagem.getScaledInstance(largura, altura, Image.SCALE_SMOOTH);
+		return cortarParaCaber((BufferedImage) imagem, largura, altura);
+	}
+
+	// =====================================================
+	// AJUSTA A FOTO AO ESPAÇO SEM DEFORMAR
+	// Aumenta ou diminui mantendo a proporção até cobrir o espaço todo
+	// e corta o que sobrar dos lados (ou de cima e de baixo), pelo centro.
+	// =====================================================
+
+	static Image cortarParaCaber(BufferedImage foto, int largura, int altura) {
+
+		double escala = Math.max(
+				(double) largura / foto.getWidth(),
+				(double) altura / foto.getHeight());
+
+		int novaLargura = (int) Math.ceil(foto.getWidth() * escala);
+		int novaAltura = (int) Math.ceil(foto.getHeight() * escala);
+
+		// getScaledInstance com SCALE_SMOOTH dá um resultado melhor ao diminuir muito a foto
+		Image redimensionada = foto.getScaledInstance(novaLargura, novaAltura, Image.SCALE_SMOOTH);
+
+		BufferedImage capa = new BufferedImage(largura, altura, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2 = capa.createGraphics();
+		g2.drawImage(redimensionada, (largura - novaLargura) / 2, (altura - novaAltura) / 2, null);
+		g2.dispose();
+
+		return capa;
 	}
 
 	// =====================================================
