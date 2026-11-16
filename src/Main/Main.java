@@ -16,6 +16,7 @@ import java.sql.Connection;
 import javax.swing.ImageIcon;
 import java.sql.SQLException;
 
+import View.BarraRolagem;
 import View.Cadastro_Livro;
 
 public class Main {
@@ -23,6 +24,9 @@ public class Main {
     public static void main(String[] args) {
 
         usarLogoComoIcone();
+
+        // Antes de criar as telas: todas usam a barra de rolagem verde do sistema
+        BarraRolagem.instalar();
 
     	Connection connection = null;
 		try {
