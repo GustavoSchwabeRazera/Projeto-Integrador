@@ -1,54 +1,81 @@
 package View;
 
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Image;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Cursor;
+import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.io.ByteArrayInputStream;
-import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
-
-import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
-
-
-import model.Autor;
-import model.Livro;
-
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import javax.swing.BorderFactory;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
+import model.Autor;
+import model.Livro;
 import net.miginfocom.swing.MigLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
+// Lista dos livros do usuário, no mesmo estilo de Livros Comigo e Solicitações:
+// painel verde arredondado com um cartão claro para cada livro.
+// Em cima da lista ficam a busca e o filtro, para quando houver muitos livros.
 public class TelaMeusLivros extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final String FILTRO_TODOS = "Todos";
+	private static final String FILTRO_DISPONIVEIS = "Disponíveis";
+	private static final String FILTRO_EMPRESTADOS = "Emprestados";
+
+	// Mesmas cores dos cartões de Livros Comigo
+	private static final Color VERDE_PAINEL = new Color(36, 107, 45);
+	private static final Color VERDE_BOTAO = new Color(114, 219, 145);
+	private static final Color TEXTO_SUAVE = new Color(60, 60, 60);
+	private static final Color VERMELHO = new Color(140, 20, 20);
+	private static final Color LARANJA = new Color(120, 60, 0);
+
 	private JPanel contentPane;
 	private JButton btnHome;
 	private JButton btnMostrarMais;
 	private JButton btnNewButton;
 
-	// Painel onde ficam as capas dos livros
-	private JPanel painelCapas;
+	private JTextField txtBusca;
+	private JComboBox<String> comboFiltro;
+	private JLabel lblContador;
 
-	// Livros que estão aparecendo na tela
-	private List<Livro> livrosNaTela;
+	// Painel com os cartões da lista
+	private JPanel painelLista;
+
+	// Livros do usuário (todos, antes do filtro)
+	private List<Livro> livrosNaTela = new ArrayList<>();
+
+	// Com quem está cada livro emprestado (ISBN -> descrição)
+	private final Map<String, String> comQuemPorIsbn = new HashMap<>();
 
 	// O LivroController preenche
 	private Consumer<Livro> aoAlterar;
@@ -75,13 +102,9 @@ public class TelaMeusLivros extends JFrame {
 		protected void paintComponent(Graphics g) {
 
 			Graphics2D g2 = (Graphics2D) g.create();
-
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
 			g2.setColor(getBackground());
-
 			g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
-
 			g2.dispose();
 
 			super.paintComponent(g);
@@ -94,20 +117,12 @@ public class TelaMeusLivros extends JFrame {
 
 	public static void main(String[] args) {
 
-		EventQueue.invokeLater(new Runnable() {
-
-			public void run() {
-
-				try {
-
-					TelaMeusLivros frame = new TelaMeusLivros();
-					frame.setVisible(true);
-
-				} catch (Exception e) {
-
-					e.printStackTrace();
-
-				}
+		EventQueue.invokeLater(() -> {
+			try {
+				TelaMeusLivros frame = new TelaMeusLivros();
+				frame.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 	}
@@ -122,103 +137,92 @@ public class TelaMeusLivros extends JFrame {
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setBounds(100, 100, 1920, 1080);
 
-		// =====================================================
-		// FUNDO DA TELA
-		// =====================================================
-
 		contentPane = new JPanel();
-
-		contentPane.setBackground(Cores.FUNDO);
-
+		contentPane.setBackground(new Color(175, 244, 198));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
 		setContentPane(contentPane);
 
-		// =====================================================
-		// MIGLAYOUT PRINCIPAL
-		// =====================================================
-
+		// Mesmo layout de Livros Comigo e Solicitações
 		contentPane.setLayout(new MigLayout("", "[200,grow][200,grow][200,grow][200,grow][200,grow]",
 				"[][][grow][grow][grow][grow][grow][grow][grow][grow]"));
 
-		// =====================================================
 		// BOTÃO HOME
-		// =====================================================
-
 		btnHome = new JButton("");
-		btnHome.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-
 		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
-
 		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-
-		btnHome.setForeground(new Color(10, 86, 27));
-
+		btnHome.setForeground(Cores.VERDE);
 		btnHome.setBorderPainted(false);
 		btnHome.setContentAreaFilled(false);
 		btnHome.setFocusPainted(false);
-
+		btnHome.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
-		ImageIcon perfil = new ImageIcon(TelaMeusLivros.class.getResource("/imagens/perfil3.png"));
+		// LOGO
+		JLabel lblLogo = new JLabel("");
+		lblLogo.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/Logo.png")));
+		contentPane.add(lblLogo, "cell 1 0 3 1,alignx center,aligny top");
 
-		Image imgPerfil = perfil.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-
-		// =====================================================
 		// TÍTULO
-		// =====================================================
-
 		JLabel lblMeusLivros = new JLabel("Meus Livros");
-
-		lblMeusLivros.setForeground(new Color(10, 86, 27));
-
+		lblMeusLivros.setForeground(Cores.VERDE);
 		lblMeusLivros.setFont(new Font("Tahoma", Font.BOLD, 34));
-
 		contentPane.add(lblMeusLivros, "cell 0 1 5 1,alignx center");
 
-		// PAINEL VERDE DOS LIVROS
-
+		// PAINEL VERDE: barra de busca, lista e botão de cadastrar
 		RoundedPanel painelLivros = new RoundedPanel(
-
-				new MigLayout("insets 20 35 25 35", "[grow][grow][grow][grow][grow][grow]", "[grow][]"),
-
-				40);
-
-		painelLivros.setBackground(new Color(36, 107, 45));
-
-		painelLivros.setBorder(BorderFactory.createEmptyBorder(20, 35, 25, 35));
-
+				new MigLayout("insets 0, wrap 1", "[grow,fill]", "[]15[grow,fill]15[]"), 40);
+		painelLivros.setBackground(VERDE_PAINEL);
+		painelLivros.setBorder(BorderFactory.createEmptyBorder(25, 35, 25, 35));
 		contentPane.add(painelLivros, "cell 0 2 5 8,grow");
 
-		// =====================================================
-		// CAPAS DOS LIVROS (preenchidas em mostrarLivros)
-		// =====================================================
+		painelLivros.add(criarBarraBusca());
 
-		painelCapas = new JPanel(new MigLayout("wrap 6", "[grow,center][grow,center][grow,center][grow,center][grow,center][grow,center]"));
-		painelCapas.setOpaque(false);
+		painelLista = new JPanel(new MigLayout("insets 0, wrap 1", "[grow,fill]", "[]15[]"));
+		painelLista.setOpaque(false);
 
-		JScrollPane scroll = new JScrollPane(painelCapas);
+		JScrollPane scroll = new JScrollPane(painelLista);
 		scroll.setOpaque(false);
 		scroll.getViewport().setOpaque(false);
 		scroll.setBorder(null);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroll.getVerticalScrollBar().setUnitIncrement(16);
-
-		painelLivros.add(scroll, "cell 0 0 6 1,grow");
+		painelLivros.add(scroll);
 
 		// Mesmo botão do Pesquisar
 		btnNewButton = new BotaoVerde("Cadastrar livro", 200, 50);
+		painelLivros.add(btnNewButton, "alignx center,growx 0,width 200!,height 50!");
+	}
 
-		painelLivros.add(
-		        btnNewButton,
-		        "cell 0 1 6 1,alignx center,aligny center,width 200!,height 50!"
-		);
+	// Busca, filtro e contador, em cima da lista
+	private JPanel criarBarraBusca() {
 
-		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/Logo.png")));
-		contentPane.add(lblNewLabel, "cell 1 0 3 1,alignx center,aligny top");
+		JPanel barra = new JPanel(new MigLayout("insets 0, gapx 12", "[400!][180!][grow]", "[42!]"));
+		barra.setOpaque(false);
+
+		txtBusca = new CampoComDica("Buscar por título, autor ou ISBN");
+		txtBusca.setBackground(new Color(255, 255, 255));
+		txtBusca.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		txtBusca.setBorder(new EmptyBorder(0, 12, 0, 12));
+		txtBusca.getDocument().addDocumentListener(new DocumentListener() {
+			public void insertUpdate(DocumentEvent e) { atualizarLista(); }
+			public void removeUpdate(DocumentEvent e) { atualizarLista(); }
+			public void changedUpdate(DocumentEvent e) { atualizarLista(); }
+		});
+		barra.add(txtBusca, "grow");
+
+		comboFiltro = new JComboBox<>(new String[] { FILTRO_TODOS, FILTRO_DISPONIVEIS, FILTRO_EMPRESTADOS });
+		comboFiltro.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		comboFiltro.setBackground(new Color(255, 255, 255));
+		comboFiltro.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		comboFiltro.addActionListener(e -> atualizarLista());
+		barra.add(comboFiltro, "grow");
+
+		lblContador = new JLabel(" ");
+		lblContador.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblContador.setForeground(Color.WHITE);
+		barra.add(lblContador, "alignx right");
+
+		return barra;
 	}
 
 	public JButton getBtnNewButton() {
@@ -235,53 +239,219 @@ public class TelaMeusLivros extends JFrame {
 
 	public void mostrarLivros(List<Livro> livros) {
 
-		livrosNaTela = livros;
+		livrosNaTela = livros != null ? livros : new ArrayList<>();
 
-		painelCapas.removeAll();
-
-		if (livros == null || livros.isEmpty()) {
-
-			JLabel vazio = new JLabel("Você ainda não cadastrou nenhum livro.");
-			vazio.setForeground(Color.WHITE);
-			vazio.setFont(new Font("Tahoma", Font.BOLD, 20));
-			painelCapas.add(vazio, "span 6,alignx center");
-
-		} else {
-
-			for (Livro livro : livros) {
-				painelCapas.add(criarLivro(livro), "aligny top");
+		// Busca uma vez só com quem está cada livro emprestado
+		comQuemPorIsbn.clear();
+		for (Livro livro : livrosNaTela) {
+			if (!livro.isDisponivel() && buscarComQuem != null) {
+				String comQuem = buscarComQuem.apply(livro);
+				if (comQuem != null) {
+					comQuemPorIsbn.put(livro.getIsbn(), comQuem);
+				}
 			}
 		}
 
-		painelCapas.revalidate();
-		painelCapas.repaint();
+		atualizarLista();
+	}
+
+	// Monta a lista de novo aplicando a busca e o filtro
+	private void atualizarLista() {
+
+		painelLista.removeAll();
+
+		String busca = semAcento(txtBusca.getText().trim());
+		String filtro = (String) comboFiltro.getSelectedItem();
+
+		int mostrados = 0;
+
+		for (Livro livro : livrosNaTela) {
+
+			if (FILTRO_DISPONIVEIS.equals(filtro) && !livro.isDisponivel()) {
+				continue;
+			}
+			if (FILTRO_EMPRESTADOS.equals(filtro) && livro.isDisponivel()) {
+				continue;
+			}
+			if (!busca.isEmpty() && !semAcento(textoDeBusca(livro)).contains(busca)) {
+				continue;
+			}
+
+			painelLista.add(criarCartao(livro), "growx");
+			mostrados++;
+		}
+
+		// Mensagem igual à de Livros Comigo quando não há nada para mostrar
+		if (mostrados == 0) {
+			JLabel vazio = new JLabel(livrosNaTela.isEmpty()
+					? "Você ainda não cadastrou nenhum livro."
+					: "Nenhum livro encontrado com essa busca.");
+			vazio.setForeground(Color.WHITE);
+			vazio.setFont(new Font("Tahoma", Font.BOLD, 22));
+			painelLista.add(vazio, "alignx center,gaptop 40");
+		}
+
+		int total = livrosNaTela.size();
+		lblContador.setText(total == 0 ? " "
+				: mostrados == total ? total + (total == 1 ? " livro" : " livros")
+				: mostrados + " de " + total + " livros");
+
+		painelLista.revalidate();
+		painelLista.repaint();
+	}
+
+	private String textoDeBusca(Livro livro) {
+		return livro.getNome() + " " + nomesAutores(livro) + " " + livro.getIsbn()
+				+ " " + livro.getEditora() + " " + livro.getGenero();
+	}
+
+	// Deixa a busca ignorar acentos e maiúsculas ("memorias" acha "Memórias")
+	private static String semAcento(String texto) {
+		return Normalizer.normalize(texto == null ? "" : texto, Normalizer.Form.NFD)
+				.replaceAll("\\p{M}", "")
+				.toLowerCase();
+	}
+
+	private static String nomesAutores(Livro livro) {
+
+		StringBuilder nomes = new StringBuilder();
+
+		if (livro.getAutores() != null) {
+			for (Autor a : livro.getAutores()) {
+				if (nomes.length() > 0) {
+					nomes.append(", ");
+				}
+				nomes.append(a.getNome());
+			}
+		}
+
+		return nomes.toString();
 	}
 
 	// =====================================================
-	// CRIA O BOTÃO COM A CAPA E O TÍTULO
+	// CARTÃO DE UM LIVRO (mesmo formato de Livros Comigo)
 	// =====================================================
 
-	private JButton criarLivro(Livro livro) {
+	private JPanel criarCartao(Livro livro) {
 
-		JButton botao = new JButton(livro.getNome());
+		RoundedPanel cartao = new RoundedPanel(
+				new MigLayout("insets 14 25 14 25", "[]20[grow]20[]", "[center]"), 35);
+		cartao.setBackground(Cores.FUNDO);
 
-		botao.setIcon(new ImageIcon(pegarImagem(livro, 135, 170)));
+		// Capa
+		cartao.add(new JLabel(new ImageIcon(pegarImagem(livro, 80, 105))), "cell 0 0,alignx center,aligny center");
 
-		// Título embaixo da capa
-		botao.setVerticalTextPosition(SwingConstants.BOTTOM);
-		botao.setHorizontalTextPosition(SwingConstants.CENTER);
-		botao.setForeground(Color.WHITE);
-		botao.setFont(new Font("Tahoma", Font.BOLD, 14));
+		// Título + detalhes + status
+		JPanel informacoes = new JPanel(new MigLayout("insets 0", "[grow]", "[]4[]4[]"));
+		informacoes.setOpaque(false);
+		cartao.add(informacoes, "cell 1 0,growx,aligny center");
 
-		botao.setContentAreaFilled(false);
-		botao.setBorderPainted(false);
-		botao.setFocusPainted(false);
-		botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		JLabel lblTitulo = new JLabel(livro.getNome());
+		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 21));
+		informacoes.add(lblTitulo, "cell 0 0");
 
-		// Ao clicar, mostra as informações
-		botao.addActionListener(e -> mostrarInfo(livro));
+		String autores = nomesAutores(livro);
+		StringBuilder detalhes = new StringBuilder(autores.isEmpty() ? "Autor não informado" : autores);
+		if (livro.getEditora() != null && !livro.getEditora().isBlank()) {
+			detalhes.append("   •   ").append(livro.getEditora());
+		}
+		if (livro.getAnoLancamento() > 0) {
+			detalhes.append("   •   ").append(livro.getAnoLancamento());
+		}
+		if (livro.getGenero() != null && !livro.getGenero().isBlank()) {
+			detalhes.append("   •   ").append(livro.getGenero());
+		}
+		JLabel lblDetalhes = new JLabel(detalhes.toString());
+		lblDetalhes.setForeground(TEXTO_SUAVE);
+		lblDetalhes.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		informacoes.add(lblDetalhes, "cell 0 1");
 
+		JLabel lblStatus = new JLabel();
+		lblStatus.setFont(new Font("Tahoma", Font.BOLD, 15));
+		if (livro.isDisponivel()) {
+			lblStatus.setText("Disponível");
+			lblStatus.setForeground(Cores.VERDE);
+		} else {
+			String comQuem = comQuemPorIsbn.get(livro.getIsbn());
+			lblStatus.setText(comQuem != null ? "Emprestado para " + comQuem : "Emprestado");
+			lblStatus.setForeground(LARANJA);
+		}
+		informacoes.add(lblStatus, "cell 0 2");
+
+		// Botões
+		JPanel acoes = new JPanel(new MigLayout("insets 0, gapx 10", "[][]", "[center]"));
+		acoes.setOpaque(false);
+
+		JButton btnAlterar = botaoAcao("Alterar", VERDE_BOTAO, Color.BLACK);
+		btnAlterar.addActionListener(e -> aoAlterar.accept(livro));
+		acoes.add(btnAlterar);
+
+		if (livro.isDisponivel()) {
+			JButton btnRemover = botaoAcao("Remover", VERMELHO, Color.WHITE);
+			btnRemover.addActionListener(e -> aoRemover.accept(livro));
+			acoes.add(btnRemover);
+		} else {
+			JButton btnDevolucao = botaoAcao("Registrar devolução", VERDE_BOTAO, Color.BLACK);
+			btnDevolucao.addActionListener(e -> aoDevolver.accept(livro));
+			acoes.add(btnDevolucao);
+		}
+
+		cartao.add(acoes, "cell 2 0,alignx center,aligny center");
+
+		// Clicar no cartão (fora dos botões) abre os detalhes
+		cartao.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		cartao.setToolTipText("Clique para ver os detalhes");
+		cartao.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarInfo(livro);
+			}
+		});
+
+		return cartao;
+	}
+
+	// Mesmo botão do "Devolver" de Livros Comigo
+	private JButton botaoAcao(String texto, Color fundo, Color cor) {
+
+		JButton botao = new BotaoArredondado(texto, 40);
+		botao.setBackground(fundo);
+		botao.setForeground(cor);
+		botao.setFont(new Font("Tahoma", Font.BOLD, 16));
+		botao.setMargin(new Insets(8, 24, 8, 24));
 		return botao;
+	}
+
+	// Campo de texto com uma dica cinza enquanto está vazio
+	private static class CampoComDica extends JTextField {
+
+		private static final long serialVersionUID = 1L;
+		private final String dica;
+
+		CampoComDica(String dica) {
+			this.dica = dica;
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+
+			super.paintComponent(g);
+
+			if (getText().isEmpty()) {
+				Graphics2D g2 = (Graphics2D) g.create();
+				g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				g2.setColor(new Color(140, 140, 140));
+				g2.setFont(getFont());
+				int y = (getHeight() - g2.getFontMetrics().getHeight()) / 2 + g2.getFontMetrics().getAscent();
+				g2.drawString(dica, getInsets().left, y);
+				g2.dispose();
+			}
+		}
+
+		@Override
+		public Dimension getPreferredSize() {
+			return new Dimension(400, 42);
+		}
 	}
 
 	// =====================================================
@@ -487,8 +657,8 @@ public class TelaMeusLivros extends JFrame {
 		return btnHome;
 	}
 
+	// Não é mais usado na tela, mas continua aqui para não quebrar quem chama
 	public JButton getBtnMostrarMais() {
 		return btnMostrarMais;
 	}
-
 }
