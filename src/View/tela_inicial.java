@@ -1,27 +1,46 @@
 package View;
 
-import java.awt.EventQueue;
-import java.awt.Image;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import javax.swing.JButton;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JLabel;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Component;
-import javax.swing.SwingConstants;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
 public class tela_inicial extends JFrame {
 
     private static final long serialVersionUID = 1L;
+
+    // Tamanho dos ícones da barra de cima e da foto de perfil
+    private static final int TAMANHO_ICONE = 44;
+    private static final int TAMANHO_FOTO = 60;
+
+    private static final Color VERDE_ESCURO = new Color(10, 86, 27);
+    private static final Color VERDE_TEXTO = new Color(40, 90, 50);
+    private static final String FONTE = "Segoe UI";
+
     private JPanel contentPane;
 
     private JButton btnPesquisar;
@@ -31,7 +50,7 @@ public class tela_inicial extends JFrame {
     private JButton btnPerfil;
     private JButton btnCalendario;
     private JButton btnHistorico;
-    private JButton btnNotificacao;   // <-- agora é ATRIBUTO da classe
+    private JButton btnNotificacao;
     private JButton btnLogo;
     private JButton btnChat;
     private int naoLidasChat = 0;
@@ -55,178 +74,146 @@ public class tela_inicial extends JFrame {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         setBounds(100, 100, 1920, 1080);
 
-        contentPane = new JPanel();
-        contentPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        contentPane = new JPanel(new BorderLayout());
         contentPane.setBackground(Cores.FUNDO);
-        contentPane.setBorder(new EmptyBorder(5, 0, 5, 5));
+        contentPane.setBorder(new EmptyBorder(16, 28, 20, 28));
         setContentPane(contentPane);
 
-        contentPane.setLayout(new MigLayout("", "[][][197.00][172.00,grow][449.00][480,grow][480,grow][261.00,grow][153.00,grow]", "[113.00,grow][][][grow][grow][grow][grow][][][][grow][71.00,grow][][][54.00,grow][grow]"));
-
-        // =========================================================
-        // LOGO
-        // =========================================================
-        btnLogo = new JButton("");
-        btnLogo.setContentAreaFilled(false);
-        btnLogo.setBorderPainted(false);
-        btnLogo.setFocusPainted(false);
-        btnLogo.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnLogo.setIcon(new ImageIcon(tela_inicial.class.getResource("/imagens/LogoPequena.png")));
-        contentPane.add(btnLogo, "cell 0 0 3 1,alignx left,aligny center");
-
-        JLabel lblEspaco1 = new JLabel("");
-        contentPane.add(lblEspaco1, "flowx,cell 7 0");
-
-        // =========================================================
-        // PERFIL
-        // =========================================================
-        btnPerfil = new JButton("");
-        btnPerfil.setFont(
-            new Font("Tahoma", Font.BOLD, 11)
-        );
-
-        btnPerfil.setIcon(
-            new ImageIcon(tela_inicial.class.getResource("/imagens/perfil3.png"))
-        );
-
-        btnPerfil.setBorderPainted(false);
-        btnPerfil.setContentAreaFilled(false);
-        btnPerfil.setFocusPainted(false);
-        btnPerfil.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        contentPane.add(btnPerfil, "flowy,cell 8 0,growy");
-
-        contentPane.add(
-            btnPerfil,
-            "flowy,cell 8 0,growy"
-        );
-
-        // =========================================================
-        // BEM-VINDO
-        // =========================================================
-        JLabel lblBemVindo = new JLabel("Bem-Vindo(a)!");
-        lblBemVindo.setForeground(new Color(10, 86, 27));
-        lblBemVindo.setFont(new Font("Tahoma", Font.BOLD, 51));
-        contentPane.add(lblBemVindo, "cell 5 3,alignx center");
-
-        // =========================================================
-        // PESQUISAR
-        // =========================================================
-        ImageIcon pesquisar = new ImageIcon(tela_inicial.class.getResource("/imagens/pesquisar.png"));
-        Image imgPesquisar = pesquisar.getImage().getScaledInstance(295, 115, Image.SCALE_SMOOTH);
-
-        // =========================================================
-        // MEUS LIVROS
-        // =========================================================
-        ImageIcon livros = new ImageIcon(tela_inicial.class.getResource("/imagens/meus livros.png"));
-        Image imgLivros = livros.getImage().getScaledInstance(295, 115, Image.SCALE_SMOOTH);
-
-        // =========================================================
-        // SOLICITAÇÕES
-        // =========================================================
-        ImageIcon solicitacoes = new ImageIcon(tela_inicial.class.getResource("/imagens/solicitacoes.png"));
-        Image imgSolicitacoes = solicitacoes.getImage().getScaledInstance(295, 115, Image.SCALE_SMOOTH);
-
-        // =========================================================
-        // LIVROS COMIGO
-        // =========================================================
-        ImageIcon livrosComigo = new ImageIcon(tela_inicial.class.getResource("/imagens/livros comigo.png"));
-        Image imgLivrosComigo = livrosComigo.getImage().getScaledInstance(295, 115, Image.SCALE_SMOOTH);
-
-        JLabel lblEspaco2 = new JLabel("");
-        contentPane.add(lblEspaco2, "flowx,cell 3 0");
-
-        JLabel lblEspaco3 = new JLabel("");
-        contentPane.add(lblEspaco3, "cell 7 0");
-
-        // =========================================================
-        // CALENDÁRIO
-        // =========================================================
-        ImageIcon calendario = new ImageIcon(tela_inicial.class.getResource("/imagens/calendario.png"));
-        Image imgCalendario = calendario.getImage().getScaledInstance(75, 75, Image.SCALE_SMOOTH);
-
-        // =========================================================
-        // HISTÓRICO
-        // =========================================================
-        ImageIcon historico = new ImageIcon(tela_inicial.class.getResource("/imagens/historico.png"));
-        Image imgHistorico = historico.getImage().getScaledInstance(170, 50, Image.SCALE_SMOOTH);
-
-        // =========================================================
-        // NOTIFICAÇÃO (sino)
-        // =========================================================
-        ImageIcon notificacao = new ImageIcon(tela_inicial.class.getResource("/imagens/notificacao.png"));
-        Image imgNotificacao = notificacao.getImage().getScaledInstance(75, 75, Image.SCALE_SMOOTH);
-                        
-                                btnPesquisar = new JButton();
-                                btnPesquisar.setIcon(new ImageIcon(imgPesquisar));
-                                btnPesquisar.setBorderPainted(false);
-                                btnPesquisar.setContentAreaFilled(false);
-                                btnPesquisar.setFocusPainted(false);
-                                btnPesquisar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                                contentPane.add(btnPesquisar, "cell 5 8,alignx center");
-                
-                        btnMeusLivros = new JButton();
-                        btnMeusLivros.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                        btnMeusLivros.setIcon(new ImageIcon(imgLivros));
-                        btnMeusLivros.setBorderPainted(false);
-                        btnMeusLivros.setContentAreaFilled(false);
-                        btnMeusLivros.setFocusPainted(false);
-                        btnMeusLivros.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                        contentPane.add(btnMeusLivros, "cell 5 10,alignx center");
-                
-                        btnSolicitacoes = new JButton();
-                        btnSolicitacoes.setIcon(new ImageIcon(imgSolicitacoes));
-                        btnSolicitacoes.setBorderPainted(false);
-                        btnSolicitacoes.setContentAreaFilled(false);
-                        btnSolicitacoes.setFocusPainted(false);
-                        btnSolicitacoes.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                        contentPane.add(btnSolicitacoes, "cell 5 11,alignx center");
-
-                        btnLivrosComigo = new JButton();
-                        btnLivrosComigo.setIcon(new ImageIcon(imgLivrosComigo));
-                        btnLivrosComigo.setBorderPainted(false);
-                        btnLivrosComigo.setContentAreaFilled(false);
-                        btnLivrosComigo.setFocusPainted(false);
-                        btnLivrosComigo.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                        contentPane.add(btnLivrosComigo, "cell 5 12,alignx center");
-        
-                btnChat = new JButton("");
-                btnChat.setContentAreaFilled(false);
-                btnChat.setBorderPainted(false);
-                btnChat.setFocusPainted(false);
-                btnChat.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                btnChat.setToolTipText("Chat");
-                btnChat.setIcon(IconeChat.criar(75, 0));
-                // Na mesma linha do sino: uma linha nova empurraria os botões para fora da tela
-                contentPane.add(btnChat, "cell 7 15,alignx right");
-
-                btnCalendario = new JButton("");
-                btnCalendario.setContentAreaFilled(false);
-                btnCalendario.setBorderPainted(false);
-                btnCalendario.setFocusPainted(false);
-                btnCalendario.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                btnCalendario.setIcon(new ImageIcon(imgCalendario));
-                contentPane.add(btnCalendario, "cell 8 14,alignx center");
-
-        btnNotificacao = new JButton("");
-        btnNotificacao.setContentAreaFilled(false);
-        btnNotificacao.setBorderPainted(false);
-        btnNotificacao.setFocusPainted(false);
-        btnNotificacao.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnNotificacao.setToolTipText("Notificações");
-        btnNotificacao.setIcon(new ImageIcon(imgNotificacao));
-        // Sem ActionListener aqui: o LivroController é quem registra a ação.
-        contentPane.add(btnNotificacao, "cell 8 15,alignx center");
-        
-                btnHistorico = new JButton("");
-                btnHistorico.setBorderPainted(false);
-                btnHistorico.setContentAreaFilled(false);
-                btnHistorico.setFocusPainted(false);
-                btnHistorico.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                btnHistorico.setIcon(new ImageIcon(imgHistorico));
-                // O dispose() que estava aqui foi REMOVIDO: quem controla a navegação é o Controller.
-                contentPane.add(btnHistorico, "cell 2 15,alignx left,aligny center");
+        contentPane.add(criarBarraSuperior(), BorderLayout.NORTH);
+        contentPane.add(criarCentro(), BorderLayout.CENTER);
+        contentPane.add(criarRodape(), BorderLayout.SOUTH);
     }
-    
+
+    // =========================================================
+    // BARRA DE CIMA: logo à esquerda, atalhos e perfil à direita
+    // =========================================================
+    private JPanel criarBarraSuperior() {
+
+        JPanel barra = new JPanel(new BorderLayout());
+        barra.setOpaque(false);
+
+        btnLogo = botaoIcone(new ImageIcon(tela_inicial.class.getResource("/imagens/LogoPequena.png")), null);
+        barra.add(btnLogo, BorderLayout.WEST);
+
+        JPanel atalhos = new JPanel(new FlowLayout(FlowLayout.RIGHT, 14, 0));
+        atalhos.setOpaque(false);
+
+        btnCalendario = botaoIcone(icone("/imagens/calendario.png", TAMANHO_ICONE), "Calendário");
+        // Sem ActionListener aqui: o LivroController é quem registra as ações.
+        btnChat = botaoIcone(IconeChat.criar(TAMANHO_ICONE, 0), "Chat");
+        btnNotificacao = botaoIcone(icone("/imagens/notificacao.png", TAMANHO_ICONE), "Notificações");
+        btnPerfil = botaoIcone(icone("/imagens/perfil3.png", TAMANHO_FOTO), "Perfil");
+
+        atalhos.add(btnCalendario);
+        atalhos.add(btnChat);
+        atalhos.add(btnNotificacao);
+        atalhos.add(separador());
+        atalhos.add(btnPerfil);
+
+        // Centraliza os ícones na altura do logo
+        JPanel alinhador = new JPanel(new GridBagLayout());
+        alinhador.setOpaque(false);
+        alinhador.add(atalhos);
+        barra.add(alinhador, BorderLayout.EAST);
+
+        return barra;
+    }
+
+    // =========================================================
+    // CENTRO: boas-vindas e os quatro cartões
+    // =========================================================
+    private JPanel criarCentro() {
+
+        JPanel centro = new JPanel(new GridBagLayout());
+        centro.setOpaque(false);
+
+        JLabel lblBemVindo = new JLabel("Bem-vindo(a)!", SwingConstants.CENTER);
+        lblBemVindo.setForeground(VERDE_ESCURO);
+        lblBemVindo.setFont(new Font(FONTE, Font.BOLD, 46));
+
+        JLabel lblSubtitulo = new JLabel("O que você quer fazer hoje?", SwingConstants.CENTER);
+        lblSubtitulo.setForeground(VERDE_TEXTO);
+        lblSubtitulo.setFont(new Font(FONTE, Font.PLAIN, 20));
+
+        btnPesquisar = new CartaoMenu("Pesquisar", "Encontre livros para pegar emprestado");
+        btnMeusLivros = new CartaoMenu("Meus Livros", "Cadastre e gerencie os seus livros");
+        btnSolicitacoes = new CartaoMenu("Solicitações", "Acompanhe os pedidos de empréstimo");
+        btnLivrosComigo = new CartaoMenu("Livros Comigo", "Livros que você pegou emprestado");
+
+        JPanel grade = new JPanel(new GridLayout(2, 2, 28, 28));
+        grade.setOpaque(false);
+        grade.add(btnPesquisar);
+        grade.add(btnMeusLivros);
+        grade.add(btnSolicitacoes);
+        grade.add(btnLivrosComigo);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        centro.add(lblBemVindo, c);
+
+        c.gridy = 1;
+        c.insets = new Insets(4, 0, 40, 0);
+        centro.add(lblSubtitulo, c);
+
+        c.gridy = 2;
+        c.insets = new Insets(0, 0, 40, 0);
+        centro.add(grade, c);
+
+        return centro;
+    }
+
+    // =========================================================
+    // RODAPÉ: histórico
+    // =========================================================
+    private JPanel criarRodape() {
+
+        JPanel rodape = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        rodape.setOpaque(false);
+
+        btnHistorico = botaoIcone(new IconeLista(26, VERDE_ESCURO), null);
+        btnHistorico.setText("Histórico");
+        btnHistorico.setIconTextGap(12);
+        btnHistorico.setFont(new Font(FONTE, Font.BOLD, 20));
+        btnHistorico.setForeground(VERDE_ESCURO);
+        // O dispose() que estava aqui foi REMOVIDO: quem controla a navegação é o Controller.
+        rodape.add(btnHistorico);
+
+        return rodape;
+    }
+
+    // =========================================================
+    // AJUDANTES
+    // =========================================================
+
+    // Botão só com ícone, sem fundo nem borda
+    private JButton botaoIcone(Icon icone, String dica) {
+
+        JButton botao = new JButton(icone);
+        botao.setContentAreaFilled(false);
+        botao.setBorderPainted(false);
+        botao.setFocusPainted(false);
+        botao.setMargin(new Insets(0, 0, 0, 0));
+        botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        botao.setToolTipText(dica);
+        return botao;
+    }
+
+    private ImageIcon icone(String caminho, int tamanho) {
+
+        Image imagem = new ImageIcon(tela_inicial.class.getResource(caminho)).getImage();
+        return new ImageIcon(imagem.getScaledInstance(tamanho, tamanho, Image.SCALE_SMOOTH));
+    }
+
+    // Risquinho vertical entre os atalhos e a foto de perfil
+    private JPanel separador() {
+
+        JPanel linha = new JPanel();
+        linha.setBackground(new Color(10, 86, 27, 70));
+        linha.setPreferredSize(new Dimension(2, 40));
+        return linha;
+    }
+
     public void atualizarFotoPerfil(byte[] foto) {
 
         Image imagem;
@@ -246,7 +233,7 @@ public class tela_inicial extends JFrame {
             imagem = new ImageIcon(foto).getImage();
         }
 
-        int tamanho = 95;
+        int tamanho = TAMANHO_FOTO;
 
         BufferedImage circular = new BufferedImage(
             tamanho,
@@ -259,6 +246,10 @@ public class tela_inicial extends JFrame {
         g2.setRenderingHint(
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON
+        );
+        g2.setRenderingHint(
+            RenderingHints.KEY_INTERPOLATION,
+            RenderingHints.VALUE_INTERPOLATION_BICUBIC
         );
 
         g2.setClip(new Ellipse2D.Double(
@@ -294,15 +285,134 @@ public class tela_inicial extends JFrame {
 
         btnPerfil.revalidate();
         btnPerfil.repaint();
-        
-        
     }
+
     // Mostra no balão do chat quantas mensagens estão sem ler
     public void atualizarNaoLidasChat(int naoLidas) {
 
         if (naoLidas != naoLidasChat) {
             naoLidasChat = naoLidas;
-            btnChat.setIcon(IconeChat.criar(75, naoLidas));
+            btnChat.setIcon(IconeChat.criar(TAMANHO_ICONE, naoLidas));
+        }
+    }
+
+    // =========================================================
+    // CARTÃO DO MENU: verde arredondado, com título e descrição.
+    // Fica mais escuro quando o mouse passa por cima.
+    // =========================================================
+    private static class CartaoMenu extends JButton {
+
+        private static final long serialVersionUID = 1L;
+
+        private static final Color COR = new Color(34, 139, 58);
+        private static final Color COR_HOVER = new Color(24, 112, 44);
+        private static final Color SOMBRA = new Color(0, 60, 20, 45);
+        private static final Color DESCRICAO = new Color(225, 245, 230);
+        private static final int ARCO = 28;
+        private static final int ALTURA_SOMBRA = 5;
+
+        private final String titulo;
+        private final String descricao;
+
+        CartaoMenu(String titulo, String descricao) {
+
+            this.titulo = titulo;
+            this.descricao = descricao;
+
+            setContentAreaFilled(false);
+            setBorderPainted(false);
+            setFocusPainted(false);
+            setOpaque(false);
+            setRolloverEnabled(true);
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
+            setPreferredSize(new Dimension(380, 150));
+            getAccessibleContext().setAccessibleName(titulo);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            int largura = getWidth();
+            int altura = getHeight() - ALTURA_SOMBRA;
+            boolean emCima = getModel().isRollover() || getModel().isPressed();
+            int deslocamento = getModel().isPressed() ? 2 : 0;
+
+            // Sombra suave embaixo
+            g2.setColor(SOMBRA);
+            g2.fillRoundRect(0, ALTURA_SOMBRA, largura, altura, ARCO, ARCO);
+
+            // Cartão
+            g2.setColor(emCima ? COR_HOVER : COR);
+            g2.fillRoundRect(0, deslocamento, largura, altura, ARCO, ARCO);
+
+            // Título e descrição centralizados
+            Font fonteTitulo = new Font(FONTE, Font.BOLD, 28);
+            Font fonteDescricao = new Font(FONTE, Font.PLAIN, 16);
+            FontMetrics mTitulo = g2.getFontMetrics(fonteTitulo);
+            FontMetrics mDescricao = g2.getFontMetrics(fonteDescricao);
+
+            int alturaTexto = mTitulo.getHeight() + 4 + mDescricao.getHeight();
+            int topo = (altura - alturaTexto) / 2 + deslocamento;
+
+            g2.setFont(fonteTitulo);
+            g2.setColor(Color.WHITE);
+            g2.drawString(titulo,
+                    (largura - mTitulo.stringWidth(titulo)) / 2,
+                    topo + mTitulo.getAscent());
+
+            g2.setFont(fonteDescricao);
+            g2.setColor(DESCRICAO);
+            g2.drawString(descricao,
+                    (largura - mDescricao.stringWidth(descricao)) / 2,
+                    topo + mTitulo.getHeight() + 4 + mDescricao.getAscent());
+
+            g2.dispose();
+        }
+    }
+
+    // Ícone de lista (três bolinhas com linhas) para o botão Histórico
+    private static class IconeLista implements Icon {
+
+        private final int tamanho;
+        private final Color cor;
+
+        IconeLista(int tamanho, Color cor) {
+            this.tamanho = tamanho;
+            this.cor = cor;
+        }
+
+        @Override
+        public void paintIcon(java.awt.Component c, Graphics g, int x, int y) {
+
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(cor);
+
+            float espessura = tamanho / 8f;
+            g2.setStroke(new BasicStroke(espessura, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+            int bolinha = Math.round(espessura * 1.4f);
+            for (int i = 0; i < 3; i++) {
+                int linhaY = y + tamanho / 6 + i * tamanho / 3;
+                g2.fillOval(x, linhaY - bolinha / 2, bolinha, bolinha);
+                g2.drawLine(x + bolinha + tamanho / 6, linhaY, x + tamanho, linhaY);
+            }
+
+            g2.dispose();
+        }
+
+        @Override
+        public int getIconWidth() {
+            return tamanho;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return tamanho;
         }
     }
 
@@ -333,15 +443,16 @@ public class tela_inicial extends JFrame {
     public JButton getBtnPerfil() {
         return btnPerfil;
     }
-  
 
-	public JButton getBtnCalendario() {
-		return btnCalendario;
-	}
-	public JButton getBtnHistorico() {
-		return btnHistorico;
-	}
-	public JButton getBtnNotificacao() {
-		return btnNotificacao;
-	}
+    public JButton getBtnCalendario() {
+        return btnCalendario;
+    }
+
+    public JButton getBtnHistorico() {
+        return btnHistorico;
+    }
+
+    public JButton getBtnNotificacao() {
+        return btnNotificacao;
+    }
 }
