@@ -1,5 +1,7 @@
 package View;
 
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -14,7 +16,11 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.net.URI;
+
+import javax.imageio.ImageIO;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -39,11 +45,14 @@ public class TelaSobre extends JFrame {
     private static final String ANO = "2026";
     private static final String GITHUB = "https://github.com/GustavoSchwabeRazera/Projeto-Integrador";
 
-    private static final String[] INTEGRANTES = {
-            "Gustavo Schwabe Razera",
-            "Guilherme de Liz",
-            "Eduardo Tomé da Silva",
-            "Robson Machado"
+    private static final int TAMANHO_FOTO = 120;
+
+    // Nome, foto, zoom (1 = foto inteira) e altura do rosto na foto (0 = topo, 1 = base)
+    private static final Integrante[] INTEGRANTES = {
+            new Integrante("Gustavo Schwabe Razera", "/imagens/integrante_gustavo.jpg", 1.0, 0.5),
+            new Integrante("Guilherme de Liz", "/imagens/integrante_guilherme.jpg", 0.65, 0.3),
+            new Integrante("Eduardo Tomé da Silva", "/imagens/integrante_eduardo.png", 1.0, 0.4),
+            new Integrante("Robson Machado", "/imagens/integrante_robson.jpg", 1.0, 0.38)
     };
 
     private JButton btnHome;
@@ -142,28 +151,80 @@ public class TelaSobre extends JFrame {
 
         PainelArredondado cartao = new PainelArredondado(new GridBagLayout(), 28);
         cartao.setBackground(Cores.VERDE);
-        cartao.setBorder(new EmptyBorder(18, 60, 20, 60));
+        cartao.setBorder(new EmptyBorder(18, 30, 22, 30));
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
+        c.gridwidth = INTEGRANTES.length;
 
         JLabel lblTitulo = new JLabel("Integrantes do grupo", SwingConstants.CENTER);
         lblTitulo.setForeground(Color.WHITE);
         lblTitulo.setFont(new Font(FONTE, Font.BOLD, 26));
-        c.insets = new Insets(0, 0, 8, 0);
+        c.insets = new Insets(0, 0, 16, 0);
         cartao.add(lblTitulo, c);
 
-        c.insets = new Insets(2, 0, 2, 0);
-        for (String nome : INTEGRANTES) {
-            JLabel lblNome = new JLabel(nome, SwingConstants.CENTER);
+        // Uma coluna por integrante: foto redonda e o nome embaixo
+        c.gridwidth = 1;
+        for (Integrante integrante : INTEGRANTES) {
+
+            JLabel lblFoto = new JLabel(fotoRedonda(integrante));
+            c.gridy = 1;
+            c.insets = new Insets(0, 18, 8, 18);
+            cartao.add(lblFoto, c);
+
+            JLabel lblNome = new JLabel(integrante.nome, SwingConstants.CENTER);
             lblNome.setForeground(TEXTO_CLARO);
-            lblNome.setFont(new Font(FONTE, Font.PLAIN, 20));
-            c.gridy++;
+            lblNome.setFont(new Font(FONTE, Font.PLAIN, 18));
+            c.gridy = 2;
+            c.insets = new Insets(0, 18, 0, 18);
             cartao.add(lblNome, c);
+
+            c.gridx++;
         }
 
         return cartao;
+    }
+
+    // Recorta um quadrado em volta do rosto e transforma em círculo com borda clara
+    private ImageIcon fotoRedonda(Integrante integrante) {
+
+        int tamanho = TAMANHO_FOTO;
+        BufferedImage redonda = new BufferedImage(tamanho, tamanho, BufferedImage.TYPE_INT_ARGB);
+
+        try {
+            BufferedImage original = ImageIO.read(TelaSobre.class.getResource(integrante.foto));
+
+            int largura = original.getWidth();
+            int altura = original.getHeight();
+            int lado = (int) (Math.min(largura, altura) * integrante.zoom);
+
+            int x = (largura - lado) / 2;
+            int y = (int) (altura * integrante.focoY) - lado / 2;
+            y = Math.max(0, Math.min(y, altura - lado));
+
+            Image recorte = original.getSubimage(x, y, lado, lado)
+                    .getScaledInstance(tamanho, tamanho, Image.SCALE_SMOOTH);
+
+            Graphics2D g2 = redonda.createGraphics();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // Desenha o círculo e depois a foto só onde o círculo existe (borda lisa)
+            g2.fill(new Ellipse2D.Double(0, 0, tamanho, tamanho));
+            g2.setComposite(AlphaComposite.SrcIn);
+            g2.drawImage(recorte, 0, 0, null);
+
+            g2.setComposite(AlphaComposite.SrcOver);
+            g2.setColor(Cores.FUNDO);
+            g2.setStroke(new BasicStroke(3f));
+            g2.draw(new Ellipse2D.Double(1.5, 1.5, tamanho - 3, tamanho - 3));
+            g2.dispose();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ImageIcon(redonda);
     }
 
     // Link do repositório: abre no navegador padrão
@@ -207,6 +268,21 @@ public class TelaSobre extends JFrame {
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), arco, arco);
             g2.dispose();
             super.paintComponent(g);
+        }
+    }
+
+    private static class Integrante {
+
+        final String nome;
+        final String foto;
+        final double zoom;
+        final double focoY;
+
+        Integrante(String nome, String foto, double zoom, double focoY) {
+            this.nome = nome;
+            this.foto = foto;
+            this.zoom = zoom;
+            this.focoY = focoY;
         }
     }
 
