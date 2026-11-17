@@ -93,7 +93,7 @@ public class tela_inicial extends JFrame {
         JPanel barra = new JPanel(new BorderLayout());
         barra.setOpaque(false);
 
-        btnLogo = botaoIcone(new ImageIcon(tela_inicial.class.getResource("/imagens/LogoPequena.png")), null);
+        btnLogo = botaoIcone(new ImageIcon(tela_inicial.class.getResource("/imagens/LogoPequena.png")), "Sobre o Capas Vivas");
         barra.add(btnLogo, BorderLayout.WEST);
 
         JPanel atalhos = new JPanel(new FlowLayout(FlowLayout.RIGHT, 14, 0));
@@ -480,6 +480,10 @@ public class tela_inicial extends JFrame {
     // =========================================================
     // GETTERS
     // =========================================================
+
+    public JButton getBtnLogo() {
+        return btnLogo;
+    }
 
     public JButton getBtnSair() {
         return btnSair;

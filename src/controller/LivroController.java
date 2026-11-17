@@ -19,6 +19,7 @@ import View.TelaLivrosComigo;
 import View.TelaLogin;
 import View.TelaMeusLivros;
 import View.TelaNotificacoes;
+import View.TelaSobre;
 import View.TelaSolicitacoes;
 import View.tela_inicial;
 
@@ -53,6 +54,7 @@ public class LivroController {
     private final TelaAlterar alterarCadastro;
     private final Historico historico;
     private final TelaChat telaChat;
+    private final TelaSobre telaSobre;
 
     private final PesquisarController pesquisarController;
     private final LoginController loginController;
@@ -99,6 +101,7 @@ public class LivroController {
         this.usuarioDAO = new UsuarioDAO();
         this.historico = new Historico();
         this.telaChat = new TelaChat();
+        this.telaSobre = new TelaSobre();
 
         this.pesquisarController =
                 new PesquisarController(livroDAO, emprestimoDAO, usuarioDAO, pesquisarLivro);
@@ -206,6 +209,15 @@ public class LivroController {
 
         telaInicial.getBtnSair()
                 .addActionListener(e -> confirmarSair());
+
+        telaInicial.getBtnLogo()
+                .addActionListener(e -> trocarPara(telaSobre));
+
+
+        // --- SOBRE ---
+
+        telaSobre.getBtnHome()
+                .addActionListener(e -> abrirHome());
 
 
         // --- CHAT ---
@@ -580,7 +592,8 @@ public class LivroController {
                 calendario,
                 alterarCadastro,
                 historico,
-                telaChat
+                telaChat,
+                telaSobre
         };
 
         for (JFrame outra : telas) {
