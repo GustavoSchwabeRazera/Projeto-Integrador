@@ -116,7 +116,8 @@ public class LivroController {
                 new CalendarioController(new EventoDAO(), emprestimoDAO, calendario);
 
         this.notificacaoController =
-                new NotificacaoController(emprestimoDAO, telaNotificacoes);
+                new NotificacaoController(emprestimoDAO, telaNotificacoes,
+                        telaInicial::atualizarNotificacoesNovas);
 
         this.livrosComigoController =
                 new LivrosComigoController(emprestimoDAO, telaLivrosComigo);
@@ -388,6 +389,7 @@ public class LivroController {
     public void logoff() {
 
         chatController.parar();
+        notificacaoController.parar();
 
         emailUsuarioLogado = null;
         cpfUsuarioLogado = null;
@@ -617,6 +619,7 @@ public class LivroController {
             cpfUsuarioLogado = loginController.getCpfLogado();
 
             chatController.iniciar(cpfUsuarioLogado);
+            notificacaoController.iniciar(cpfUsuarioLogado);
 
             abrirHome();
         }

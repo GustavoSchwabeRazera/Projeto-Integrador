@@ -34,9 +34,23 @@ public class EmprestimoDAO {
     private final HistoricoDAO historicoDAO = new HistoricoDAO();
 
 
+    // Conexão separada para buscas em segundo plano (null = conexão compartilhada)
+    private final Connection conexaoPropria;
+
+    public EmprestimoDAO() {
+        this(null);
+    }
+
+    public EmprestimoDAO(Connection conexaoPropria) {
+        this.conexaoPropria = conexaoPropria;
+    }
+
+
     private Connection getConn() throws SQLException {
 
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = conexaoPropria != null
+                ? conexaoPropria
+                : ConnectionFactory.getConnection();
 
         // Cria as colunas se o banco foi montado antes delas existirem
         if (!colunasVerificadas) {

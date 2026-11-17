@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Image;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
@@ -33,6 +34,29 @@ final class IconeChat {
 
         if (naoLidas > 0) {
             desenharContador(g2, tamanho, naoLidas);
+        }
+
+        g2.dispose();
+
+        return new ImageIcon(imagem);
+    }
+
+
+    // Coloca o mesmo contador vermelho do chat em cima de outro ícone
+    static ImageIcon comContador(Image icone, int tamanho, int contador) {
+
+        BufferedImage imagem = new BufferedImage(tamanho, tamanho, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2 = imagem.createGraphics();
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+
+        g2.drawImage(icone, 0, 0, tamanho, tamanho, null);
+
+        if (contador > 0) {
+            desenharContador(g2, tamanho, contador);
         }
 
         g2.dispose();

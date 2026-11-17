@@ -55,6 +55,8 @@ public class tela_inicial extends JFrame {
     private JButton btnChat;
     private JButton btnSair;
     private int naoLidasChat = 0;
+    private int notificacoesNovas = 0;
+    private Image imagemSino;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -102,7 +104,8 @@ public class tela_inicial extends JFrame {
         btnCalendario = botaoIcone(icone("/imagens/calendario.png", TAMANHO_ICONE), "Calendário");
         // Sem ActionListener aqui: o LivroController é quem registra as ações.
         btnChat = botaoIcone(IconeChat.criar(TAMANHO_ICONE, 0), "Chat");
-        btnNotificacao = botaoIcone(icone("/imagens/notificacao.png", TAMANHO_ICONE), "Notificações");
+        imagemSino = new ImageIcon(tela_inicial.class.getResource("/imagens/notificacao.png")).getImage();
+        btnNotificacao = botaoIcone(IconeChat.comContador(imagemSino, TAMANHO_ICONE, 0), "Notificações");
         btnPerfil = botaoIcone(icone("/imagens/perfil3.png", TAMANHO_FOTO), "Perfil");
 
         atalhos.add(btnCalendario);
@@ -301,6 +304,15 @@ public class tela_inicial extends JFrame {
         if (naoLidas != naoLidasChat) {
             naoLidasChat = naoLidas;
             btnChat.setIcon(IconeChat.criar(TAMANHO_ICONE, naoLidas));
+        }
+    }
+
+    // Mostra no sino quantas notificações novas ainda não foram vistas
+    public void atualizarNotificacoesNovas(int novas) {
+
+        if (novas != notificacoesNovas) {
+            notificacoesNovas = novas;
+            btnNotificacao.setIcon(IconeChat.comContador(imagemSino, TAMANHO_ICONE, novas));
         }
     }
 
