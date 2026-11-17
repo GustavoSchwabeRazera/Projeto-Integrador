@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.function.Consumer;
 
 
 import View.JanelaMensagem;
@@ -23,6 +24,9 @@ public class SolicitacaoController {
     // Usuário cujas solicitações (recebidas e enviadas) estão na tela
     private String cpfUsuario;
 
+    // Abre o chat com quem pediu o livro (quem decide a tela é o LivroController)
+    private Consumer<Solicitacao> aoConversar = s -> { };
+
 
     public SolicitacaoController(
             EmprestimoDAO emprestimoDAO,
@@ -34,6 +38,12 @@ public class SolicitacaoController {
         telaSolicitacoes.setAoAceitar(this::aceitarSolicitacao);
 
         telaSolicitacoes.setAoRecusar(this::recusarSolicitacao);
+    }
+
+
+    public void setAoConversar(Consumer<Solicitacao> aoConversar) {
+
+        this.aoConversar = aoConversar;
     }
 
 
@@ -72,6 +82,8 @@ public class SolicitacaoController {
 
 
     public void aceitarSolicitacao(Solicitacao solicitacao) {
+
+        boolean abrirChat = false;
 
         try {
 
@@ -122,15 +134,18 @@ public class SolicitacaoController {
 
             emprestimoDAO.aceitar(solicitacao, retirada, retorno);
 
-            mostrarMensagem(
+            // Primeiro botão abre o chat; "OK" (o padrão) só fecha
+            abrirChat = JanelaMensagem.escolher(
                     "Solicitação aceita!\n"
                     + "Entregue o livro em " + retirada.format(FORMATO_DATA)
                     + " e receba de volta em " + retorno.format(FORMATO_DATA) + ".\n"
                     + "As datas já estão no seu calendário.\n"
                     + "Combine a entrega com " + solicitacao.getNomeSolicitante()
-                    + ":\n" + solicitacao.getEmailSolicitante()
-                    + "  |  " + solicitacao.getTelefoneSolicitante()
-            );
+                    + " pelo chat.",
+                    "Sucesso",
+                    null,
+                    "Abrir chat", "OK"
+            ) == 0;
 
         } catch (SQLException e) {
 
@@ -142,6 +157,10 @@ public class SolicitacaoController {
         }
 
         carregarSolicitacoes();
+
+        if (abrirChat) {
+            aoConversar.accept(solicitacao);
+        }
     }
 
 

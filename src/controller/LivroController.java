@@ -263,6 +263,8 @@ public class LivroController {
 
         telaSolicitacoes.setAoConversar(s -> abrirChatCom(s.getCpfSolicitante()));
 
+        solicitacaoController.setAoConversar(s -> abrirChatCom(s.getCpfSolicitante()));
+
 
         // --- NOTIFICAÇÕES ---
 
