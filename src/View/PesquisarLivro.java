@@ -245,7 +245,7 @@ public class PesquisarLivro extends JFrame {
             if (dono != null) {
                 nomeDono = dono[0];
                 emailDono = dono[1];
-                telefoneDono = dono[2];
+                telefoneDono = Telefone.formatar(dono[2]);
             }
         } catch (Exception e) {
             e.printStackTrace();

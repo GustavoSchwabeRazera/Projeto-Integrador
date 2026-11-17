@@ -310,7 +310,7 @@ public class TelaSolicitacoes extends JFrame {
         adicionarPeriodo(informacoes, s, "cell 0 1");
 
         JLabel lblContato = new JLabel(
-            s.getEmailSolicitante() + "   •   " + s.getTelefoneSolicitante()
+            s.getEmailSolicitante() + "   •   " + Telefone.formatar(s.getTelefoneSolicitante())
         );
         lblContato.setForeground(new Color(60, 60, 60));
         lblContato.setFont(new Font("Tahoma", Font.PLAIN, 15));

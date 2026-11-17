@@ -851,7 +851,7 @@ public class Perfil extends JFrame {
 		);
 
 		lblTelefone.setText(
-				"Telefone:   " + telefone
+				"Telefone:   " + Telefone.formatar(telefone)
 		);
 
 		lblDataDeNascimento.setText(

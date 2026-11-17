@@ -3,6 +3,7 @@ package controller;
 import java.sql.SQLException;
 
 
+import View.Telefone;
 import View.JanelaMensagem;
 import View.Perfil;
 import View.TelaAlterar;
@@ -134,7 +135,7 @@ public class PerfilController {
 
                 
                 alterarCadastro.getTxtTelefone()
-                        .setText(dados[3]);
+                        .setText(Telefone.formatar(dados[3]));
 
             
                 alterarCadastro.getTxtDataNascimento()

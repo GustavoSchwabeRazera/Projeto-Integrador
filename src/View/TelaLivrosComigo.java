@@ -200,7 +200,7 @@ public class TelaLivrosComigo extends JFrame {
         JLabel lblDono = new JLabel(
             "Livro de " + emprestimo.getNomeDono()
             + "   •   " + emprestimo.getEmailDono()
-            + "   •   " + emprestimo.getTelefoneDono()
+            + "   •   " + Telefone.formatar(emprestimo.getTelefoneDono())
         );
         lblDono.setForeground(new Color(60, 60, 60));
         lblDono.setFont(new Font("Tahoma", Font.PLAIN, 15));
