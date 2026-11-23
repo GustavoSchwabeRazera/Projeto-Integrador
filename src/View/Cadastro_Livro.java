@@ -115,21 +115,8 @@ public class Cadastro_Livro extends JFrame {
 
 
 
-        btnVoltar = new JButton("");
+        btnVoltar = new BotaoVerde("Voltar");
 
-        btnVoltar.setIcon(
-                new ImageIcon(Cadastro_Livro.class.getResource("/imagens/Voltar.png"))
-        );
-
-        btnVoltar.setFont(new Font("Tahoma", Font.PLAIN, 28));
-
-        btnVoltar.setForeground(new Color(10, 86, 27));
-
-        btnVoltar.setBorderPainted(false);
-
-        btnVoltar.setContentAreaFilled(false);
-
-        btnVoltar.setFocusPainted(false);
 
         contentPane.add(btnVoltar, "cell 0 0,alignx left,aligny top");
 
@@ -151,7 +138,7 @@ public class Cadastro_Livro extends JFrame {
 
         lblTituloTela = new JLabel("Cadastro de Livros:");
 
-        lblTituloTela.setForeground(new Color(10, 86, 27));
+        lblTituloTela.setForeground(Cores.VERDE);
 
         lblTituloTela.setFont(new Font("Tahoma", Font.BOLD, 48));
 
@@ -163,7 +150,7 @@ public class Cadastro_Livro extends JFrame {
 
         panel.setForeground(Color.WHITE);
 
-        panel.setBackground(new Color(10, 86, 27));
+        panel.setBackground(Cores.VERDE);
 
         panel.setOpaque(false);
 
@@ -180,7 +167,7 @@ public class Cadastro_Livro extends JFrame {
 
         JLabel lblTitulo = new JLabel("TÍTULO DO LIVRO:");
 
-        lblTitulo.setForeground(new Color(10, 86, 27));
+        lblTitulo.setForeground(Cores.VERDE);
 
         lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -196,7 +183,7 @@ public class Cadastro_Livro extends JFrame {
         txtNome.setColumns(10);
 
         txtNome.setBorder(
-                BorderFactory.createLineBorder(new Color(10, 86, 27), 2)
+                BorderFactory.createLineBorder(Cores.VERDE, 2)
         );
 
         panel.add(txtNome, "cell 2 2,growx,h 42!");
@@ -205,7 +192,7 @@ public class Cadastro_Livro extends JFrame {
 
         JLabel lblEditora = new JLabel("EDITORA:");
 
-        lblEditora.setForeground(new Color(10, 86, 27));
+        lblEditora.setForeground(Cores.VERDE);
 
         lblEditora.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -221,7 +208,7 @@ public class Cadastro_Livro extends JFrame {
         txtEditora.setColumns(10);
 
         txtEditora.setBorder(
-                BorderFactory.createLineBorder(new Color(10, 86, 27), 2)
+                BorderFactory.createLineBorder(Cores.VERDE, 2)
         );
 
         panel.add(txtEditora, "cell 2 5,growx,height 42!");
@@ -230,7 +217,7 @@ public class Cadastro_Livro extends JFrame {
 
         JLabel lblAno = new JLabel("ANO DE LANÇAMENTO:");
 
-        lblAno.setForeground(new Color(10, 86, 27));
+        lblAno.setForeground(Cores.VERDE);
 
         lblAno.setFont(new Font("Tahoma", Font.BOLD, 30));
 
@@ -246,7 +233,7 @@ public class Cadastro_Livro extends JFrame {
         txtAno.setColumns(10);
 
         txtAno.setBorder(
-                BorderFactory.createLineBorder(new Color(10, 86, 27), 2)
+                BorderFactory.createLineBorder(Cores.VERDE, 2)
         );
 
         panel.add(txtAno, "cell 2 8,growx,h 42!");
@@ -255,7 +242,7 @@ public class Cadastro_Livro extends JFrame {
 
         JLabel lblAutor = new JLabel("AUTOR:");
 
-        lblAutor.setForeground(new Color(10, 86, 27));
+        lblAutor.setForeground(Cores.VERDE);
 
         lblAutor.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -273,7 +260,7 @@ public class Cadastro_Livro extends JFrame {
 
         JLabel lblGenero = new JLabel("GÊNERO:");
 
-        lblGenero.setForeground(new Color(10, 86, 27));
+        lblGenero.setForeground(Cores.VERDE);
 
         lblGenero.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -286,12 +273,12 @@ public class Cadastro_Livro extends JFrame {
 
         comboBox.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        comboBox.setForeground(new Color(10, 89, 27));
+        comboBox.setForeground(Cores.VERDE);
 
         comboBox.setBackground(Color.WHITE);
 
         comboBox.setBorder(
-                BorderFactory.createLineBorder(new Color(10, 86, 27), 2)
+                BorderFactory.createLineBorder(Cores.VERDE, 2)
         );
 
         comboBox.setModel(new DefaultComboBoxModel<>(Generos.values()));
@@ -302,7 +289,7 @@ public class Cadastro_Livro extends JFrame {
 
         JLabel lblISBN = new JLabel("ISBN:");
 
-        lblISBN.setForeground(new Color(10, 86, 27));
+        lblISBN.setForeground(Cores.VERDE);
 
         lblISBN.setFont(new Font("Tahoma", Font.BOLD, 30));
 
@@ -316,7 +303,7 @@ public class Cadastro_Livro extends JFrame {
         textField.setColumns(10);
 
         textField.setBorder(
-                BorderFactory.createLineBorder(new Color(10, 86, 27), 2)
+                BorderFactory.createLineBorder(Cores.VERDE, 2)
         );
 
         panel.add(textField, "cell 2 18,growx,height 42!");
@@ -331,15 +318,7 @@ public class Cadastro_Livro extends JFrame {
 
 
 
-        botaoCadastrar = new JButton("");
-
-        botaoCadastrar.setContentAreaFilled(false);
-
-        botaoCadastrar.setBorderPainted(false);
-
-        botaoCadastrar.setIcon(
-                new ImageIcon(Cadastro_Livro.class.getResource("/imagens/BotaoCerto.png"))
-        );
+        botaoCadastrar = new BotaoVerde("Cadastrar", 260, 52);
 
         panel.add(botaoCadastrar, "cell 2 20");
 

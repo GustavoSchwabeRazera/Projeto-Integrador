@@ -17,7 +17,7 @@ public class RoundedButton extends JButton {
 
         setForeground(Color.WHITE);
 
-        setBackground(new Color(10, 86, 27));
+        setBackground(Cores.VERDE);
 
         setFont(
             new Font(
@@ -45,7 +45,7 @@ public class RoundedButton extends JButton {
         );
 
         g2.setColor(
-            new Color(10, 86, 27)
+            Cores.VERDE
         );
 
         g2.fillRoundRect(

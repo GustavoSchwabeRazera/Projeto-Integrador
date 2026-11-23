@@ -112,7 +112,7 @@ public class TelaLogin extends JFrame {
 
 		JLabel lblTitulo = new JLabel("Bem-vindo!");
 
-		lblTitulo.setForeground(new Color(20, 90, 40));
+		lblTitulo.setForeground(Cores.VERDE);
 		lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 34));
 
 		panelLogin.add(lblTitulo, "cell 0 1,align center");
@@ -184,8 +184,8 @@ public class TelaLogin extends JFrame {
 		// BOTÃO ENTRAR
 		// ======================================
 
-		Color verde = new Color(24, 125, 45);
-		Color hover = new Color(16, 100, 35);
+		Color verde = Cores.VERDE;
+		Color hover = Cores.VERDE_HOVER;
 
 		botaoCadastrar = new JButton("Entrar");
 		botaoCadastrar.setBorderPainted(false);
@@ -193,10 +193,10 @@ public class TelaLogin extends JFrame {
 		botaoCadastrar.setBackground(verde);
 		botaoCadastrar.setForeground(Color.WHITE);
 		botaoCadastrar.setFocusPainted(false);
-		botaoCadastrar.setBorder(new LineBorder(new Color(24,125,45), 1, true));
+		botaoCadastrar.setBorder(new LineBorder(Cores.VERDE, 1, true));
 		botaoCadastrar.setFont(new Font("Segoe UI", Font.BOLD, 18));
 		botaoCadastrar.setBorder(
-			    BorderFactory.createLineBorder(new Color(24,125,45), 2, true)
+			    BorderFactory.createLineBorder(Cores.VERDE, 2, true)
 			);
 		
 
@@ -243,7 +243,7 @@ public class TelaLogin extends JFrame {
 		
 		
 			
-		lblCadastro.setForeground(new Color(24, 125, 45));
+		lblCadastro.setForeground(Cores.VERDE);
 		lblCadastro.setFont(new Font("Segoe UI", Font.BOLD, 15));
 
 		panelLogin.add(lblCadastro, "cell 0 10,alignx center");

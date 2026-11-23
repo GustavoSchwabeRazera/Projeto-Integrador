@@ -53,7 +53,7 @@ public class TelaMeusLivros extends JFrame {
 	private static final String FILTRO_EMPRESTADOS = "Emprestados";
 
 	// Mesmas cores dos cartões de Livros Comigo
-	private static final Color VERDE_PAINEL = new Color(36, 107, 45);
+	private static final Color VERDE_PAINEL = Cores.VERDE;
 	private static final Color VERDE_BOTAO = new Color(114, 219, 145);
 	private static final Color TEXTO_SUAVE = new Color(60, 60, 60);
 	private static final Color VERMELHO = new Color(140, 20, 20);
@@ -147,13 +147,7 @@ public class TelaMeusLivros extends JFrame {
 				"[][][grow][grow][grow][grow][grow][grow][grow][grow]"));
 
 		// BOTÃO HOME
-		btnHome = new JButton("");
-		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
-		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-		btnHome.setForeground(Cores.VERDE);
-		btnHome.setBorderPainted(false);
-		btnHome.setContentAreaFilled(false);
-		btnHome.setFocusPainted(false);
+		btnHome = new BotaoVerde("Voltar");
 		btnHome.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
@@ -662,7 +656,7 @@ public class TelaMeusLivros extends JFrame {
 		g2.fillRect(0, 0, largura, altura);
 
 		// Borda verde
-		g2.setColor(new Color(10, 86, 27));
+		g2.setColor(Cores.VERDE);
 		g2.drawRect(0, 0, largura - 1, altura - 1);
 
 		// "?" grande no meio

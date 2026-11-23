@@ -137,21 +137,12 @@ public class TelaSolicitacoes extends JFrame {
         // BOTÃO HOME
         // =====================================================
 
-        btnHome = new JButton("");
+        btnHome = new BotaoVerde("Voltar");
 		btnHome.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
 
-		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
-
-		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-
-		btnHome.setForeground(new Color(10, 86, 27));
-
-		btnHome.setBorderPainted(false);
-		btnHome.setContentAreaFilled(false);
-		btnHome.setFocusPainted(false);
 
 		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
         
@@ -167,7 +158,7 @@ public class TelaSolicitacoes extends JFrame {
         JLabel lblSolicitacoes = new JLabel("Solicitações");
 
         lblSolicitacoes.setForeground(
-            new Color(10, 86, 27)
+            Cores.VERDE
         );
 
         lblSolicitacoes.setFont(
@@ -215,7 +206,7 @@ public class TelaSolicitacoes extends JFrame {
             new MigLayout("insets 0", "[0:0:,grow,fill]", "[]12[0:0:,grow,fill]"),
             40
         );
-        coluna.setForeground(new Color(10, 86, 27));
+        coluna.setForeground(Cores.VERDE);
         coluna.setBorder(BorderFactory.createEmptyBorder(22, 25, 22, 25));
 
         JLabel lblTitulo = new JLabel(titulo);
@@ -357,7 +348,7 @@ public class TelaSolicitacoes extends JFrame {
         }
 
         JLabel lblPeriodo = new JLabel(periodo);
-        lblPeriodo.setForeground(new Color(19, 74, 38));
+        lblPeriodo.setForeground(Cores.VERDE);
         lblPeriodo.setFont(new Font("Tahoma", Font.BOLD, 15));
         informacoes.add(lblPeriodo, posicao);
     }

@@ -459,21 +459,12 @@ public class Perfil extends JFrame {
 		// BOTÃO HOME - DIMINUÍDO
 		// =========================================================
 
-		btnHome = new JButton("");
+		btnHome = new BotaoVerde("Voltar");
 		btnHome.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
 
-		btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
-
-		btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-
-		btnHome.setForeground(new Color(10, 86, 27));
-
-		btnHome.setBorderPainted(false);
-		btnHome.setContentAreaFilled(false);
-		btnHome.setFocusPainted(false);
 
 		contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
@@ -547,7 +538,7 @@ public class Perfil extends JFrame {
 				new JLabel("Informações:");
 
 		lblPerfil.setForeground(
-				new Color(19, 74, 38)
+				Cores.VERDE
 		);
 
 		lblPerfil.setFont(
@@ -571,7 +562,7 @@ public class Perfil extends JFrame {
 				new JLabel("Foto de perfil:");
 
 		lblFotoPerfilText.setForeground(
-				new Color(19, 74, 38)
+				Cores.VERDE
 		);
 
 		lblFotoPerfilText.setFont(
@@ -624,7 +615,7 @@ public class Perfil extends JFrame {
 				);
 
 		panelDados.setBackground(
-				new Color(25, 90, 45)
+				Cores.VERDE
 		);
 
 		// Nome

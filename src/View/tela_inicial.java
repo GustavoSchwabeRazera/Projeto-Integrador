@@ -37,8 +37,8 @@ public class tela_inicial extends JFrame {
     private static final int TAMANHO_ICONE = 44;
     private static final int TAMANHO_FOTO = 60;
 
-    private static final Color VERDE_ESCURO = new Color(10, 86, 27);
-    private static final Color VERDE_TEXTO = new Color(40, 90, 50);
+    private static final Color VERDE_ESCURO = Cores.VERDE;
+    private static final Color VERDE_TEXTO = Cores.VERDE;
     private static final String FONTE = "Segoe UI";
 
     private JPanel contentPane;

@@ -26,7 +26,7 @@ CREATE TABLE Livros
     data_lancamento DATE NOT NULL,
     editora VARCHAR(50),
     generos VARCHAR(50),
-    FOREIGN KEY (CPF_dono) REFERENCES Usuarios(CPF)
+    FOREIGN KEY (CPF_dono) REFERENCES Usuarios(CPF) 
 );
 
 -- Tabela de autores

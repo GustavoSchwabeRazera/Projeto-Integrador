@@ -120,21 +120,8 @@ public class Lista_Autores extends JFrame {
         // BOTÃO VOLTAR
         // =====================================================
 
-        btnVoltar = new JButton("");
+        btnVoltar = new BotaoVerde("Voltar");
 
-        btnVoltar.setIcon(
-                new ImageIcon(Lista_Autores.class.getResource("/imagens/Voltar.png"))
-        );
-
-        btnVoltar.setFont(new Font("Tahoma", Font.PLAIN, 28));
-
-        btnVoltar.setForeground(new Color(10, 86, 27));
-
-        btnVoltar.setBorderPainted(false);
-
-        btnVoltar.setContentAreaFilled(false);
-
-        btnVoltar.setFocusPainted(false);
 
         // Fecha a lista e volta para o cadastro de livro
         btnVoltar.addActionListener(
@@ -154,7 +141,7 @@ public class Lista_Autores extends JFrame {
                 );
 
         titulo.setForeground(
-                new Color(10, 86, 27)
+                Cores.VERDE
         );
 
         titulo.setFont(
@@ -198,7 +185,7 @@ public class Lista_Autores extends JFrame {
         );
 
         listaAutores.setForeground(
-                new Color(10, 86, 27)
+                Cores.VERDE
         );
 
         listaAutores.setBackground(

@@ -19,6 +19,11 @@ public class BotaoVerde extends JButton {
 
     private static final int ARCO = 22;
 
+    // Tamanho padrão do botão "Voltar" que fica no canto das telas
+    public BotaoVerde(String texto) {
+        this(texto, 130, 46);
+    }
+
     public BotaoVerde(String texto, int largura, int altura) {
 
         super(texto);

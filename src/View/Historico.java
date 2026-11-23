@@ -37,7 +37,7 @@ public class Historico extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Color VERDE_ESCURO = new Color(10, 86, 27);
+	private static final Color VERDE_ESCURO = Cores.VERDE;
 	private static final Color VERDE_CLARO = Cores.FUNDO;
 	private static final DateTimeFormatter FORMATO_DATA =
 			DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
@@ -129,13 +129,10 @@ public class Historico extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new MigLayout("", "[307.00,grow][300.00,grow][grow][338.00,grow][322.00,grow]", "[][][grow][grow][grow]"));
 
-		 btnHome = new JButton("");
+		 btnHome = new BotaoVerde("Voltar");
 		 btnHome.setFocusable(false);
 		 btnHome.setFocusTraversalKeysEnabled(false);
 		btnHome.setDefaultCapable(false);
-		btnHome.setBorderPainted(false);
-		btnHome.setContentAreaFilled(false);
-		btnHome.setIcon(new ImageIcon(Historico.class.getResource("/imagens/casa 1.png")));
 		btnHome.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}

@@ -44,7 +44,7 @@ public class TelaNotificacoes extends JFrame {
     // Cada tipo de notificação tem sua etiqueta colorida
     private enum Tipo {
         SOLICITACAO("Solicitação", new Color(33, 99, 178)),
-        EMPRESTIMO("Empréstimo", new Color(30, 125, 60)),
+        EMPRESTIMO("Empréstimo", Cores.VERDE),
         PRAZO("Prazo", new Color(176, 96, 0)),
         ATRASO("Atrasado", new Color(176, 32, 32)),
         DEVOLUCAO("Devolução", new Color(106, 61, 160));
@@ -121,16 +121,7 @@ public class TelaNotificacoes extends JFrame {
         );
 
         // BOTÃO HOME
-        btnHome = new JButton("");
-        btnHome.setPreferredSize(new Dimension(50, 50));
-        ImageIcon iconeHome = new ImageIcon(TelaNotificacoes.class.getResource("/imagens/casa 1.png"));
-        Image imagemHome = iconeHome.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
-        btnHome.setIcon(new ImageIcon(imagemHome));
-        btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-        btnHome.setForeground(new Color(10, 86, 27));
-        btnHome.setBorderPainted(false);
-        btnHome.setContentAreaFilled(false);
-        btnHome.setFocusPainted(false);
+        btnHome = new BotaoVerde("Voltar");
         btnHome.setCursor(new Cursor(Cursor.HAND_CURSOR));
         contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
@@ -141,7 +132,7 @@ public class TelaNotificacoes extends JFrame {
 
         // TÍTULO
         JLabel lblNotificacoes = new JLabel("Notificações");
-        lblNotificacoes.setForeground(new Color(10, 86, 27));
+        lblNotificacoes.setForeground(Cores.VERDE);
         lblNotificacoes.setFont(new Font("Tahoma", Font.BOLD, 34));
         contentPane.add(lblNotificacoes, "cell 0 2 5 1,alignx center");
 
@@ -149,8 +140,8 @@ public class TelaNotificacoes extends JFrame {
         RoundedPanel painelNotificacoes = new RoundedPanel(
             new MigLayout("insets 0", "[0:0:,grow,fill]", "[0:0:,grow,fill]"), 40
         );
-        painelNotificacoes.setForeground(new Color(10, 86, 27));
-        painelNotificacoes.setBackground(new Color(36, 107, 45));
+        painelNotificacoes.setForeground(Cores.VERDE);
+        painelNotificacoes.setBackground(Cores.VERDE);
         painelNotificacoes.setBorder(BorderFactory.createEmptyBorder(30, 35, 30, 35));
         contentPane.add(painelNotificacoes, "cell 0 3 5 8,grow");
 

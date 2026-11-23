@@ -73,13 +73,7 @@ public class PesquisarLivro extends JFrame {
         );
  
         // ===== BOTÃO HOME =====
-        btnHome = new JButton("");
-        btnHome.setIcon(new ImageIcon(TelaMeusLivros.class.getResource("/imagens/casa 1.png")));
-        btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-        btnHome.setForeground(new Color(10, 86, 27));
-        btnHome.setBorderPainted(false);
-        btnHome.setContentAreaFilled(false);
-        btnHome.setFocusPainted(false);
+        btnHome = new BotaoVerde("Voltar");
         btnHome.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             }
@@ -88,7 +82,7 @@ public class PesquisarLivro extends JFrame {
  
         // ===== TÍTULO (centralizado) =====
         JLabel lblNewLabel = new JLabel("Pesquisar Livros");
-        lblNewLabel.setForeground(new Color(10, 86, 27));
+        lblNewLabel.setForeground(Cores.VERDE);
         lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
         lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 51));
         contentPane.add(lblNewLabel, "cell 0 1 5 1,alignx center");
@@ -123,7 +117,7 @@ public class PesquisarLivro extends JFrame {
         // Cores verdes iguais ao resto do projeto
         tabelaLivros.setBackground(Cores.FUNDO);
         tabelaLivros.setForeground(new Color(30, 30, 30));
-        tabelaLivros.setGridColor(new Color(24, 125, 45));
+        tabelaLivros.setGridColor(Cores.VERDE);
         tabelaLivros.setSelectionBackground(new Color(114, 219, 145));
         tabelaLivros.setSelectionForeground(Color.BLACK);
         tabelaLivros.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -165,11 +159,11 @@ public class PesquisarLivro extends JFrame {
             public Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, false, false, row, column);
-                setBackground(new Color(10, 86, 27));
+                setBackground(Cores.VERDE);
                 setForeground(Color.WHITE);
                 setFont(new Font("Tahoma", Font.BOLD, 16));
                 setHorizontalAlignment(SwingConstants.CENTER);
-                setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(24, 125, 45)));
+                setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Cores.VERDE));
                 return this;
             }
         });
@@ -188,7 +182,7 @@ public class PesquisarLivro extends JFrame {
 
         scrollLivros = new JScrollPane(tabelaLivros);
         scrollLivros.getViewport().setBackground(Cores.FUNDO);
-        scrollLivros.setBorder(BorderFactory.createLineBorder(new Color(10, 86, 27), 2));
+        scrollLivros.setBorder(BorderFactory.createLineBorder(Cores.VERDE, 2));
         scrollLivros.setVisible(false); // só aparece depois de pesquisar
         contentPane.add(scrollLivros, "cell 0 4 5 3,grow");
     }

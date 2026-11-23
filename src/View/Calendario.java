@@ -134,11 +134,7 @@ public class Calendario extends JFrame {
         // BOTÃO HOME
         // =====================================================
 
-        btnHome = new JButton("");
-        btnHome.setIcon(new ImageIcon(Calendario.class.getResource("/imagens/casa 1.png")));
-        btnHome.setBorderPainted(false);
-        btnHome.setContentAreaFilled(false);
-        btnHome.setFocusPainted(false);
+        btnHome = new BotaoVerde("Voltar");
         contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
         // =====================================================

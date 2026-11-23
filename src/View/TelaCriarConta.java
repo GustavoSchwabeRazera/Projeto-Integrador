@@ -147,7 +147,7 @@ public class TelaCriarConta extends JFrame {
         // ======================================
 
         JLabel lblTitulo = new JLabel("Criar sua conta");
-        lblTitulo.setForeground(new Color(20, 90, 40));
+        lblTitulo.setForeground(Cores.VERDE);
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 30));
         panelCadastro.add(lblTitulo, "cell 0 1,align center");
 
@@ -280,8 +280,8 @@ public class TelaCriarConta extends JFrame {
         // BOTÃO CADASTRAR
         // ======================================
 
-        Color verde = new Color(24, 125, 45);
-        Color hover = new Color(16, 100, 35);
+        Color verde = Cores.VERDE;
+        Color hover = Cores.VERDE_HOVER;
 
         botaoCadastrar = new JButton("Cadastrar");
         botaoCadastrar.setBackground(verde);
@@ -289,7 +289,7 @@ public class TelaCriarConta extends JFrame {
         botaoCadastrar.setFocusPainted(false);
         botaoCadastrar.setBorderPainted(false);
         botaoCadastrar.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        botaoCadastrar.setBorder(BorderFactory.createLineBorder(new Color(24, 125, 45), 2, true));
+        botaoCadastrar.setBorder(BorderFactory.createLineBorder(Cores.VERDE, 2, true));
 
         botaoCadastrar.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -319,7 +319,7 @@ public class TelaCriarConta extends JFrame {
         // ======================================
 
         botaoEntrar = new JButton("<HTML><U>Entrar</U></HTML>");
-        botaoEntrar.setForeground(new Color(24, 125, 45));
+        botaoEntrar.setForeground(Cores.VERDE);
         botaoEntrar.setFont(new Font("Segoe UI", Font.BOLD, 15));
         botaoEntrar.setBorderPainted(false);
         botaoEntrar.setContentAreaFilled(false);

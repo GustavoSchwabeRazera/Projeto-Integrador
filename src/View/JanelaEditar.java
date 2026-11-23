@@ -98,28 +98,11 @@ public class JanelaEditar extends JFrame {
 
 
         // Botão Salvar
-        btnSalvar = new JButton("");
-        btnSalvar.setContentAreaFilled(false);
-        btnSalvar.setBorderPainted(false);
-
-        // Carrega a imagem original
-        ImageIcon iconeOriginal = new ImageIcon(
-            JanelaEditar.class.getResource("/imagens/SalvarAlteracao.png")
-        );
-
-        // Diminui somente a imagem
-        Image imagem = iconeOriginal.getImage().getScaledInstance(
-            175, 75, Image.SCALE_SMOOTH
-        );
-
-        btnSalvar.setIcon(new ImageIcon(imagem));
-
+        btnSalvar = new BotaoVerde("Salvar Alterações", 220, 50);
         btnSalvar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             }
         });
-
-        btnSalvar.setFont(new Font("Tahoma", Font.BOLD, 14));
 
         contentPane.add(
             btnSalvar,

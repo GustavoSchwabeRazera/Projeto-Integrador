@@ -95,13 +95,7 @@ public class TelaLivrosComigo extends JFrame {
         );
 
         // BOTÃO HOME
-        btnHome = new JButton("");
-        btnHome.setIcon(new ImageIcon(TelaLivrosComigo.class.getResource("/imagens/casa 1.png")));
-        btnHome.setFont(new Font("Tahoma", Font.PLAIN, 28));
-        btnHome.setForeground(new Color(10, 86, 27));
-        btnHome.setBorderPainted(false);
-        btnHome.setContentAreaFilled(false);
-        btnHome.setFocusPainted(false);
+        btnHome = new BotaoVerde("Voltar");
         btnHome.setCursor(new Cursor(Cursor.HAND_CURSOR));
         contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 
@@ -112,7 +106,7 @@ public class TelaLivrosComigo extends JFrame {
 
         // TÍTULO
         JLabel lblTitulo = new JLabel("Livros Comigo");
-        lblTitulo.setForeground(new Color(10, 86, 27));
+        lblTitulo.setForeground(Cores.VERDE);
         lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 34));
         contentPane.add(lblTitulo, "cell 0 1 5 1,alignx center");
 
@@ -120,7 +114,7 @@ public class TelaLivrosComigo extends JFrame {
         RoundedPanel painelLivros = new RoundedPanel(
             new MigLayout("insets 0", "[grow]", "[grow]"), 40
         );
-        painelLivros.setBackground(new Color(36, 107, 45));
+        painelLivros.setBackground(Cores.VERDE);
         painelLivros.setBorder(BorderFactory.createEmptyBorder(30, 35, 30, 35));
         contentPane.add(painelLivros, "cell 0 2 5 8,grow");
 
@@ -211,7 +205,7 @@ public class TelaLivrosComigo extends JFrame {
         lblPrazo.setForeground(
             !emprestimo.isDevolucaoSolicitada() && emprestimo.getDiasRestantes() < 0
                 ? new Color(140, 20, 20)
-                : new Color(10, 86, 27)
+                : Cores.VERDE
         );
         informacoes.add(lblPrazo, "cell 0 2");
 

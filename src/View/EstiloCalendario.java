@@ -16,8 +16,8 @@ import com.toedter.calendar.JDayChooser;
 // campo de data com calendário (usado ao escolher as datas do empréstimo)
 public final class EstiloCalendario {
 
-    public static final Color VERDE_ESCURO = new Color(19, 74, 38);   // textos
-    public static final Color VERDE_PAINEL = new Color(25, 90, 45);   // fundo do calendário
+    public static final Color VERDE_ESCURO = Cores.VERDE;   // textos
+    public static final Color VERDE_PAINEL = Cores.VERDE;   // fundo do calendário
     public static final Color VERDE_BOTAO  = new Color(114, 219, 145); // dia selecionado
     public static final Color DOURADO      = new Color(240, 196, 80);  // domingos e dias marcados
 

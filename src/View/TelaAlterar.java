@@ -127,12 +127,8 @@ public class TelaAlterar extends JFrame {
         setContentPane(contentPane);
         contentPane.setLayout(new MigLayout("", "[231.00][1461.00px][242.00]", "[][925px]"));
         
-        btnVoltar = new JButton("");
+        btnVoltar = new BotaoVerde("Voltar");
        
-        btnVoltar.setBorderPainted(false);
-        btnVoltar.setFocusPainted(false);
-        btnVoltar.setContentAreaFilled(false);
-        btnVoltar.setIcon(new ImageIcon(TelaAlterar.class.getResource("/imagens/Voltar.png")));
         contentPane.add(btnVoltar, "cell 0 0");
 
         // ======================================
@@ -165,7 +161,7 @@ public class TelaAlterar extends JFrame {
         // ======================================
 
         JLabel lblTitulo = new JLabel("Alterar Cadastro:");
-        lblTitulo.setForeground(new Color(20, 90, 40));
+        lblTitulo.setForeground(Cores.VERDE);
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 30));
         panelCadastro.add(lblTitulo, "cell 0 1,align center");
 
@@ -299,8 +295,8 @@ public class TelaAlterar extends JFrame {
         // BOTÃO CADASTRAR
         // ======================================
 
-        Color verde = new Color(24, 125, 45);
-        Color hover = new Color(16, 100, 35);
+        Color verde = Cores.VERDE;
+        Color hover = Cores.VERDE_HOVER;
 
         botaoCadastrar = new JButton("Atualizar");
         botaoCadastrar.setBackground(verde);
@@ -308,7 +304,7 @@ public class TelaAlterar extends JFrame {
         botaoCadastrar.setFocusPainted(false);
         botaoCadastrar.setBorderPainted(false);
         botaoCadastrar.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        botaoCadastrar.setBorder(BorderFactory.createLineBorder(new Color(24, 125, 45), 2, true));
+        botaoCadastrar.setBorder(BorderFactory.createLineBorder(Cores.VERDE, 2, true));
 
         botaoCadastrar.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override

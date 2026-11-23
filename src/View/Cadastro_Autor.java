@@ -147,7 +147,7 @@ public Cadastro_Autor() {
             );
 
     titulo.setForeground(
-            new Color(10, 86, 27)
+            Cores.VERDE
     );
 
     titulo.setFont(
@@ -189,7 +189,7 @@ public Cadastro_Autor() {
             );
 
     lblNome.setForeground(
-            new Color(10, 86, 27)
+            Cores.VERDE
     );
 
     lblNome.setHorizontalAlignment(
@@ -223,7 +223,7 @@ public Cadastro_Autor() {
 
     txtNome.setBorder(
             BorderFactory.createLineBorder(
-                    new Color(10, 86, 27),
+                    Cores.VERDE,
                     2
             )
     );
@@ -241,7 +241,7 @@ public Cadastro_Autor() {
             );
 
     lblNacionalidade.setForeground(
-            new Color(10, 86, 27)
+            Cores.VERDE
     );
 
     lblNacionalidade.setHorizontalAlignment(
@@ -313,20 +313,7 @@ public Cadastro_Autor() {
 
 
 
-    botaoCadastrar =
-            new JButton("");
-
-    botaoCadastrar.setContentAreaFilled(false);
-
-    botaoCadastrar.setBorderPainted(false);
-
-    botaoCadastrar.setIcon(
-            new ImageIcon(
-                    Cadastro_Autor.class.getResource(
-                            "/imagens/BotaoCerto.png"
-                    )
-            )
-    );
+    botaoCadastrar = new BotaoVerde("Cadastrar", 260, 52);
 
     panel.add(
             botaoCadastrar,

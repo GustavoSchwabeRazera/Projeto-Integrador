@@ -39,8 +39,8 @@ public class TelaChat extends JFrame {
     private static final long serialVersionUID = 1L;
 
     private static final Color VERDE_FUNDO = Cores.FUNDO;
-    private static final Color VERDE_ESCURO = new Color(10, 86, 27);
-    private static final Color VERDE_PAINEL = new Color(36, 107, 45);
+    private static final Color VERDE_ESCURO = Cores.VERDE;
+    private static final Color VERDE_PAINEL = Cores.VERDE;
     private static final Color VERDE_BOTAO = new Color(114, 219, 145);
     private static final Color CINZA_BOLHA = new Color(232, 238, 234);
     private static final Color CINZA_TEXTO = new Color(60, 60, 60);
@@ -109,11 +109,7 @@ public class TelaChat extends JFrame {
                 "[200,grow][200,grow][200,grow][200,grow][200,grow]",
                 "[][][grow]"));
 
-        btnHome = new JButton("");
-        btnHome.setIcon(new ImageIcon(TelaChat.class.getResource("/imagens/casa 1.png")));
-        btnHome.setBorderPainted(false);
-        btnHome.setContentAreaFilled(false);
-        btnHome.setFocusPainted(false);
+        btnHome = new BotaoVerde("Voltar");
         btnHome.setCursor(new Cursor(Cursor.HAND_CURSOR));
         contentPane.add(btnHome, "cell 0 0,alignx left,aligny top");
 

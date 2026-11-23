@@ -38,7 +38,7 @@ public class TelaSobre extends JFrame {
     private static final long serialVersionUID = 1L;
 
     private static final String FONTE = "Segoe UI";
-    private static final Color VERDE_TEXTO = new Color(40, 90, 50);
+    private static final Color VERDE_TEXTO = Cores.VERDE;
     private static final Color TEXTO_CLARO = new Color(225, 245, 230);
 
     private static final String INSTITUICAO = "IFSC - Campus Gaspar";
@@ -73,10 +73,7 @@ public class TelaSobre extends JFrame {
         setContentPane(contentPane);
 
         // Botão de voltar para a tela inicial (a ação fica no Controller)
-        btnHome = new JButton(new ImageIcon(TelaSobre.class.getResource("/imagens/casa 1.png")));
-        btnHome.setContentAreaFilled(false);
-        btnHome.setBorderPainted(false);
-        btnHome.setFocusPainted(false);
+        btnHome = new BotaoVerde("Voltar");
         btnHome.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnHome.setToolTipText("Voltar para o início");
 
