@@ -54,7 +54,7 @@ public class MensagemDAO {
                 : ConnectionFactory.getConnection();
 
         // Cria a tabela se o banco MySQL foi montado antes dela existir
-        if (!tabelaVerificada && !ConnectionFactory.usaPostgres()) {
+        if (!tabelaVerificada) {
 
             try (PreparedStatement stmt = conn.prepareStatement(
                     "CREATE TABLE IF NOT EXISTS Mensagens ("

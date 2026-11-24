@@ -68,15 +68,6 @@ public class EmprestimoDAO {
 
     private void criarColunaSeFaltar(Connection conn, String tabela, String coluna) throws SQLException {
 
-        // O PostgreSQL já sabe pular a coluna que existe
-        if (ConnectionFactory.usaPostgres()) {
-            try (PreparedStatement alterar = conn.prepareStatement(
-                    "ALTER TABLE " + tabela + " ADD COLUMN IF NOT EXISTS " + coluna + " DATE NULL")) {
-                alterar.executeUpdate();
-            }
-            return;
-        }
-
         try (PreparedStatement stmt = conn.prepareStatement(
                 "SELECT 1 FROM information_schema.COLUMNS "
                 + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? "
